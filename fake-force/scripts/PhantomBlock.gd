@@ -3,8 +3,15 @@ extends RigidBody2D
 ##
 ## is_phantom = true  ：受幻觉影响（按 global_influence_strength 比例受力）
 ## is_phantom = false ：绝对方块（绝缘体），纹丝不动
+##
+## 方块为"无重力"悬浮物，在 x_min~x_max 范围内被幻觉力来回推动，
+## 玩家可踩其垫脚。视觉：幻灵=半透明蓝，绝对=实心橙。
 
 @export var is_phantom : bool = true
+@export var size_x : float = 100.0
+@export var size_y : float = 40.0
+@export var x_min : float = -INF
+@export var x_max : float = INF
 
 
 func _ready() -> void:
@@ -12,10 +19,30 @@ func _ready() -> void:
 
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
-	if not is_phantom:
-		return
-	var fake_accel : Vector2 = IllusionManager.get_current_fake_vector()
-	if fake_accel == Vector2.ZERO:
-		return
-	var strength : float = IllusionManager.global_influence_strength
-	state.apply_central_force(fake_accel * strength * mass)
+	if is_phantom:
+		var fake_accel : Vector2 = IllusionManager.get_current_fake_vector()
+		var k : float = IllusionManager.get_current_damping()
+		var strength : float = IllusionManager.global_influence_strength
+		# 幻觉力 + 阻尼（力 = m×a）
+		var f : Vector2 = fake_accel * strength * mass - k * state.linear_velocity * mass
+		state.apply_central_force(f)
+	# 漂移范围限制（无重力悬浮物的"边界"）
+	var p : Vector2 = state.transform.origin
+	var moved : bool = false
+	if p.x < x_min:
+		p.x = x_min
+		moved = true
+	elif p.x > x_max:
+		p.x = x_max
+		moved = true
+	if moved:
+		state.transform.origin = p
+		state.linear_velocity.x = 0.0
+
+
+func _draw() -> void:
+	var c : Color = Color(0.27, 0.53, 1.0, 0.5) if is_phantom else Color(1.0, 0.53, 0.0, 1.0)
+	var hx : float = size_x * 0.5
+	var hy : float = size_y * 0.5
+	draw_rect(Rect2(-hx, -hy, size_x, size_y), c)
+	draw_rect(Rect2(-hx, -hy, size_x, size_y), c.lightened(0.35), false, 2.0)

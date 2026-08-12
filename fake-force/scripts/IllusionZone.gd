@@ -1,29 +1,57 @@
 extends Area2D
 ## 幻觉区域（IllusionZone）
 ##
-## 策划案 v2.0 §5.5：四个参数全部作为 Area2D 导出变量，
-## 关卡设计师在 Inspector 直接调参，无需碰代码。
-## 进入区域的 IllusionGroup 物体（玩家/幻灵方块）受区域参数影响。
+## 策划案 v2.0 §5.5：G/η/k/ω 全部作为 Area2D 导出变量，Inspector 直接调参。
+## 幻觉场（决策2）：参考系不定时向某方向加速；玩家受到的幻觉力 = -a_ref（惯性力）。
+## 匀速间歇（coast）期间幻觉消失；G 值可每相位随机（g_random_enabled）。
+## 进入区域的 IllusionGroup 物体（玩家/幻灵方块）受其影响。
+
+const IllusionFieldScript := preload("res://scripts/IllusionField.gd")
 
 @export_group("幻觉参数")
-@export var g_value : float = 0.0
+@export var g_value : float = 0.8
 @export var eta : float = 1.0
-@export var damping : float = 0.5
+@export var damping : float = 0.6
 @export var omega : float = 0.0
-@export var direction : Vector2 = Vector2.LEFT
+
+@export_group("幻觉场")
+@export var field_mode : int = 1                 # 0=CONSTANT 1=CYCLE 2=RANDOM
+@export var field_directions : Array = [Vector2.LEFT, Vector2.RIGHT]  # 参考系加速方向池
+@export var field_interval : float = 3.0         # 加速相位时长（秒）
+@export var field_coast : float = 3.0            # 匀速间歇时长（秒，0=无间歇）
+@export var field_jitter : float = 1.0           # 相位时长随机抖动（±秒）
+
+@export_group("强度随机")
+@export var g_random_enabled : bool = false
+@export var g_min : float = 0.6
+@export var g_max : float = 1.0
 
 var _occupants : int = 0
+var _field = IllusionFieldScript.new()
+var _current_g : float = 0.8
 
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	_current_g = g_value
+	_field.setup(field_mode, field_directions, field_interval, field_coast, field_jitter)
+
+
+func _physics_process(delta: float) -> void:
+	if _occupants <= 0:
+		return
+	# 参考系加速方向 → 幻觉力方向（反向）；匀速间歇时 a_dir=ZERO → 无幻觉
+	var a_dir : Vector2 = _field.update(delta)
+	if _field.switched_this_frame:
+		_roll_g()
+	IllusionManager.set_zone_params(_current_g, omega, eta, damping, -a_dir)
 
 
 func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("IllusionGroup"):
 		_occupants += 1
-		_apply_zone()
+		_field.reset()
 
 
 func _on_body_exited(body: Node2D) -> void:
@@ -31,9 +59,12 @@ func _on_body_exited(body: Node2D) -> void:
 		_occupants = maxi(_occupants - 1, 0)
 		if _occupants <= 0:
 			IllusionManager.reset_zone_params()
-		else:
-			_apply_zone()
 
 
-func _apply_zone() -> void:
-	IllusionManager.set_zone_params(g_value, omega, eta, damping, direction)
+func _roll_g() -> void:
+	if g_random_enabled and g_max > g_min:
+		_current_g = randf_range(g_min, g_max)
+	else:
+		_current_g = g_value
+
+

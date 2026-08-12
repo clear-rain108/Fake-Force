@@ -1,53 +1,88 @@
 extends CharacterBody2D
-## 玩家：核心移动逻辑（速度合成）
+## 玩家：核心移动逻辑（回归策划案 v2.0 §5.2，无重力）
 ##
-## 速度合成公式（策划案 v2.0 §5.2，物理层永不因洞察模式分支）：
-##   velocity += (input_dir * speed / eta + fake_force + damping_force + gravity) * delta
+## velocity += (input_dir * speed / η + fake_force + damping_force) * delta
 ##
-## 说明：
-## - eta / damping 由所在 IllusionZone 经 IllusionManager 提供，可被马赫尘埃调整
-## - 附加 max_speed / max_fall_speed 上限：阻尼=0 的"无阻力"环境下速度依然可控
-## - 洞察模式只切换 Engine.time_scale 与视觉层（箭头/星空定格），不修改物理计算
+## 设计决策落实：
+## - 决策1：不保留重力，所有力由幻觉区提供
+## - 决策2：幻觉力 = 系统不定时向某方向加速产生的惯性力（IllusionZone 驱动）
+## - 决策3：瞬时起跳——平台上轻点 W 触发一次跳跃（无持续喷气）
+## - 决策4：物理层永不因洞察模式分支
+## - 决策5：坠落 > 最大次数判定失败，按 R 重新挑战（可设存档点）
+## - 已确认：空中微重力（跳跃/悬空时小幅下落，落地即停）
 
 @export_group("移动参数")
-@export var speed : float = 800.0          # 输入推力（单位/秒²）
-@export var gravity : float = 500.0        # 基础重力（非幻觉参数）
-@export var max_speed : float = 500.0      # 横向 / 上升速度上限
-@export var max_fall_speed : float = 900.0 # 最大下落速度
+@export var speed : float = 200.0          # 输入推力（单位/秒²）
+@export var jump_velocity : float = 380.0  # 瞬时起跳初速（向上）
+@export var jump_gravity : float = 500.0   # 空中微重力（向下，落地即停）
+@export var max_speed_x : float = 300.0    # 横向速度上限
+@export var jump_cap : float = 500.0       # 上升速度上限
+@export var max_fall_speed : float = 600.0 # 最大下落速度
+
+@export_group("坠落判定")
+@export var kill_y : float = 1000.0        # 低于此高度视为坠落
+@export var max_falls : int = 3            # 超过3次坠落判定失败
+
+@export_group("尘埃系统")
+@export var eta_default : float = 1.0      # 初始惯性系数
+@export var dust_eta_step : float = 0.25   # 消耗1份尘埃的 η 变化量
+
+var player_eta : float = 1.0
+var dust_count : int = 0
 
 @export_group("洞察模式")
 @export var insight_time_scale : float = 0.2
 @export var energy_max : float = 100.0
-@export var energy_drain : float = 100.0   # 每秒消耗（1 秒耗尽）
-@export var energy_recovery : float = 33.3 # 每秒恢复（3 秒满格）
+@export var energy_drain : float = 100.0   # 每秒消耗（1秒耗尽）
+@export var energy_recovery : float = 33.3 # 每秒恢复（3秒满格）
 
 var insight_energy : float = 100.0
 var is_insight : bool = false
 
-var _start_position : Vector2 = Vector2.ZERO
+var fall_count : int = 0
+var failed : bool = false
+
+var _spawn_point : Vector2 = Vector2.ZERO
 
 
 func _ready() -> void:
 	add_to_group("IllusionGroup")
 	add_to_group("Player")
-	motion_mode = CharacterBody2D.MOTION_MODE_FLOATING
 	max_slides = 8
 	insight_energy = energy_max
-	_start_position = global_position
+	_spawn_point = global_position
+	player_eta = eta_default
 
 
 func _physics_process(delta: float) -> void:
+	if failed:
+		velocity = Vector2.ZERO
+		return
+
 	# —— 物理层：不因洞察模式做任何分支 ——
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")
-	var eta_now : float = IllusionManager.get_current_eta()
+	var eta_now : float = player_eta
 	var fake_force : Vector2 = IllusionManager.get_current_fake_vector()
 	var damping_force : Vector2 = -IllusionManager.get_current_damping() * velocity
-	var gravity_vec : Vector2 = Vector2(0.0, gravity)
-	velocity += (input_dir * speed / eta_now + fake_force + damping_force + gravity_vec) * delta
-	# 速度上限（阻尼=0 的无阻力环境下依然可控）
-	velocity.x = clampf(velocity.x, -max_speed, max_speed)
-	velocity.y = clampf(velocity.y, -max_speed, max_fall_speed)
+
+	# 瞬时起跳（决策3）：平台上轻点 W
+	if Input.is_action_just_pressed("up") and is_on_floor():
+		# 跳跃高度随 η：越轻（η 小）跳得越高越远，越重（η 大）跳得越低
+		velocity.y = -jump_velocity / sqrt(player_eta)
+
+	# 空中微重力（已确认）：非落地时小幅下落
+	if not is_on_floor():
+		velocity.y += jump_gravity * delta
+
+	# 文档 §5.2 速度合成（无重力）
+	velocity += (input_dir * speed / eta_now + fake_force + damping_force) * delta
+	velocity.x = clampf(velocity.x, -max_speed_x, max_speed_x)
+	velocity.y = clampf(velocity.y, -jump_cap, max_fall_speed)
 	move_and_slide()
+
+	# 坠落检测（决策5）
+	if global_position.y > kill_y:
+		_on_fallen()
 
 
 func _process(delta: float) -> void:
@@ -56,10 +91,47 @@ func _process(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	# 沙盒便捷：按 R 复位到出生点
-	if event is InputEventKey and event.pressed and not event.echo \
-			and event.physical_keycode == KEY_R:
-		global_position = _start_position
+	if not (event is InputEventKey and event.pressed and not event.echo):
+		return
+	match event.physical_keycode:
+		KEY_R:
+			reset_level()
+		KEY_Q:
+			_consume_dust(dust_eta_step)   # 消耗1份尘埃：变重（η+）
+		KEY_Z:
+			_consume_dust(-dust_eta_step)  # 消耗1份尘埃：变轻（η-）
+
+
+## 存档点（后续阶段可调用）
+func set_checkpoint(pos: Vector2) -> void:
+	_spawn_point = pos
+
+
+func reset_level() -> void:
+	fall_count = 0
+	failed = false
+	global_position = _spawn_point
+	velocity = Vector2.ZERO
+
+
+func add_dust(n: int) -> void:
+	dust_count += n
+
+
+func _consume_dust(delta_eta: float) -> void:
+	if dust_count <= 0:
+		return
+	dust_count -= 1
+	player_eta = clampf(player_eta + delta_eta, 0.3, 2.5)
+
+
+func _on_fallen() -> void:
+	fall_count += 1
+	if fall_count > max_falls:
+		failed = true
+		velocity = Vector2.ZERO
+	else:
+		global_position = _spawn_point
 		velocity = Vector2.ZERO
 
 
@@ -97,7 +169,7 @@ func _draw() -> void:
 	# 红色虚线箭头：虚假力
 	var fake_vec : Vector2 = IllusionManager.get_current_fake_vector()
 	if fake_vec.length_squared() > 0.01:
-		var len_px : float = clampf(fake_vec.length() * 10.0, 24.0, 120.0)
+		var len_px : float = clampf(fake_vec.length() * 2.5, 20.0, 140.0)
 		_draw_arrow(center, fake_vec.normalized() * len_px, Color(1.0, 0.3, 0.25), true, 4.0)
 
 
@@ -123,4 +195,5 @@ func _draw_arrow(from: Vector2, vec: Vector2, color: Color, dashed: bool, width:
 		var perp : Vector2 = dir_n.orthogonal() * head_len * 0.5
 		draw_line(to, head_base + perp, color, width)
 		draw_line(to, head_base - perp, color, width)
+
 
