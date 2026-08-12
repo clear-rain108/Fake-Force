@@ -109,20 +109,20 @@ Demo仅制作 **1个完整大关卡**，时长 3~5 分钟，严格遵循"A（唯
 ### 5.2 物理执行流程（_physics_process 伪代码）
 所有受影响的物体（玩家、幻灵方块）统一执行以下叠加逻辑：
 
-    # 在 Player.gd 和 PhantomBlock.gd 中
-    func _physics_process(delta):
-        # 1. 获取玩家的原始输入（方向向量）
-        var input_dir = Input.get_vector("left", "right", "up", "down")
-        
-        # 2. 从 IllusionManager 获取当前帧的虚假力
-        var fake_force = IllusionManager.get_current_fake_vector()
-        
-        # 3. 应用阻尼（阻力）
-        var damping_force = -k * velocity
-        
-        # 4. 最终速度合成（神之一笔）
-        velocity += (input_dir * speed + fake_force + damping_force) * delta
-        move_and_slide()
+	# 在 Player.gd 和 PhantomBlock.gd 中
+	func _physics_process(delta):
+		# 1. 获取玩家的原始输入（方向向量）
+		var input_dir = Input.get_vector("left", "right", "up", "down")
+		
+		# 2. 从 IllusionManager 获取当前帧的虚假力
+		var fake_force = IllusionManager.get_current_fake_vector()
+		
+		# 3. 应用阻尼（阻力）
+		var damping_force = -k * velocity
+		
+		# 4. 最终速度合成（神之一笔）
+		velocity += (input_dir * speed + fake_force + damping_force) * delta
+		move_and_slide()
 
 ### 5.3 关键节点分组与属性
 - **组（Group）**：所有可受幻觉影响的物体，必须添加到 `"IllusionGroup"` 组。

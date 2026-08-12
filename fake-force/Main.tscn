@@ -1,0 +1,77 @@
+[gd_scene load_steps=9 format=3]
+
+[ext_resource type="Script" path="res://scripts/StarField.gd" id="1_starfield"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" path="res://scripts/IllusionZone.gd" id="3_zone"]
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="5_hud"]
+[ext_resource type="Script" path="res://scripts/LevelGen.gd" id="7_level"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="6_texture"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
+size = Vector2(1700, 950)
+
+[node name="Main" type="Node2D"]
+
+[node name="StarField" type="Node2D" parent="."]
+script = ExtResource("1_starfield")
+
+[node name="LevelGen" type="Node2D" parent="."]
+script = ExtResource("7_level")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+z_index = 1
+position = Vector2(400, 620)
+script = ExtResource("2_player")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+z_index = -1
+texture = ExtResource("6_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="IllusionZone" type="Area2D" parent="."]
+position = Vector2(800, 350)
+g_value = 1.0
+damping = 0.0
+direction = Vector2(0, 1)
+script = ExtResource("3_zone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
+shape = SubResource("RectangleShape2D_zone")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("5_hud")
+
+[node name="GValue" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 42.0
+theme_override_font_sizes/font_size = 22
+text = "当前幻觉强度：0.0 G"
+
+[node name="EnergyBar" type="ProgressBar" parent="HUD"]
+offset_left = 16.0
+offset_top = 50.0
+offset_right = 260.0
+offset_bottom = 70.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="Hint" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 80.0
+offset_right = 560.0
+offset_bottom = 110.0
+theme_override_font_sizes/font_size = 14
+text = "WASD 移动(按住W上升)   |   Shift 洞察(1s)   |   R 复位"
+
