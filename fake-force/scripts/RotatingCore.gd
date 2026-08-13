@@ -9,9 +9,10 @@ extends Node2D
 ## 玩家经 get_current_fake_vector() 统一读取（与区域幻觉力叠加）。
 
 @export_group("旋转参数")
-@export var omega : float = 1.0            # rad/s（试玩校准）
-@export var coriolis_scale : float = 0.0   # 关闭科里奥利：黑洞场景只保留径向离心力（避免"左右摆"）
-@export var influence_radius : float = 300.0  # 仅核心附近受力
+@export var omega : float = 1.5            # rad/s（试玩校准）
+@export var gravity_in : float = 250.0     # 向核心的引力加速度（旋转圆盘模型）
+@export var coriolis_scale : float = 0.0   # 科里奥利（剧情模式阶段3已关闭）
+@export var influence_radius : float = 300.0  # 影响/圆盘半径
 @export var core_radius : float = 60.0     # 视觉半径
 @export var core_color : Color = Color(0.2, 0.42, 0.95)
 

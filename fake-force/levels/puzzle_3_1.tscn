@@ -1,0 +1,152 @@
+[gd_scene load_steps=12 format=3]
+
+[ext_resource type="Script" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" path="res://scripts/Goal.gd" id="3_goal"]
+[ext_resource type="Script" path="res://scripts/PuzzleHUD.gd" id="4_hud"]
+[ext_resource type="Script" path="res://scripts/PuzzleVictory.gd" id="5_victory"]
+[ext_resource type="Script" path="res://scripts/StarField.gd" id="6_star"]
+[ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="7_vignette"]
+[ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="8_core"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="9_texture"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(60, 40)
+
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="StarField" type="Node2D" parent="."]
+script = ExtResource("6_star")
+
+[node name="RotatingCore" type="Node2D" parent="."]
+position = Vector2(0, 0)
+omega = 1.5
+gravity_in = 560.0
+influence_radius = 320.0
+script = ExtResource("8_core")
+
+[node name="Player" type="CharacterBody2D" parent="."]
+z_index = 1
+position = Vector2(180, 0)
+rotating_mode = true
+radial_accel = 60.0
+tang_accel = 60.0
+script = ExtResource("2_player")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+z_index = -1
+texture = ExtResource("9_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="Goal" type="Area2D" parent="."]
+position = Vector2(260, 0)
+script = ExtResource("3_goal")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
+shape = SubResource("RectangleShape2D_goal")
+
+[node name="GrimVignette" type="CanvasLayer" parent="."]
+layer = 40
+
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette"]
+script = ExtResource("7_vignette")
+
+[node name="PuzzleHUD" type="CanvasLayer" parent="."]
+script = ExtResource("4_hud")
+
+[node name="TopLeft" type="Control" parent="PuzzleHUD"]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 42.0
+
+[node name="GValue" type="Label" parent="PuzzleHUD/TopLeft"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 20
+text = "当前幻觉强度：0.0 G"
+
+[node name="TopRight" type="Control" parent="PuzzleHUD"]
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 10.0
+offset_right = -16.0
+offset_bottom = 42.0
+
+[node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+max_value = 100.0
+value = 100.0
+show_percentage = false
+
+[node name="BottomLeft" type="Control" parent="PuzzleHUD"]
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -10.0
+
+[node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "尘埃：0"
+
+[node name="BottomRight" type="Control" parent="PuzzleHUD"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = -16.0
+offset_bottom = -10.0
+
+[node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight"]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+text = "η = 1.00"
+
+[node name="SysMsg" type="Label" parent="PuzzleHUD"]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -620.0
+offset_top = -95.0
+offset_right = -16.0
+offset_bottom = -52.0
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 2
+text = ""
+
+[node name="PuzzleVictory" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="VictoryDraw" type="Node2D" parent="PuzzleVictory"]
+script = ExtResource("5_victory")
+

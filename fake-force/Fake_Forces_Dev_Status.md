@@ -1,8 +1,11 @@
 # 《Fake Forces 善假于物》—— 开发状态记录 (Dev Status)
 
-> 关联文档：`Fake_Forces_Design_v3.0.md`（设计）｜`Fake_Forces_Lore.md`（剧情）
+> 关联文档：
+> - `Fake_Forces_Design_v3.0.md`（剧情模式设计）
+> - `Fake_Forces_Design_Puzzle.md`（解密模式设计）
+> - `Fake_Forces_Lore.md`（剧情集）
 > 记录当前工程实现进度、参数配置与待办事项
-> 最后更新：2026-08-12
+> 最后更新：2026-08-13（v2.0：解密模式 + 双模式架构）
 
 ---
 
@@ -12,41 +15,59 @@
 | :--- | :--- |
 | 引擎 | Godot 4.7（2D，Forward+ / D3D12） |
 | 工程路径 | `D:\Fake Force\fake\Fake Force\fake-force` |
-| 主场景 | `Main.tscn` |
-| Autoload | `IllusionManager`（`scripts/IllusionManager.gd`） |
+| 主场景 | `MainMenu.tscn`（主菜单，区分解密/剧情） |
+| Autoload | `IllusionManager`（`scripts/IllusionManager.gd`，含 `game_mode` 双模式） |
 | 素材 | `Art_Chsr_Main.png`（玩家，32×32） |
 
 ---
 
 ## 二、已实现系统
 
+### 剧情模式（Main.tscn，阶段1+2+3）
 | 系统 | 脚本 | 说明 |
 | :--- | :--- | :--- |
-| 幻觉管理器 | `IllusionManager.gd` | Autoload 单例；`G_TO_ACCEL=40`；`current_fake_vector + rotating_accel` 合成 |
-| 玩家 | `Player.gd` | 无重力三分量移动；瞬时起跳（高度随η）；空中微重力500/s²；洞察1秒；坠落计数(>3失败)；尘埃收集/消耗(Q重/Z轻)；存档点支持 |
-| 幻觉区域 | `IllusionZone.gd` + `IllusionField.gd` | G/η/k/ω 全导出；方向切换(CONSTANT/CYCLE/RANDOM)+匀速间歇+G随机+时长抖动 |
-| 幻灵/绝对方块 | `PhantomBlock.gd` | `is_phantom` 控制受力；100×40；漂移范围限制；蓝(半透明)/橙(实心)视觉 |
-| 马赫尘埃 | `Dust.gd` | 按住E收集（380px范围）；消耗调η |
-| 粒子星空 | `StarField.gd` | 白色小点缓慢旋转；洞察模式定格 |
-| HUD | `HUD.gd` | 有效G值(绿→红)；能量条；尘埃数/η显示；教学/失败提示 |
-| 关卡生成 | `StageBuilder.gd` | 三阶段平台（P1~P16+出口） |
-| 记事本 | `Notebook.gd` + `NotebookTrigger.gd` | 5页剧情碎片；`← →`翻页；`F`阅读；区域进入/G值耦合触发 |
-| 存档点 | `Checkpoint.gd` | 触碰更新复活点；绿色光柱标记 |
-| 提示区 | `HintZone.gd` | 区域进入显示一次操作提示 |
-| 旋转核心 | `RotatingCore.gd` | 离心力ω²r（径向）；**科里奥利已关闭**；自转+公转小点视觉 |
-| 隐藏平台 | `HiddenPlatform.gd` | 常态隐形、洞察模式半透明可见 |
-| 出口触发 | `VictoryTrigger.gd` | 触碰出口启动结局 |
-| 结局演出 | `EndingSequence.gd` | 白闪→黑洞(旋转光晕+吸积粒子)→角色滑入→老人面孔→台词→主题字→结束(Esc退出) |
+| 幻觉管理器 | `IllusionManager.gd` | 双模式 G_TO_ACCEL：剧情 40 / 解密 10；`rotating_accel`；`get_current_effective_g` |
+| 玩家 | `Player.gd` | 三分量移动；瞬时起跳（η影响）；空中微重力；洞察1秒；坠落计数；尘埃Q/Z；存档点；η光晕；**旋转圆盘模式（`rotating_mode`，待测试）** |
+| 幻觉区域 | `IllusionZone.gd` + `IllusionField.gd` | G/η/k/ω 导出；CONSTANT/CYCLE/RANDOM；匀速间歇；G正弦渐变；时长抖动 |
+| 幻灵/绝对方块 | `PhantomBlock.gd` | `is_phantom`；漂移范围限制 |
+| 马赫尘埃 | `Dust.gd` | E收集 |
+| 粒子星空 | `StarField.gd` | 跟随玩家；G=0摆动；加速度拖曳；黑洞弧线 |
+| HUD | `HUD.gd` | 剧情布局 |
+| 关卡生成 | `StageBuilder.gd` | 三阶段平台 |
+| 记事本 | `Notebook.gd` + `NotebookTrigger.gd` | 5页剧情碎片；翻页 |
+| 存档点/提示区 | `Checkpoint.gd` / `HintZone.gd` | |
+| 旋转核心 | `RotatingCore.gd` | 离心ω²r；**新增 `gravity_in`（向心引力）** |
+| 隐藏平台/出口 | `HiddenPlatform.gd` / `VictoryTrigger.gd` | |
+| 结局演出 | `EndingSequence.gd` | 多阶段黑洞结局 |
+| 开场导言 | `OpeningSequence.gd` | 8段多行 |
+| 边缘红晕 | `GrimVignette.gd` | 破碎光带，0~0.8G渐变 |
+
+### 解密模式（levels/puzzle_*.tscn，7关）
+| 系统 | 脚本 | 说明 |
+| :--- | :--- | :--- |
+| 关卡根 | `PuzzleLevelRoot.gd` | 强制解密模式；旋转关自动绑定核心 |
+| 解密HUD | `PuzzleHUD.gd` | §5.3布局（左上G/右上能量/左下尘埃/右下η+系统提示） |
+| 解密胜利 | `PuzzleVictory.gd` | 白闪→哲学文字→3秒回选关页 |
+| 终点 | `Goal.gd` | 金色菱形 |
+| 尖刺 | `Spikes.gd` | 红色倒三角；η<0.6免疫 |
+| 可撞碎墙 | `CrushableWall.gd` | η>1.5撞击粉碎 |
+| 旋转挡板 | `RotatingObstacle.gd` | 弧形障碍绕核心旋转 |
+| 主菜单星空 | `MenuStarField.gd` | 自转；Shift轨迹拉长 |
+| 主菜单/选关 | `MainMenu.gd` / `LevelSelect.gd` | 双模式入口/7关选择 |
 
 ---
 
-## 三、三阶段关卡
+## 三、解密模式 7 关卡
 
-| 阶段 | 名称 | 平台 | 幻觉区参数 | 核心内容 |
-| :--- | :--- | :--- | :--- | :--- |
-| 1 | 系统的牢笼 | P1~P9 | G=0.8±0.2随机，damping=0.6，cycle左右(3s)+匀速(3s) | 纯平台跳跃；首次洞察教学 |
-| 2 | 幻觉的外延 | P10~P13 | G=1.2(1.1~1.5)，damping=0.5，间歇2s | 深渊+幻灵方块垫脚+尘埃+绝对方块锚点；记事本1~3页 |
-| 3 | 真相的折叠 | P14+P15核心地面+P16核心顶+出口 | G=0(旋转核心供力)，damping=0.3 | 旋转核心离心甩向出口；隐藏平台(洞察可见)；记事本4~5页；结局 |
+| 关卡 | 谜题 | 关键元素 |
+| :--- | :--- | :--- |
+| 1-1 | 初识偏转 | 长滞空+大缺口(350px)，G=0.8左 |
+| 1-2 | 变向偏转 | 双幻觉区（左→右上斜/右→左） |
+| 1-3 | 双向往返 | U型通道，G=1.5恒右 |
+| 2-1 | 幻灵垫脚 | 深渊+幻灵方块漂移+绝对方块 |
+| 2-2 | 尘埃轻重 | 尖刺+可撞碎墙+4尘埃 |
+| 3-1 | 离心抛射 | 旋转圆盘模型 |
+| 3-2 | 科里奥利螺旋 | 旋转圆盘+3挡板 |
 
 ---
 
@@ -54,27 +75,30 @@
 
 | 参数 | 值 | 说明 |
 | :--- | :--- | :--- |
-| `G_TO_ACCEL` | 40 | 1G=40 单位/s²（为无重力环境调整，待校准） |
-| `speed` | 200 | 输入推力（单位/s²） |
-| `jump_velocity` / `jump_gravity` | 380 / 500 | 起跳初速 / 空中微重力 |
-| 洞察 | 1秒消耗，3秒恢复 | energy_drain=100/s |
-| `kill_y` / `max_falls` | 1000 / 3 | 坠落判定 / 失败阈值 |
-| 阶段3 ω / 影响半径 | 1.0 / 300px | 离心力强度 / 范围（科里奥利=0） |
-| 尘埃 η 步长 | 0.25 | Q变重 / Z变轻 |
+| `g_to_accel` | 剧情 40 / 解密 10 | 双模式换算 |
+| 解密 `speed` | 35 | 低推力→幻觉力占推力23~43%（明显） |
+| 解密 `jump_velocity/gravity` | 150 / 120 | 滞空2.5s，幻觉偏移明显 |
+| 洞察 | 1秒消耗，3秒恢复 | |
+| 尘埃步长（解密2-2） | 0.7 | Z→0.3飘尖刺；Q→1.7撞墙 |
+| 旋转核心 | ω=1.5, gravity_in=560 | 平衡半径≈249 |
 
 ---
 
 ## 五、已知问题 / 待办
 
-- [ ] 阶段1/2 平台布局细化（当前为占位白盒）
-- [ ] 旋转核心谜题数值待最终校准（用户测试反馈中）
-- [ ] 尘埃的 η 谜题机制（η>1.5 撞碎幻灵 / η<0.6 飘过尖刺）未实现
-- [ ] 黑洞场景"背景星空拉伸成弧线"特效未实现
-- [ ] 开场导言画面（剧情集第一部分文本）未接入游戏
-- [ ] 音效（AudioStreamGenerator 合成）未实现
-- [ ] 记事本第4/5页触发位置已就位，待验证
+- [x] 双模式架构（主菜单/选关页）
+- [x] 解密 7 关搭建 + 新元素（尖刺/墙/挡板）
+- [x] 解密参数校准（speed 35，幻觉明显）
+- [ ] **旋转圆盘模型【待测试/更改】**：3-1/3-2 当前手感未经用户验收，可能需重构
+- [ ] 1-2 斜向幻觉效果待用户验证
+- [ ] 1-3 平台辅助跳跃细化
+- [ ] 各关难度/数值逐关校验
+- [ ] 解密模式音效
+- [ ] 剧情模式：场景拆分（阶段3独立 Stage3.tscn）、音效、尘埃η谜题、收尾打磨
 
 ---
 
-> 文档版本：v1.0（开发状态记录）
+> 文档版本：v2.0（开发状态记录）
 > 说明：每次开发迭代后更新本文件。
+
+

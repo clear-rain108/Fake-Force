@@ -45,10 +45,13 @@ func _physics_process(delta: float) -> void:
 	var a_dir : Vector2 = _field.update(delta)
 	if _field.switched_this_frame:
 		_roll_g()
-	# G 值渐变：加速相位内正弦缓动 0→峰值→0（体现"加速度建立与消失"）；匀速间歇为 0
+	# G 值渐变：非恒定模式下加速相位内正弦缓动 0→峰值→0；匀速间歇为 0
 	var g_now : float = 0.0
 	if a_dir != Vector2.ZERO:
-		g_now = _current_g * sin(PI * clampf(_field.accel_progress, 0.0, 1.0))
+		if field_mode == 0:  # CONSTANT：恒定强度
+			g_now = _current_g
+		else:
+			g_now = _current_g * sin(PI * clampf(_field.accel_progress, 0.0, 1.0))
 	IllusionManager.set_zone_params(g_now, omega, eta, damping, -a_dir)
 
 

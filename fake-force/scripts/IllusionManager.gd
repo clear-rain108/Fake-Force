@@ -3,12 +3,13 @@ extends Node
 ##
 ## 全局存储当前幻觉场的核心参数，供玩家、幻灵方块等统一读取。
 ## 物理层永远不因洞察模式分支，所有虚假力计算都从这里取值。
-## 参考：策划案 v2.0 §5.1（扩展 eta/damping 传递 + 幻觉场支持）
+## 双模式：剧情模式（G_TO_ACCEL=40）/ 解密模式（G_TO_ACCEL=10，文档规范）
 
-## 1G 对应的加速度（单位/s²）。
-## 文档原定 10，为让"幻觉力改变落点"在无重力环境中显著（决策2），
-## 调整至 40 并在试玩后继续校准。
-const G_TO_ACCEL : float = 40.0
+const G_TO_ACCEL_STORY : float = 40.0
+const G_TO_ACCEL_PUZZLE : float = 10.0
+
+var g_to_accel : float = G_TO_ACCEL_STORY
+var game_mode : String = "story"   # "story" 剧情 / "puzzle" 解密
 
 var global_influence_strength : float = 1.0  # 0~1，控制环境物体受力比例
 var current_fake_vector : Vector2 = Vector2.ZERO
@@ -17,6 +18,13 @@ var current_g_value : float = 0.0
 var current_omega : float = 0.0
 var current_eta : float = 1.0
 var current_damping : float = 0.5
+
+
+## 切换游戏模式（剧情/解密），并切换 G→加速度 换算系数
+func set_mode(mode: String) -> void:
+	game_mode = mode
+	g_to_accel = G_TO_ACCEL_PUZZLE if mode == "puzzle" else G_TO_ACCEL_STORY
+	reset_zone_params()
 
 
 func get_current_fake_vector() -> Vector2:
@@ -29,7 +37,7 @@ func get_current_g() -> float:
 
 ## 有效幻觉强度：匀速间歇（无幻觉）时为 0
 func get_current_effective_g() -> float:
-	return current_fake_vector.length() / G_TO_ACCEL
+	return current_fake_vector.length() / maxf(g_to_accel, 0.001)
 
 
 func get_current_omega() -> float:
@@ -54,7 +62,7 @@ func set_zone_params(g_value: float, omega: float, eta: float, damping: float, f
 	if fake_dir == Vector2.ZERO:
 		current_fake_vector = Vector2.ZERO
 	else:
-		current_fake_vector = fake_dir.normalized() * g_value * G_TO_ACCEL
+		current_fake_vector = fake_dir.normalized() * g_value * g_to_accel
 
 
 ## 所有区域物体离开后调用：恢复默认参数
@@ -64,5 +72,6 @@ func reset_zone_params() -> void:
 	current_eta = 1.0
 	current_damping = 0.5
 	current_fake_vector = Vector2.ZERO
+
 
 

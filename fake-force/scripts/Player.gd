@@ -19,6 +19,13 @@ extends CharacterBody2D
 @export var jump_cap : float = 500.0       # 上升速度上限
 @export var max_fall_speed : float = 600.0 # 最大下落速度
 
+@export_group("旋转模式")
+@export var rotating_mode : bool = false   # 旋转圆盘模型（3-1/3-2）
+@export var radial_accel : float = 80.0    # W/S 径向推力
+@export var tang_accel : float = 80.0      # A/D 角向推力
+var core_ref : Node2D = null               # 绑定的旋转核心
+var _prev_rot_pos : Vector2 = Vector2.ZERO
+
 @export_group("坠落判定")
 @export var kill_y : float = 1000.0        # 低于此高度视为坠落
 @export var max_falls : int = 3            # 超过3次坠落判定失败
@@ -58,6 +65,10 @@ func _physics_process(delta: float) -> void:
 	if failed:
 		velocity = Vector2.ZERO
 		return
+	# 旋转圆盘模型：玩家随核心公转 + 向心引力
+	if rotating_mode and is_instance_valid(core_ref):
+		_rotating_physics(delta)
+		return
 
 	# —— 物理层：不因洞察模式做任何分支 ——
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")
@@ -82,6 +93,30 @@ func _physics_process(delta: float) -> void:
 
 	# 坠落检测（决策5）
 	if global_position.y > kill_y:
+		_on_fallen()
+
+
+## 旋转圆盘模型：玩家站在旋转圆盘上（随核心公转），
+## 受离心力（向外）与向心引力（向内）平衡；W/S 径向移动、A/D 绕盘移动。
+func _rotating_physics(delta: float) -> void:
+	var rel : Vector2 = global_position - core_ref.global_position
+	var r : float = maxf(rel.length(), 1.0)
+	var ang : float = rel.angle()
+	var input := Input.get_vector("left", "right", "up", "down")
+	# 玩家输入（加速度）
+	var ang_v : float = input.x * tang_accel
+	var rad_v : float = input.y * radial_accel  # W=向心(-r)，S=离心(+r)
+	# 离心力（向外）+ 向心引力（向内）
+	var centrif : float = core_ref.omega * core_ref.omega * r
+	rad_v += (centrif - core_ref.gravity_in)
+	# 位置更新
+	_prev_rot_pos = global_position
+	r += rad_v * delta
+	ang += (ang_v / r + core_ref.omega) * delta  # 角速度 = 玩家输入 + 公转ω
+	global_position = core_ref.global_position + Vector2.from_angle(ang) * r
+	velocity = (global_position - _prev_rot_pos) / maxf(delta, 0.001)
+	# 坠落判定（掉出圆盘外缘）
+	if r > core_ref.influence_radius:
 		_on_fallen()
 
 
@@ -125,7 +160,27 @@ func _consume_dust(delta_eta: float) -> void:
 	player_eta = clampf(player_eta + delta_eta, 0.3, 2.5)
 
 
+## 危险入口（尖刺/旋转障碍等调用）：解密=即时重生+系统提示；剧情=坠落计数
+func on_hazard() -> void:
+	if IllusionManager.game_mode == "puzzle":
+		_instant_respawn()
+	else:
+		_on_fallen()
+
+
+func _instant_respawn() -> void:
+	global_position = _spawn_point
+	velocity = Vector2.ZERO
+	var hud := get_tree().get_first_node_in_group("HUD")
+	if hud and hud.has_method("show_system_message"):
+		hud.show_system_message("【系统】：发现子操作系统异常，已自动恢复初始状态。（报告已收录）")
+
+
 func _on_fallen() -> void:
+	if IllusionManager.game_mode == "puzzle":
+		_instant_respawn()
+		return
+	# 剧情模式：坠落计数（>max_falls 失败）
 	fall_count += 1
 	if fall_count > max_falls:
 		failed = true
