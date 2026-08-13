@@ -45,7 +45,11 @@ func _physics_process(delta: float) -> void:
 	var a_dir : Vector2 = _field.update(delta)
 	if _field.switched_this_frame:
 		_roll_g()
-	IllusionManager.set_zone_params(_current_g, omega, eta, damping, -a_dir)
+	# G 值渐变：加速相位内正弦缓动 0→峰值→0（体现"加速度建立与消失"）；匀速间歇为 0
+	var g_now : float = 0.0
+	if a_dir != Vector2.ZERO:
+		g_now = _current_g * sin(PI * clampf(_field.accel_progress, 0.0, 1.0))
+	IllusionManager.set_zone_params(g_now, omega, eta, damping, -a_dir)
 
 
 func _on_body_entered(body: Node2D) -> void:

@@ -10,6 +10,8 @@ var _t : float = 0.0
 
 func _ready() -> void:
 	add_to_group("Ending")
+	# 树暂停（start_ending 会 get_tree().paused = true）时结局仍要播放与响应输入
+	process_mode = Node.PROCESS_MODE_ALWAYS
 	visible = false
 
 

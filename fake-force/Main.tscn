@@ -1,21 +1,23 @@
-[gd_scene load_steps=27 format=3]
+[gd_scene format=3 uid="uid://c7888o5ynbkdj"]
 
-[ext_resource type="Script" path="res://scripts/StarField.gd" id="1_starfield"]
-[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
-[ext_resource type="Script" path="res://scripts/IllusionZone.gd" id="3_zone"]
-[ext_resource type="Script" path="res://scripts/PhantomBlock.gd" id="4_block"]
-[ext_resource type="Script" path="res://scripts/HUD.gd" id="5_hud"]
-[ext_resource type="Script" path="res://scripts/Dust.gd" id="9_dust"]
-[ext_resource type="Script" path="res://scripts/StageBuilder.gd" id="8_stage"]
-[ext_resource type="Script" path="res://scripts/HintZone.gd" id="10_hint"]
-[ext_resource type="Script" path="res://scripts/Checkpoint.gd" id="11_checkpoint"]
-[ext_resource type="Script" path="res://scripts/Notebook.gd" id="12_notebook"]
-[ext_resource type="Script" path="res://scripts/NotebookTrigger.gd" id="13_trigger"]
-[ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="14_rotating"]
-[ext_resource type="Script" path="res://scripts/VictoryTrigger.gd" id="15_victory"]
-[ext_resource type="Script" path="res://scripts/EndingSequence.gd" id="16_ending"]
-[ext_resource type="Script" path="res://scripts/HiddenPlatform.gd" id="17_hidden"]
+[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="1_starfield"]
+[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://cwdwx54qndmnj" path="res://scripts/IllusionZone.gd" id="3_zone"]
+[ext_resource type="Script" uid="uid://c2a5py7w4p28b" path="res://scripts/PhantomBlock.gd" id="4_block"]
+[ext_resource type="Script" uid="uid://ktvrk72i67co" path="res://scripts/HUD.gd" id="5_hud"]
 [ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="6_texture"]
+[ext_resource type="Script" uid="uid://bx3xsickn4dia" path="res://scripts/StageBuilder.gd" id="8_stage"]
+[ext_resource type="Script" uid="uid://c2r5ktdwdbnh1" path="res://scripts/Dust.gd" id="9_dust"]
+[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="10_hint"]
+[ext_resource type="Script" uid="uid://qeflfrpjpb8y" path="res://scripts/Checkpoint.gd" id="11_checkpoint"]
+[ext_resource type="Script" uid="uid://ccywmpee4h0qw" path="res://scripts/Notebook.gd" id="12_notebook"]
+[ext_resource type="Script" uid="uid://d00i24ln7k3ut" path="res://scripts/NotebookTrigger.gd" id="13_trigger"]
+[ext_resource type="Script" uid="uid://clvlxe7bej24l" path="res://scripts/RotatingCore.gd" id="14_rotating"]
+[ext_resource type="Script" uid="uid://ckvwtfasg3qqv" path="res://scripts/VictoryTrigger.gd" id="15_victory"]
+[ext_resource type="Script" uid="uid://6v6xh2m4brrh" path="res://scripts/EndingSequence.gd" id="16_ending"]
+[ext_resource type="Script" uid="uid://bb2dk5syesbbk" path="res://scripts/HiddenPlatform.gd" id="17_hidden"]
+[ext_resource type="Script" uid="uid://d0oinyw3wf1v1" path="res://scripts/OpeningSequence.gd" id="18_opening"]
+[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="19_vignette"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -41,201 +43,179 @@ size = Vector2(200, 300)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone3"]
 size = Vector2(1800, 900)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hidden"]
-size = Vector2(320, 30)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_exit"]
-size = Vector2(140, 50)
+size = Vector2(280, 14)
 
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=726544362]
 
-[node name="StarField" type="Node2D" parent="."]
+[node name="StarField" type="Node2D" parent="." unique_id=1855930004]
 script = ExtResource("1_starfield")
 
-[node name="StageBuilder" type="Node2D" parent="."]
+[node name="StageBuilder" type="Node2D" parent="." unique_id=1388974266]
 script = ExtResource("8_stage")
 
-[node name="Player" type="CharacterBody2D" parent="."]
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1584464065]
 z_index = 1
-position = Vector2(5600, 100)
-kill_y = 1000.0
+position = Vector2(0, 650)
 script = ExtResource("2_player")
 
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1737745893]
 z_index = -1
 texture = ExtResource("6_texture")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=729081976]
 shape = SubResource("CircleShape2D_player")
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1760167967]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="IllusionZone" type="Area2D" parent="."]
+[node name="IllusionZone" type="Area2D" parent="." unique_id=960067489]
 position = Vector2(1300, 500)
-g_value = 0.8
-damping = 0.6
-field_mode = 1
-field_directions = [Vector2(-1, 0), Vector2(1, 0)]
-field_interval = 3.0
-field_coast = 3.0
-field_jitter = 1.0
-g_random_enabled = true
-g_min = 0.6
-g_max = 1.0
 script = ExtResource("3_zone")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone" unique_id=1506165767]
 shape = SubResource("RectangleShape2D_zone1")
 
-[node name="IllusionZone2" type="Area2D" parent="."]
+[node name="IllusionZone2" type="Area2D" parent="." unique_id=2128675839]
 position = Vector2(4200, 400)
-g_value = 1.2
-damping = 0.5
-field_mode = 1
-field_directions = [Vector2(-1, 0), Vector2(1, 0)]
-field_interval = 3.0
-field_coast = 2.0
-field_jitter = 1.0
-g_random_enabled = true
-g_min = 1.1
-g_max = 1.5
 script = ExtResource("3_zone")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone2" unique_id=657009234]
 shape = SubResource("RectangleShape2D_zone2")
 
-[node name="PhantomBlock" type="RigidBody2D" parent="."]
+[node name="PhantomBlock" type="RigidBody2D" parent="." unique_id=689967856]
 position = Vector2(3700, 120)
 gravity_scale = 0.0
 linear_damp = 2.5
-x_min = 3550.0
-x_max = 3900.0
 script = ExtResource("4_block")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PhantomBlock"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PhantomBlock" unique_id=34684357]
 shape = SubResource("RectangleShape2D_block")
 
-[node name="AbsoluteBlock" type="RigidBody2D" parent="."]
+[node name="AbsoluteBlock" type="RigidBody2D" parent="." unique_id=2027522240]
 position = Vector2(3750, 40)
 gravity_scale = 0.0
-is_phantom = false
 script = ExtResource("4_block")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsoluteBlock"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsoluteBlock" unique_id=2127302447]
 shape = SubResource("RectangleShape2D_block")
 
-[node name="Dust1" type="Area2D" parent="."]
+[node name="Dust1" type="Area2D" parent="." unique_id=28016895]
 position = Vector2(3400, 130)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1" unique_id=1588464951]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Dust2" type="Area2D" parent="."]
+[node name="Dust2" type="Area2D" parent="." unique_id=953347504]
 position = Vector2(3650, 60)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2" unique_id=489975918]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Dust3" type="Area2D" parent="."]
+[node name="Dust3" type="Area2D" parent="." unique_id=1065906747]
 position = Vector2(4100, 130)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3" unique_id=1080568924]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="HintZone1" type="Area2D" parent="."]
+[node name="HintZone1" type="Area2D" parent="." unique_id=634349191]
 position = Vector2(3200, 350)
-hint_text = "按住 E 收集马赫尘埃；按 Z 消耗可变轻——跳得更高更远"
 script = ExtResource("10_hint")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone1" unique_id=1325654096]
 shape = SubResource("RectangleShape2D_hint")
 
-[node name="HintZone2" type="Area2D" parent="."]
+[node name="HintZone2" type="Area2D" parent="." unique_id=1984327387]
 position = Vector2(3700, 300)
-hint_text = "踏上幻灵方块，它会借幻觉之力漂向对岸"
 script = ExtResource("10_hint")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone2" unique_id=623944279]
 shape = SubResource("RectangleShape2D_hint")
 
-[node name="Checkpoint" type="Area2D" parent="."]
+[node name="Checkpoint" type="Area2D" parent="." unique_id=1619015248]
 position = Vector2(3200, 150)
 script = ExtResource("11_checkpoint")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint" unique_id=1931628056]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="NotebookTrigger" type="Area2D" parent="."]
+[node name="NotebookTrigger" type="Area2D" parent="." unique_id=651759332]
 position = Vector2(3200, 150)
 script = ExtResource("13_trigger")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger" unique_id=487141764]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="RotatingCore" type="Node2D" parent="."]
+[node name="RotatingCore" type="Node2D" parent="." unique_id=1084522036]
 position = Vector2(6400, 500)
 script = ExtResource("14_rotating")
 
-[node name="IllusionZone3" type="Area2D" parent="."]
+[node name="IllusionZone3" type="Area2D" parent="." unique_id=2016796592]
 position = Vector2(6000, 300)
-g_value = 0.0
-damping = 0.3
-field_mode = 0
-field_directions = [Vector2(-1, 0)]
 script = ExtResource("3_zone")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone3" unique_id=1480084375]
 shape = SubResource("RectangleShape2D_zone3")
 
-[node name="HiddenPlatform" type="StaticBody2D" parent="."]
+[node name="HiddenPlatform" type="StaticBody2D" parent="." unique_id=19315623]
 position = Vector2(6260, 270)
 script = ExtResource("17_hidden")
 
-[node name="NotebookTrigger2" type="Area2D" parent="."]
+[node name="NotebookTrigger2" type="Area2D" parent="." unique_id=1520601675]
 position = Vector2(5600, 140)
-unlock_count = 4
 script = ExtResource("13_trigger")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger2" unique_id=67019060]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="Checkpoint2" type="Area2D" parent="."]
+[node name="Checkpoint2" type="Area2D" parent="." unique_id=1117076933]
 position = Vector2(5600, 120)
 script = ExtResource("11_checkpoint")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2" unique_id=1699558322]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="NotebookTrigger3" type="Area2D" parent="."]
+[node name="NotebookTrigger3" type="Area2D" parent="." unique_id=468086708]
 position = Vector2(6260, 260)
-unlock_count = 5
 script = ExtResource("13_trigger")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger3" unique_id=607028738]
 shape = SubResource("RectangleShape2D_hint")
 
-[node name="VictoryTrigger" type="Area2D" parent="."]
-position = Vector2(6400, 168)
+[node name="VictoryTrigger" type="Area2D" parent="." unique_id=1381090267]
+position = Vector2(6400, 60)
 script = ExtResource("15_victory")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="VictoryTrigger"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VictoryTrigger" unique_id=1359320880]
+position = Vector2(-1, -45)
 shape = SubResource("RectangleShape2D_exit")
 
-[node name="Ending" type="CanvasLayer" parent="."]
+[node name="Ending" type="CanvasLayer" parent="." unique_id=314854200]
 layer = 100
 
-[node name="EndingDraw" type="Node2D" parent="Ending"]
+[node name="EndingDraw" type="Node2D" parent="Ending" unique_id=782604766]
 script = ExtResource("16_ending")
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=184992310]
+layer = 40
+
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=1879706826]
+script = ExtResource("19_vignette")
+
+[node name="Opening" type="CanvasLayer" parent="." unique_id=272291037]
+layer = 50
+
+[node name="OpeningDraw" type="Node2D" parent="Opening" unique_id=1753314697]
+script = ExtResource("18_opening")
+
+[node name="HUD" type="CanvasLayer" parent="." unique_id=385699299]
 script = ExtResource("5_hud")
 
-[node name="GValue" type="Label" parent="HUD"]
+[node name="GValue" type="Label" parent="HUD" unique_id=128421507]
 offset_left = 16.0
 offset_top = 10.0
 offset_right = 420.0
@@ -243,24 +223,22 @@ offset_bottom = 42.0
 theme_override_font_sizes/font_size = 22
 text = "当前幻觉强度：0.0 G"
 
-[node name="EnergyBar" type="ProgressBar" parent="HUD"]
+[node name="EnergyBar" type="ProgressBar" parent="HUD" unique_id=2060205221]
 offset_left = 16.0
 offset_top = 50.0
 offset_right = 260.0
 offset_bottom = 70.0
-max_value = 100.0
 value = 100.0
 show_percentage = false
 
-[node name="Message" type="Label" parent="HUD"]
+[node name="Message" type="Label" parent="HUD" unique_id=418954582]
 offset_left = 16.0
 offset_top = 120.0
 offset_right = 900.0
 offset_bottom = 160.0
 theme_override_font_sizes/font_size = 18
-text = ""
 
-[node name="DustInfo" type="Label" parent="HUD"]
+[node name="DustInfo" type="Label" parent="HUD" unique_id=483300740]
 offset_left = 16.0
 offset_top = 175.0
 offset_right = 400.0
@@ -268,7 +246,7 @@ offset_bottom = 205.0
 theme_override_font_sizes/font_size = 16
 text = "马赫尘埃：0"
 
-[node name="EtaInfo" type="Label" parent="HUD"]
+[node name="EtaInfo" type="Label" parent="HUD" unique_id=143246248]
 offset_left = 16.0
 offset_top = 205.0
 offset_right = 500.0
@@ -276,8 +254,5 @@ offset_bottom = 235.0
 theme_override_font_sizes/font_size = 16
 text = "η：1.00"
 
-[node name="Notebook" type="Node2D" parent="HUD"]
+[node name="Notebook" type="Node2D" parent="HUD" unique_id=1590121712]
 script = ExtResource("12_notebook")
-
-
-

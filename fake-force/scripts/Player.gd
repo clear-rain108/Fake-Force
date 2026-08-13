@@ -159,6 +159,16 @@ func _exit_insight() -> void:
 
 
 func _draw() -> void:
+	# η 光晕反馈：仅在 η≠1 时出现（重=红 / 轻=蓝），范围较小
+	var eta_r : float = clampf((player_eta - 1.0) / 0.5, -1.0, 1.0)
+	if absf(eta_r) > 0.02:
+		var glow_c : Color
+		if eta_r > 0.0:
+			glow_c = Color(1.0, 0.3, 0.25, 0.28 * eta_r)
+		else:
+			glow_c = Color(0.25, 0.6, 1.0, -0.28 * eta_r)
+		draw_circle(Vector2.ZERO, 20.0, glow_c)
+
 	if not is_insight:
 		return
 	var center : Vector2 = Vector2.ZERO

@@ -19,7 +19,9 @@ var interval_jitter : float = 1.0
 
 var _phase_remaining : float = 0.0
 var _index : int = 0
+var _accel_len : float = 1.0
 var switched_this_frame : bool = false
+var accel_progress : float = 0.0   # 加速相位内进度 0~1（供 G 值渐变）
 
 
 func setup(p_mode: int, p_directions: Array, p_interval: float, p_coast: float, p_jitter: float) -> void:
@@ -39,8 +41,10 @@ func reset() -> void:
 func update(delta: float) -> Vector2:
 	switched_this_frame = false
 	if mode == Mode.CONSTANT:
+		accel_progress = 1.0
 		return _current_direction()
 	if directions.is_empty():
+		accel_progress = 0.0
 		return Vector2.ZERO
 	_phase_remaining -= delta
 	if _phase_remaining <= 0.0:
@@ -48,7 +52,11 @@ func update(delta: float) -> Vector2:
 		switched_this_frame = true
 	# 匀速间歇：相位末段（coast 时长）
 	if coast_time > 0.0 and _phase_remaining <= coast_time:
+		accel_progress = 0.0
 		return Vector2.ZERO
+	# 加速相位内进度
+	var accel_remaining : float = _phase_remaining - coast_time
+	accel_progress = clampf(1.0 - accel_remaining / _accel_len, 0.0, 1.0)
 	return _current_direction()
 
 
@@ -65,7 +73,8 @@ func _roll_duration() -> float:
 	var accel : float = interval
 	if interval_jitter > 0.0:
 		accel += randf_range(-interval_jitter, interval_jitter)
-	return maxf(accel, 0.05) + coast_time
+	_accel_len = maxf(accel, 0.05)
+	return _accel_len + coast_time
 
 
 func _current_direction() -> Vector2:
