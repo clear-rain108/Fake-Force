@@ -55,9 +55,9 @@ script = ExtResource("1_starfield")
 script = ExtResource("8_stage")
 
 [node name="Player" type="CharacterBody2D" parent="." unique_id=1584464065]
+script = ExtResource("2_player")
 z_index = 1
 position = Vector2(0, 650)
-script = ExtResource("2_player")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1737745893]
 z_index = -1
@@ -71,124 +71,124 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
 [node name="IllusionZone" type="Area2D" parent="." unique_id=960067489]
-position = Vector2(1300, 500)
 script = ExtResource("3_zone")
+position = Vector2(1300, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone" unique_id=1506165767]
 shape = SubResource("RectangleShape2D_zone1")
 
 [node name="IllusionZone2" type="Area2D" parent="." unique_id=2128675839]
-position = Vector2(4200, 400)
 script = ExtResource("3_zone")
+position = Vector2(4200, 400)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone2" unique_id=657009234]
 shape = SubResource("RectangleShape2D_zone2")
 
 [node name="PhantomBlock" type="RigidBody2D" parent="." unique_id=689967856]
+script = ExtResource("4_block")
 position = Vector2(3700, 120)
 gravity_scale = 0.0
 linear_damp = 2.5
-script = ExtResource("4_block")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PhantomBlock" unique_id=34684357]
 shape = SubResource("RectangleShape2D_block")
 
 [node name="AbsoluteBlock" type="RigidBody2D" parent="." unique_id=2027522240]
+script = ExtResource("4_block")
 position = Vector2(3750, 40)
 gravity_scale = 0.0
-script = ExtResource("4_block")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="AbsoluteBlock" unique_id=2127302447]
 shape = SubResource("RectangleShape2D_block")
 
 [node name="Dust1" type="Area2D" parent="." unique_id=28016895]
-position = Vector2(3400, 130)
 script = ExtResource("9_dust")
+position = Vector2(3400, 130)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1" unique_id=1588464951]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Dust2" type="Area2D" parent="." unique_id=953347504]
-position = Vector2(3650, 60)
 script = ExtResource("9_dust")
+position = Vector2(3650, 60)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2" unique_id=489975918]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Dust3" type="Area2D" parent="." unique_id=1065906747]
-position = Vector2(4100, 130)
 script = ExtResource("9_dust")
+position = Vector2(4100, 130)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3" unique_id=1080568924]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="HintZone1" type="Area2D" parent="." unique_id=634349191]
-position = Vector2(3200, 350)
 script = ExtResource("10_hint")
+position = Vector2(3200, 350)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone1" unique_id=1325654096]
 shape = SubResource("RectangleShape2D_hint")
 
 [node name="HintZone2" type="Area2D" parent="." unique_id=1984327387]
-position = Vector2(3700, 300)
 script = ExtResource("10_hint")
+position = Vector2(3700, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone2" unique_id=623944279]
 shape = SubResource("RectangleShape2D_hint")
 
 [node name="Checkpoint" type="Area2D" parent="." unique_id=1619015248]
-position = Vector2(3200, 150)
 script = ExtResource("11_checkpoint")
+position = Vector2(3200, 150)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint" unique_id=1931628056]
 shape = SubResource("RectangleShape2D_checkpoint")
 
 [node name="NotebookTrigger" type="Area2D" parent="." unique_id=651759332]
-position = Vector2(3200, 150)
 script = ExtResource("13_trigger")
+position = Vector2(3200, 150)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger" unique_id=487141764]
 shape = SubResource("RectangleShape2D_checkpoint")
 
 [node name="RotatingCore" type="Node2D" parent="." unique_id=1084522036]
-position = Vector2(6400, 500)
 script = ExtResource("14_rotating")
+position = Vector2(6400, 500)
 
 [node name="IllusionZone3" type="Area2D" parent="." unique_id=2016796592]
-position = Vector2(6000, 300)
 script = ExtResource("3_zone")
+position = Vector2(6000, 300)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone3" unique_id=1480084375]
 shape = SubResource("RectangleShape2D_zone3")
 
 [node name="HiddenPlatform" type="StaticBody2D" parent="." unique_id=19315623]
-position = Vector2(6260, 270)
 script = ExtResource("17_hidden")
+position = Vector2(6260, 270)
 
 [node name="NotebookTrigger2" type="Area2D" parent="." unique_id=1520601675]
-position = Vector2(5600, 140)
 script = ExtResource("13_trigger")
+position = Vector2(5600, 140)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger2" unique_id=67019060]
 shape = SubResource("RectangleShape2D_checkpoint")
 
 [node name="Checkpoint2" type="Area2D" parent="." unique_id=1117076933]
-position = Vector2(5600, 120)
 script = ExtResource("11_checkpoint")
+position = Vector2(5600, 120)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2" unique_id=1699558322]
 shape = SubResource("RectangleShape2D_checkpoint")
 
 [node name="NotebookTrigger3" type="Area2D" parent="." unique_id=468086708]
-position = Vector2(6260, 260)
 script = ExtResource("13_trigger")
+position = Vector2(6260, 260)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger3" unique_id=607028738]
 shape = SubResource("RectangleShape2D_hint")
 
 [node name="VictoryTrigger" type="Area2D" parent="." unique_id=1381090267]
-position = Vector2(6400, 60)
 script = ExtResource("15_victory")
+position = Vector2(6400, 60)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="VictoryTrigger" unique_id=1359320880]
 position = Vector2(-1, -45)

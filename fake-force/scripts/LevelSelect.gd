@@ -7,6 +7,7 @@ const LEVELS : Array = [
 	["res://levels/puzzle_1_3.tscn", "1-3  双向往返"],
 	["res://levels/puzzle_2_1.tscn", "2-1  幻灵垫脚"],
 	["res://levels/puzzle_2_2.tscn", "2-2  尘埃轻重"],
+	["res://levels/puzzle_2_3.tscn", "2-3  参考系登高"],
 	["res://levels/puzzle_3_1.tscn", "3-1  离心抛射"],
 	["res://levels/puzzle_3_2.tscn", "3-2  科里奥利"],
 ]

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
@@ -13,11 +13,14 @@
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platL"]
+size = Vector2(500, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platM"]
+size = Vector2(300, 30)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
-size = Vector2(800, 30)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_root")
@@ -25,22 +28,47 @@ script = ExtResource("1_root")
 [node name="StarField" type="Node2D" parent="."]
 script = ExtResource("6_star")
 
+[node name="PlatformLow" type="StaticBody2D" parent="."]
+position = Vector2(0, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformLow"]
+shape = SubResource("RectangleShape2D_platL")
+
+[node name="Poly" type="Polygon2D" parent="PlatformLow"]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-250, -15, 250, -15, 250, 15, -250, 15)
+
+[node name="PlatformMid" type="StaticBody2D" parent="."]
+position = Vector2(0, 380)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformMid"]
+shape = SubResource("RectangleShape2D_platM")
+
+[node name="Poly" type="Polygon2D" parent="PlatformMid"]
+color = Color(0.45, 0.45, 0.48, 1)
+polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+
 [node name="RotatingCore" type="Node2D" parent="."]
 script = ExtResource("8_core")
-position = Vector2(0, 300)
+position = Vector2(0, 250)
 omega = 0.8
-core_radius = 250.0
+core_radius = 200.0
 influence_radius = 250.0
 
 [node name="Player" type="CharacterBody2D" parent="."]
 script = ExtResource("2_player")
 z_index = 1
-position = Vector2(200, 300)
+position = Vector2(0, 450)
 rotating_mode = true
-start_in_rot = true
+start_in_rot = false
+speed = 60.0
+jump_velocity = 300.0
+jump_gravity = 200.0
+max_speed_x = 140.0
+jump_cap = 350.0
+max_fall_speed = 350.0
 radial_accel = 60.0
 tang_accel = 60.0
-safe_ring_radius = 200.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1
@@ -55,7 +83,7 @@ position_smoothing_speed = 8.0
 
 [node name="Goal" type="Area2D" parent="RotatingCore"]
 script = ExtResource("3_goal")
-position = Vector2(-200, 0)
+position = Vector2(200, 0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RotatingCore/Goal"]
 shape = SubResource("RectangleShape2D_goal")

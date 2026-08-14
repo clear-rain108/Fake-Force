@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
@@ -24,6 +24,9 @@ size = Vector2(700, 600)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_step"]
+size = Vector2(80, 20)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_root")
@@ -62,16 +65,16 @@ color = Color(0.4, 0.4, 0.4, 1)
 polygon = PackedVector2Array(-20, -250, 20, -250, 20, 250, -20, 250)
 
 [node name="Player" type="CharacterBody2D" parent="."]
+script = ExtResource("2_player")
 z_index = 1
 position = Vector2(-260, 100)
-speed = 35.0
-jump_velocity = 150.0
-jump_gravity = 120.0
-max_speed_x = 90.0
-jump_cap = 180.0
-max_fall_speed = 250.0
+speed = 60.0
+jump_velocity = 300.0
+jump_gravity = 200.0
+max_speed_x = 140.0
+jump_cap = 350.0
+max_fall_speed = 350.0
 kill_y = 800.0
-script = ExtResource("2_player")
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1
@@ -85,19 +88,49 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
 [node name="IllusionZone" type="Area2D" parent="."]
+script = ExtResource("3_zone")
 position = Vector2(0, 250)
 g_value = 1.5
 damping = 0.4
 field_mode = 0
 field_directions = [Vector2(1, 0)]
-script = ExtResource("3_zone")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
 shape = SubResource("RectangleShape2D_zone")
 
+[node name="Step1" type="StaticBody2D" parent="."]
+position = Vector2(250, 350)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Step1"]
+shape = SubResource("RectangleShape2D_step")
+
+[node name="Poly" type="Polygon2D" parent="Step1"]
+color = Color(0.45, 0.45, 0.48, 1)
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
+[node name="Step2" type="StaticBody2D" parent="."]
+position = Vector2(250, 250)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Step2"]
+shape = SubResource("RectangleShape2D_step")
+
+[node name="Poly" type="Polygon2D" parent="Step2"]
+color = Color(0.45, 0.45, 0.48, 1)
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
+[node name="Step3" type="StaticBody2D" parent="."]
+position = Vector2(250, 150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Step3"]
+shape = SubResource("RectangleShape2D_step")
+
+[node name="Poly" type="Polygon2D" parent="Step3"]
+color = Color(0.45, 0.45, 0.48, 1)
+polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
+
 [node name="Goal" type="Area2D" parent="."]
-position = Vector2(260, 100)
 script = ExtResource("4_goal")
+position = Vector2(260, 100)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 shape = SubResource("RectangleShape2D_goal")

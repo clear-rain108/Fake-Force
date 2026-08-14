@@ -18,4 +18,7 @@ func _on_body_entered(body: Node2D) -> void:
 		_shown = true
 		var hud := get_tree().get_first_node_in_group("HUD")
 		if hud:
-			hud.show_message(hint_text, hint_duration)
+			if hud.has_method("show_system_message"):
+				hud.show_system_message(hint_text)
+			elif hud.has_method("show_message"):
+				hud.show_message(hint_text, hint_duration)

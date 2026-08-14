@@ -19,12 +19,24 @@ extends CharacterBody2D
 @export var jump_cap : float = 500.0       # 上升速度上限
 @export var max_fall_speed : float = 600.0 # 最大下落速度
 
-@export_group("旋转模式")
-@export var rotating_mode : bool = false   # 旋转圆盘模型（3-1/3-2）
-@export var radial_accel : float = 80.0    # W/S 径向推力
-@export var tang_accel : float = 80.0      # A/D 角向推力
-var core_ref : Node2D = null               # 绑定的旋转核心
-var _prev_rot_pos : Vector2 = Vector2.ZERO
+@export_group("旋转参考系")
+@export var rotating_mode : bool = false   # 关卡启用旋转参考系（3-1/3-2）
+@export var start_in_rot : bool = false    # 开局即已在旋转参考系（已同步）
+@export var radial_accel : float = 60.0    # W/S 径向推力（向心/离心）
+@export var tang_accel : float = 60.0      # A/D 切向推力
+@export var sync_radius : float = 30.0     # 同步判定阈值（相对速度）
+@export var safe_ring_radius : float = 0.0 # 安全环半径（0=不启用）
+@export var safe_ring_strength : float = 200.0
+
+enum { ROT_NONE, ROT_SWITCHING, ROT_SYNCED }
+var core_ref : Node2D = null
+var rot_state : int = ROT_NONE             # 0=横向 1=切换中 2=已同步
+var rot_sync_lock : float = 0.0            # 同步后拒绝输入计时
+var _switching : bool = false              # 切换洞察中（无时间限制）
+var _last_insight_in_rot : bool = false
+var _dbg_radial : Vector2 = Vector2.ZERO   # 合力径向分量（切换洞察绘制）
+var _dbg_tang : Vector2 = Vector2.ZERO     # 合力切向分量
+var _dbg_target : Vector2 = Vector2.ZERO   # 目标向心力
 
 @export_group("坠落判定")
 @export var kill_y : float = 1000.0        # 低于此高度视为坠落
@@ -52,6 +64,16 @@ var failed : bool = false
 var _spawn_point : Vector2 = Vector2.ZERO
 
 
+## 由关卡根节点调用：绑定旋转核心并初始化（支持"开局即同步"）
+func setup_rotating(core: Node2D) -> void:
+	core_ref = core
+	if start_in_rot:
+		rot_state = ROT_SYNCED
+		# 开局即已同步：位置随盘，速度=圆盘速度（角速度 ω + 向心力维持）
+		var R : Vector2 = global_position - core_ref.global_position
+		velocity = Vector2(-core_ref.omega * R.y, core_ref.omega * R.x)
+
+
 func _ready() -> void:
 	add_to_group("IllusionGroup")
 	add_to_group("Player")
@@ -65,8 +87,8 @@ func _physics_process(delta: float) -> void:
 	if failed:
 		velocity = Vector2.ZERO
 		return
-	# 旋转圆盘模型：玩家随核心公转 + 向心引力
-	if rotating_mode and is_instance_valid(core_ref):
+	# 旋转参考系：切换中 / 已同步时用旋转物理
+	if rotating_mode and is_instance_valid(core_ref) and rot_state != ROT_NONE:
 		_rotating_physics(delta)
 		return
 
@@ -96,28 +118,57 @@ func _physics_process(delta: float) -> void:
 		_on_fallen()
 
 
-## 旋转圆盘模型：玩家站在旋转圆盘上（随核心公转），
-## 受离心力（向外）与向心引力（向内）平衡；W/S 径向移动、A/D 绕盘移动。
+## 旋转参考系物理：玩家以旋转核心为静止参考系
+## - 圆盘速度 disk_v = (-ω·R.y, ω·R.x)（随盘转）
+## - 相对速度 v_rel = velocity − disk_v
+## - 惯性力（虚假力，幻觉场）：离心 ω²·R + 科里奥利 (2ω·v_rel.y, −2ω·v_rel.x)
+## - 输入：W/S 径向（W 向心）、A/D 切向
 func _rotating_physics(delta: float) -> void:
-	var rel : Vector2 = global_position - core_ref.global_position
-	var r : float = maxf(rel.length(), 1.0)
-	var ang : float = rel.angle()
+	var core_pos : Vector2 = core_ref.global_position
+	var R : Vector2 = global_position - core_pos
+	var r : float = maxf(R.length(), 1.0)
+	var omega : float = core_ref.omega
+	var disk_v : Vector2 = Vector2(-omega * R.y, omega * R.x)  # 圆盘切向速度
+	var v_rel : Vector2 = velocity - disk_v
+	# 玩家输入（切向/径向，相对核心）
 	var input := Input.get_vector("left", "right", "up", "down")
-	# 玩家输入（加速度）
-	var ang_v : float = input.x * tang_accel
-	var rad_v : float = input.y * radial_accel  # W=向心(-r)，S=离心(+r)
-	# 离心力（向外）+ 向心引力（向内）
-	var centrif : float = core_ref.omega * core_ref.omega * r
-	rad_v += (centrif - core_ref.gravity_in)
-	# 位置更新
-	_prev_rot_pos = global_position
-	r += rad_v * delta
-	ang += (ang_v / r + core_ref.omega) * delta  # 角速度 = 玩家输入 + 公转ω
-	global_position = core_ref.global_position + Vector2.from_angle(ang) * r
-	velocity = (global_position - _prev_rot_pos) / maxf(delta, 0.001)
-	# 坠落判定（掉出圆盘外缘）
+	var r_hat : Vector2 = R / r
+	var t_hat : Vector2 = r_hat.orthogonal()
+	var a_input : Vector2 = r_hat * (-input.y) * radial_accel + t_hat * input.x * tang_accel
+	# 旋转虚假力（幻觉场）：离心 + 科里奥利
+	var a_cent : Vector2 = omega * omega * R
+	var a_cor : Vector2 = Vector2(2.0 * omega * v_rel.y, -2.0 * omega * v_rel.x)
+	IllusionManager.set_rot_inertia(a_cent + a_cor)
+	# 绝对加速度：
+	# - 切换中：无向心力 → 输入直接作用（直线/惯性，旋转参考系中表现为"被甩"）
+	# - 已同步：向心加速度 -ω²R（圆盘提供）维持圆周运动 → 无输入也随盘转；输入叠加
+	var a_abs : Vector2
+	if rot_state == ROT_SWITCHING:
+		a_abs = a_input
+	else:  # ROT_SYNCED
+		a_abs = a_input - omega * omega * R
+		# 安全环：额外恢复力（稳定在安全环半径）
+		if safe_ring_radius > 0.0:
+			a_abs += -r_hat * (r - safe_ring_radius) * 3.0
+	# 同步锁定：拒绝输入 1s（只保持向心圆周运动）
+	if rot_sync_lock > 0.0:
+		a_abs = -omega * omega * R if rot_state == ROT_SYNCED else Vector2.ZERO
+	velocity += a_abs * delta
+	global_position += velocity * delta
+	# 缓存力（切换洞察显示：径向/切向合力 + 目标向心力）
+	var total_view : Vector2 = a_input + a_cent + a_cor
+	_dbg_radial = r_hat * total_view.dot(r_hat)
+	_dbg_tang = t_hat * total_view.dot(t_hat)
+	_dbg_target = -r_hat * (omega * omega * r)
+	# 同步锁定计时
+	if rot_sync_lock > 0.0:
+		rot_sync_lock -= delta
+	# 同步检测（切换中）：相对速度≈0 → 同步成功
+	if rot_state == ROT_SWITCHING and v_rel.length() < sync_radius:
+		_on_synced()
+	# 脱离圆盘
 	if r > core_ref.influence_radius:
-		_on_fallen()
+		_exit_rotating()
 
 
 func _process(delta: float) -> void:
@@ -191,6 +242,24 @@ func _on_fallen() -> void:
 
 
 func _update_insight(delta: float) -> void:
+	# 参考系切换判定（F4）：本次与上次在不同参考系影响范围 → 触发切换
+	var in_rot_now : bool = rotating_mode and is_instance_valid(core_ref) \
+		and (global_position - core_ref.global_position).length() < core_ref.influence_radius
+	if Input.is_action_just_pressed("insight"):
+		if rotating_mode and in_rot_now and not _last_insight_in_rot and rot_state == ROT_NONE:
+			_switching = true
+			rot_state = ROT_SWITCHING
+			is_insight = true
+			Engine.time_scale = insight_time_scale
+	_last_insight_in_rot = in_rot_now
+
+	# 切换洞察：无时间限制，直到同步完成
+	if _switching:
+		is_insight = true
+		Engine.time_scale = insight_time_scale
+		return
+
+	# 普通洞察：能量限制
 	var want_insight : bool = Input.is_action_pressed("insight") and insight_energy > 0.0
 	if want_insight and not is_insight:
 		is_insight = true
@@ -199,7 +268,6 @@ func _update_insight(delta: float) -> void:
 		_exit_insight()
 
 	if is_insight:
-		# 能量按真实时间消耗（避免 0.2 倍速下被无限延长）
 		var real_delta : float = delta / maxf(Engine.time_scale, 0.001)
 		insight_energy = maxf(insight_energy - energy_drain * real_delta, 0.0)
 		if insight_energy <= 0.0:
@@ -211,6 +279,33 @@ func _update_insight(delta: float) -> void:
 func _exit_insight() -> void:
 	is_insight = false
 	Engine.time_scale = 1.0
+	_switching = false
+
+
+func _on_synced() -> void:
+	rot_state = ROT_SYNCED
+	rot_sync_lock = 1.0
+	_switching = false
+	is_insight = false
+	Engine.time_scale = 1.0
+	# 贴盘速度（随盘转）
+	if is_instance_valid(core_ref):
+		var R : Vector2 = global_position - core_ref.global_position
+		velocity = Vector2(-core_ref.omega * R.y, core_ref.omega * R.x)
+	var hud := get_tree().get_first_node_in_group("HUD")
+	if hud and hud.has_method("show_system_message"):
+		hud.show_system_message("【系统】：达到参考系对应强度，参考系切换完成，已自动退出解析模式。")
+
+
+func _exit_rotating() -> void:
+	rot_state = ROT_NONE
+	_switching = false
+	is_insight = false
+	Engine.time_scale = 1.0
+	IllusionManager.reset_zone_params()  # 恢复横向参考系幻觉场
+	var hud := get_tree().get_first_node_in_group("HUD")
+	if hud and hud.has_method("show_system_message"):
+		hud.show_system_message("【系统】：检测到参考系出现较大偏差，建议切换参考系")
 
 
 func _draw() -> void:
@@ -227,15 +322,32 @@ func _draw() -> void:
 	if not is_insight:
 		return
 	var center : Vector2 = Vector2.ZERO
-	# 蓝色实线箭头：玩家意图
+	# 切换洞察（参考系切换）：目标向心力(金) + 径向力(蓝) + 切向力(红)
+	if _switching or rot_state == ROT_SWITCHING:
+		if _dbg_target.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_target.normalized() * 55.0, Color(1.0, 0.84, 0.0), false, 4.0)
+		if _dbg_radial.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_radial.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
+		if _dbg_tang.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_tang.normalized() * 45.0, Color(1.0, 0.3, 0.25), true, 4.0)
+		return
+	# 旋转参考系洞察：蓝=径向合力、红=切向合力（径向/切向分解）
+	if rot_state != ROT_NONE:
+		if _dbg_radial.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_radial.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
+		if _dbg_tang.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_tang.normalized() * 45.0, Color(1.0, 0.3, 0.25), true, 4.0)
+		return
+	# 横向参考系洞察：蓝=输入、红=虚假力（幻觉场）、绿=重力
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")
 	if input_dir.length_squared() > 0.01:
 		_draw_arrow(center, input_dir.normalized() * 60.0, Color(0.25, 0.6, 1.0), false, 4.0)
-	# 红色虚线箭头：虚假力
 	var fake_vec : Vector2 = IllusionManager.get_current_fake_vector()
 	if fake_vec.length_squared() > 0.01:
 		var len_px : float = clampf(fake_vec.length() * 2.5, 20.0, 140.0)
 		_draw_arrow(center, fake_vec.normalized() * len_px, Color(1.0, 0.3, 0.25), true, 4.0)
+	if rot_state == ROT_NONE:
+		_draw_arrow(center, Vector2(0.0, 40.0), Color(0.3, 1.0, 0.4), false, 3.0)
 
 
 func _draw_arrow(from: Vector2, vec: Vector2, color: Color, dashed: bool, width: float) -> void:

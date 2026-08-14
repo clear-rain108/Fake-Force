@@ -43,5 +43,5 @@ func _draw() -> void:
 	draw_string(font, vp * 0.5 + Vector2(-400, 0), \
 		"所谓力，不过是参考系中加速度的幻觉。", \
 		HORIZONTAL_ALIGNMENT_CENTER, 800, 26, Color(0.85, 0.92, 1.0, a))
-	draw_string(font, vp * 0.5 + Vector2(-300, 60), "—— 解密成功 ——", \
+	draw_string(font, vp * 0.5 + Vector2(-300, 60), "你过关！", \
 		HORIZONTAL_ALIGNMENT_CENTER, 600, 16, Color(0.6, 0.7, 0.8, a))

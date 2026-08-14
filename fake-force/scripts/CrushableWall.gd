@@ -32,6 +32,10 @@ func _on_touch(body: Node2D) -> void:
 
 
 func _draw() -> void:
-	draw_rect(Rect2(-40, -20, 80, 40), Color(0.27, 0.53, 1.0, 0.5))
-	draw_rect(Rect2(-40, -20, 80, 40), Color(0.6, 0.8, 1.0, 0.6), false, 2.0)
+	# 发光光晕 + 醒目边框（蓝色屏障）
+	draw_rect(Rect2(-46, -26, 92, 52), Color(0.27, 0.53, 1.0, 0.14))
+	draw_rect(Rect2(-40, -20, 80, 40), Color(0.27, 0.53, 1.0, 0.55))
+	draw_rect(Rect2(-40, -20, 80, 40), Color(0.8, 0.95, 1.0, 1.0), false, 3.0)
+	# 中间"屏障"横纹
+	draw_line(Vector2(-40, 0), Vector2(40, 0), Color(0.8, 0.95, 1.0, 0.7), 2.0)
 

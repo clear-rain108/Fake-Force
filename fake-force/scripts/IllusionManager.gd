@@ -65,6 +65,13 @@ func set_zone_params(g_value: float, omega: float, eta: float, damping: float, f
 		current_fake_vector = fake_dir.normalized() * g_value * g_to_accel
 
 
+## 旋转参考系：把旋转惯性力（离心+科里奥利）作为当前幻觉场写入
+## （旋转幻觉场与横向幻觉场互斥，随参考系切换）
+func set_rot_inertia(inertia: Vector2) -> void:
+	current_fake_vector = inertia
+	rotating_accel = Vector2.ZERO
+
+
 ## 所有区域物体离开后调用：恢复默认参数
 func reset_zone_params() -> void:
 	current_g_value = 0.0
