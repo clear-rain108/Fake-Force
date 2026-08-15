@@ -108,6 +108,12 @@
 - [x] 洞察箭头图例全局化（`ArrowLegend.gd` 由 PuzzleHUD/HUD 自动挂载，横向/旋转/切换自适应）+ 旋转系箭头语义统一（蓝=输入、红=惯性力）
 - [x] Q3 出口重设计（圆盘上 → 核心正上方，需切向加速甩出到达）
 - [x] **死代码清理**：删除 `LevelGen.gd`（沙盒生成器，无引用）、`LOOP1sp.test.ogg`（测试音频，无引用）；移除未用变量 `Player.safe_ring_strength` / `RotatingCore.gravity_in`；移除无调用 getter `get_current_g/get_current_omega/get_current_eta`
+- [x] **动态星空背景系统**（CanvasLayer -1）：星云+星星着色器（洞察定格 / G 变暗）、GPUParticles2D 尘埃（流向随虚假力×0.5 旋转）、扭曲层（ω→引力透镜 0~0.08，默认隐藏）；`IllusionManager.is_insight_mode` 由 Player 每帧同步
+- [x] **背景音乐接入**：恢复 `LOOP1sp.test.ogg`，随背景场景自动播放（全部可玩关卡）
+- [x] **开始页音乐**：`MainMenu` 播放 `Out of the spaxe.ogg`（每次进入主菜单重新播放，不循环）
+- [x] **关卡音乐循环修复**：`LOOP1sp.test.ogg` 导入 loop=false → true
+- [x] **音量控制**：暂停菜单内"音乐/音效"双滑块（Music / SFX+Ambient+Voice 总线），持久化 `user://settings.cfg`
+- [x] **程序化音效系统**：`AudioManager`（Autoload）——常驻 Ambient Drone（双 Generator 流，G/洞察实时联动）、移动风声（粉红噪声带通）、洞察扫频、尘埃/记事本/区域过渡/黑洞序列音效；`audio_buses.tres`（Master/Music/Ambient+LPF+Reverb/SFX/Voice）
 - [ ] **各关难度/手感逐关校准（用户测试反馈中）**
 - [ ] 旋转关卡手感（Q4/Q5）最终验收
 - [ ] 解密模式音效
@@ -153,5 +159,5 @@
 
 ---
 
-> 文档版本：v2.5（开发状态记录，2026-08-15：死代码清理——删除 LevelGen/测试音频，移除未用变量与 getter）
+> 文档版本：v2.8（开发状态记录，2026-08-15：关卡音乐循环修复 / 暂停页音量控制 / 程序化音效系统）
 > 说明：每次开发迭代后更新本文件。

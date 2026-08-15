@@ -2,6 +2,7 @@
 
 [ext_resource type="Script" uid="uid://4daplrkscs6y" path="res://scripts/MainMenu.gd" id="1_menu"]
 [ext_resource type="Script" uid="uid://cyhkdu8428g16" path="res://scripts/MenuStarField.gd" id="2_star"]
+[ext_resource type="AudioStream" uid="uid://n1f51f74dfdw" path="res://Out of the spaxe.ogg" id="3_music"]
 
 [node name="MainMenu" type="Control" unique_id=1432923395]
 layout_mode = 3
@@ -16,6 +17,11 @@ layer = -1
 [node name="Stars" type="Node2D" parent="BgStars" unique_id=240733114]
 position = Vector2(576, 324)
 script = ExtResource("2_star")
+
+[node name="Music" type="AudioStreamPlayer" parent="." unique_id=2100000011]
+bus = &"Music"
+stream = ExtResource("3_music")
+volume_db = -4.0
 
 [node name="Title" type="Label" parent="." unique_id=1230914245]
 layout_mode = 0

@@ -10,6 +10,7 @@ const G_TO_ACCEL_PUZZLE : float = 10.0
 
 var g_to_accel : float = G_TO_ACCEL_STORY
 var game_mode : String = "story"   # "story" 剧情 / "puzzle" 解密
+var is_insight_mode : bool = false # 当前是否处于洞察模式（背景星空定格，由 Player 每帧同步）
 
 var global_influence_strength : float = 1.0  # 0~1，控制环境物体受力比例
 var current_fake_vector : Vector2 = Vector2.ZERO

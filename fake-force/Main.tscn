@@ -18,6 +18,7 @@
 [ext_resource type="Script" uid="uid://bb2dk5syesbbk" path="res://scripts/HiddenPlatform.gd" id="17_hidden"]
 [ext_resource type="Script" uid="uid://d0oinyw3wf1v1" path="res://scripts/OpeningSequence.gd" id="18_opening"]
 [ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="19_vignette"]
+[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="20_bg"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -47,6 +48,8 @@ size = Vector2(1800, 900)
 size = Vector2(280, 14)
 
 [node name="Main" type="Node2D" unique_id=726544362]
+
+[node name="Background" parent="." instance=ExtResource("20_bg")]
 
 [node name="StarField" type="Node2D" parent="." unique_id=1855930004]
 script = ExtResource("1_starfield")

@@ -35,6 +35,7 @@ func _collect() -> void:
 	collected = true
 	if is_instance_valid(_player):
 		_player.add_dust(1)
+	AudioManager.play_dust_collect()  # 粒子捕获音效
 	queue_free()
 
 

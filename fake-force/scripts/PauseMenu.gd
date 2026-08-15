@@ -60,10 +60,10 @@ func _build_ui() -> void:
 	box.anchor_top = 0.5
 	box.anchor_right = 0.5
 	box.anchor_bottom = 0.5
-	box.offset_left = -120.0
-	box.offset_top = -150.0
-	box.offset_right = 120.0
-	box.offset_bottom = 150.0
+	box.offset_left = -130.0
+	box.offset_top = -240.0
+	box.offset_right = 130.0
+	box.offset_bottom = 240.0
 	box.add_theme_constant_override("separation", 22)
 	box.alignment = BoxContainer.ALIGNMENT_CENTER
 	_panel.add_child(box)
@@ -85,6 +85,37 @@ func _build_ui() -> void:
 	var quit_btn := _make_button("退出游戏")
 	quit_btn.pressed.connect(_quit)
 	box.add_child(quit_btn)
+
+	# —— 音量控制（音乐 / 游戏内音效） ——
+	var music_lbl := Label.new()
+	music_lbl.text = "音乐音量"
+	music_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	music_lbl.add_theme_font_size_override("font_size", 16)
+	box.add_child(music_lbl)
+
+	var music_slider := HSlider.new()
+	music_slider.min_value = 0.0
+	music_slider.max_value = 1.0
+	music_slider.step = 0.05
+	music_slider.custom_minimum_size = Vector2(210, 0)
+	music_slider.value = AudioManager.music_volume
+	music_slider.value_changed.connect(func(v: float) -> void: AudioManager.set_music_volume(v))
+	box.add_child(music_slider)
+
+	var sfx_lbl := Label.new()
+	sfx_lbl.text = "音效音量"
+	sfx_lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	sfx_lbl.add_theme_font_size_override("font_size", 16)
+	box.add_child(sfx_lbl)
+
+	var sfx_slider := HSlider.new()
+	sfx_slider.min_value = 0.0
+	sfx_slider.max_value = 1.0
+	sfx_slider.step = 0.05
+	sfx_slider.custom_minimum_size = Vector2(210, 0)
+	sfx_slider.value = AudioManager.sfx_volume
+	sfx_slider.value_changed.connect(func(v: float) -> void: AudioManager.set_sfx_volume(v))
+	box.add_child(sfx_slider)
 
 
 func _make_button(text: String) -> Button:

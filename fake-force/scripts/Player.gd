@@ -34,6 +34,7 @@ var rot_sync_lock : float = 0.0            # 同步后拒绝输入计时
 var _switching : bool = false              # 切换洞察中（无时间限制）
 var _last_insight_in_rot : bool = false
 var _last_in_rot_range : bool = false      # 上一帧是否处于旋转核心影响范围（进入提示前沿检测）
+var _prev_insight : bool = false           # 上一帧洞察状态（切换扫频音前沿检测）
 var _dbg_input : Vector2 = Vector2.ZERO    # 洞察：玩家输入加速度（A/D切向+W/S径向）
 var _dbg_inertia : Vector2 = Vector2.ZERO  # 洞察：惯性力（离心+科里奥利）
 var _dbg_target : Vector2 = Vector2.ZERO   # 切换洞察：目标向心力（=ω²r 向心）
@@ -179,6 +180,10 @@ func _rotating_physics(delta: float) -> void:
 
 
 func _process(delta: float) -> void:
+	IllusionManager.is_insight_mode = is_insight  # 同步洞察状态（背景星空定格）
+	if is_insight != _prev_insight:
+		_prev_insight = is_insight
+		AudioManager.transition_insight_mode(is_insight)  # 洞察进入/退出扫频音
 	_update_insight(delta)
 	_update_platform_fade(delta)
 	queue_redraw()

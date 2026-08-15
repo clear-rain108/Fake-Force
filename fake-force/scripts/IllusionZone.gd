@@ -59,6 +59,8 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("IllusionGroup"):
 		_occupants += 1
 		_field.reset()
+		if body.is_in_group("Player"):
+			AudioManager.transition_zone(g_value)  # 环境音向新区域预设平滑过渡
 
 
 func _on_body_exited(body: Node2D) -> void:

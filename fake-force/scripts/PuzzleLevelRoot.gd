@@ -4,6 +4,8 @@ extends Node2D
 
 func _ready() -> void:
 	IllusionManager.set_mode("puzzle")
+	# 动态星空背景（CanvasLayer -1：星云/尘埃/扭曲层 + 背景音乐）
+	add_child(load("res://scenes/background.tscn").instantiate())
 	var player := get_tree().get_first_node_in_group("Player")
 	var core := get_tree().get_first_node_in_group("RotatingCore")
 	if player and core and player.rotating_mode:

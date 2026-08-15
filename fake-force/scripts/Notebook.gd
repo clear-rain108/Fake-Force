@@ -95,6 +95,7 @@ func _unhandled_input(event: InputEvent) -> void:
 				_close_page()
 			elif glowing and page_index < unlocked:
 				reading = true
+				AudioManager.play_notebook_reveal()  # 档案解锁拍频音
 		KEY_RIGHT, KEY_D:
 			if reading:
 				_next_page()
