@@ -1,6 +1,8 @@
 extends Node2D
-## 解密版胜利演出：白闪 → 哲学文字 → 3秒后返回选关页
+## 解密版胜利演出：白闪 → 哲学文字 → 3秒后返回对应选关页
 ## 挂载于 CanvasLayer(layer=100) 下，坐标为视口坐标
+
+@export var return_scene : String = "res://LevelSelect.tscn"
 
 var _active : bool = false
 var _t : float = 0.0
@@ -18,6 +20,7 @@ func start() -> void:
 	_active = true
 	visible = true
 	_t = 0.0
+	Engine.time_scale = 1.0   # 玩家可能在洞察(0.2x)中通关：复位全局时间，避免下关仍慢速
 	get_tree().paused = true
 
 
@@ -28,7 +31,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 	if _t >= 3.5:
 		get_tree().paused = false
-		get_tree().change_scene_to_file("res://LevelSelect.tscn")
+		get_tree().change_scene_to_file(return_scene)
 
 
 func _draw() -> void:

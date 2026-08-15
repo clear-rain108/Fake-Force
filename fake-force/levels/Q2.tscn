@@ -93,7 +93,7 @@ position = Vector2(0, 250)
 g_value = 1.5
 damping = 0.4
 field_mode = 0
-field_directions = [Vector2(1, 0)]
+field_directions = [Vector2(-1, 0)]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
 shape = SubResource("RectangleShape2D_zone")

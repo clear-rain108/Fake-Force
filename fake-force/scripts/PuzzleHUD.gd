@@ -15,6 +15,11 @@ func _ready() -> void:
 	add_to_group("HUD")
 	_player = get_tree().get_first_node_in_group("Player")
 	sys_msg.text = ""
+	# 全局箭头图例（洞察模式下显示受力说明，各关统一）
+	if not has_node("ArrowLegend"):
+		var legend : Node = load("res://scripts/ArrowLegend.gd").new()
+		legend.name = "ArrowLegend"
+		add_child(legend)
 
 
 func _process(delta: float) -> void:

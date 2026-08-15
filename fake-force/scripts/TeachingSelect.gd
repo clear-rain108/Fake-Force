@@ -1,12 +1,11 @@
 extends Control
-## 选关页：解密模式 主线关卡
+## 教学关卡：入门教程（T1 初识偏转 / T2 幻灵垫脚 / T3 尘埃轻重）
 
 const LEVELS : Array = [
-	["res://levels/Q1.tscn", "Q1  变向偏转"],
-	["res://levels/Q2.tscn", "Q2  双向往返"],
-	["res://levels/Q3.tscn", "Q3  参考系登高"],
-	["res://levels/Q4.tscn", "Q4  离心抛射"],
-	["res://levels/Q5.tscn", "Q5  科里奥利"],
+	["res://levels/T1.tscn", "T1  初识偏转"],
+	["res://levels/T2.tscn", "T2  幻灵垫脚"],
+	["res://levels/T3.tscn", "T3  尘埃轻重"],
+	["res://levels/T4.tscn", "T4  旋转参考系"],
 ]
 
 

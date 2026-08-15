@@ -1,0 +1,227 @@
+[gd_scene format=3 uid="uid://cbtkisajspdif"]
+
+[ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
+[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://cwdwx54qndmnj" path="res://scripts/IllusionZone.gd" id="3_zone"]
+[ext_resource type="Script" uid="uid://c2a5py7w4p28b" path="res://scripts/PhantomBlock.gd" id="4_block"]
+[ext_resource type="Script" uid="uid://dvsx07o14qyhl" path="res://scripts/Goal.gd" id="5_goal"]
+[ext_resource type="Script" uid="uid://byoakdplxucs8" path="res://scripts/PuzzleHUD.gd" id="6_hud"]
+[ext_resource type="Script" uid="uid://kx8b1e2i7x68" path="res://scripts/PuzzleVictory.gd" id="7_victory"]
+[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="8_star"]
+[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="9_vignette"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="10_texture"]
+[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="11_hint"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platL"]
+size = Vector2(250, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platR"]
+size = Vector2(300, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
+size = Vector2(1000, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_block"]
+size = Vector2(100, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
+size = Vector2(800, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(60, 40)
+
+[node name="Main" type="Node2D" unique_id=1656915120]
+script = ExtResource("1_root")
+
+[node name="StarField" type="Node2D" parent="." unique_id=973146099]
+script = ExtResource("8_star")
+
+[node name="PlatformLeft" type="StaticBody2D" parent="." unique_id=43346580]
+position = Vector2(-125, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformLeft" unique_id=1493953556]
+shape = SubResource("RectangleShape2D_platL")
+
+[node name="Poly" type="Polygon2D" parent="PlatformLeft" unique_id=1686754147]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-125, -15, 125, -15, 125, 15, -125, 15)
+
+[node name="PlatformRight" type="StaticBody2D" parent="." unique_id=1567521940]
+position = Vector2(550, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformRight" unique_id=1121817555]
+shape = SubResource("RectangleShape2D_platR")
+
+[node name="Poly" type="Polygon2D" parent="PlatformRight" unique_id=418530568]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=97232916]
+z_index = 1
+position = Vector2(-150, 450)
+script = ExtResource("2_player")
+speed = 55.0
+jump_velocity = 250.0
+jump_gravity = 170.0
+max_speed_x = 120.0
+jump_cap = 300.0
+max_fall_speed = 300.0
+kill_y = 800.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1689855940]
+z_index = -1
+texture = ExtResource("10_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=746315890]
+shape = SubResource("CircleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=338629749]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="IllusionZone" type="Area2D" parent="." unique_id=775920444]
+position = Vector2(200, 300)
+script = ExtResource("3_zone")
+g_value = 1.2
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone" unique_id=1700220422]
+shape = SubResource("RectangleShape2D_zone")
+
+[node name="PhantomBlock" type="RigidBody2D" parent="." unique_id=1187264336]
+position = Vector2(250, 430)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+x_min = 150.0
+x_max = 300.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PhantomBlock" unique_id=1550995318]
+shape = SubResource("RectangleShape2D_block")
+
+[node name="AbsoluteBlock" type="RigidBody2D" parent="." unique_id=1352386452]
+position = Vector2(228, 159)
+gravity_scale = 0.0
+script = ExtResource("4_block")
+is_phantom = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsoluteBlock" unique_id=981316096]
+shape = SubResource("RectangleShape2D_block")
+
+[node name="HintZone" type="Area2D" parent="." unique_id=177940901]
+position = Vector2(150, 350)
+script = ExtResource("11_hint")
+hint_text = "橙色方块＝绝对路标（纹丝不动）；蓝色方块会被吹动——等它漂到中间，踩着它过深渊"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone" unique_id=748787132]
+shape = SubResource("RectangleShape2D_hint")
+
+[node name="Goal" type="Area2D" parent="." unique_id=456460909]
+position = Vector2(550, 440)
+script = ExtResource("5_goal")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal" unique_id=369923355]
+shape = SubResource("RectangleShape2D_goal")
+
+[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=743197844]
+layer = 40
+
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=1796439612]
+script = ExtResource("9_vignette")
+
+[node name="PuzzleHUD" type="CanvasLayer" parent="." unique_id=1887175680]
+script = ExtResource("6_hud")
+
+[node name="TopLeft" type="Control" parent="PuzzleHUD" unique_id=965420535]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 42.0
+
+[node name="GValue" type="Label" parent="PuzzleHUD/TopLeft" unique_id=1997316174]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 20
+text = "当前幻觉强度：0.0 G"
+
+[node name="TopRight" type="Control" parent="PuzzleHUD" unique_id=1177927113]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 10.0
+offset_right = -16.0
+offset_bottom = 42.0
+
+[node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=705692207]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+value = 100.0
+show_percentage = false
+
+[node name="BottomLeft" type="Control" parent="PuzzleHUD" unique_id=1421231912]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -10.0
+
+[node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=417065579]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "尘埃：0"
+
+[node name="BottomRight" type="Control" parent="PuzzleHUD" unique_id=511116760]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = -16.0
+offset_bottom = -10.0
+
+[node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=2124058511]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "η = 1.00"
+horizontal_alignment = 2
+
+[node name="SysMsg" type="Label" parent="PuzzleHUD" unique_id=72688586]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -620.0
+offset_top = -95.0
+offset_right = -16.0
+offset_bottom = -52.0
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 2
+
+[node name="PuzzleVictory" type="CanvasLayer" parent="." unique_id=431021608]
+layer = 100
+
+[node name="VictoryDraw" type="Node2D" parent="PuzzleVictory" unique_id=421265254]
+script = ExtResource("7_victory")
+return_scene = "res://TeachingSelect.tscn"

@@ -3,12 +3,18 @@ extends Control
 
 func _ready() -> void:
 	$PuzzleButton.pressed.connect(_on_puzzle)
+	$TeachingButton.pressed.connect(_on_teaching)
 	$StoryButton.pressed.connect(_on_story)
 
 
 func _on_puzzle() -> void:
 	IllusionManager.set_mode("puzzle")
 	get_tree().change_scene_to_file("res://LevelSelect.tscn")
+
+
+func _on_teaching() -> void:
+	IllusionManager.set_mode("puzzle")
+	get_tree().change_scene_to_file("res://TeachingSelect.tscn")
 
 
 func _on_story() -> void:

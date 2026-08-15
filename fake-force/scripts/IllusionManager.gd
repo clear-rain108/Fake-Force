@@ -31,21 +31,9 @@ func get_current_fake_vector() -> Vector2:
 	return current_fake_vector + rotating_accel
 
 
-func get_current_g() -> float:
-	return current_g_value
-
-
 ## 有效幻觉强度：匀速间歇（无幻觉）时为 0
 func get_current_effective_g() -> float:
 	return current_fake_vector.length() / maxf(g_to_accel, 0.001)
-
-
-func get_current_omega() -> float:
-	return current_omega
-
-
-func get_current_eta() -> float:
-	return current_eta
 
 
 func get_current_damping() -> float:

@@ -1,4 +1,4 @@
-[gd_scene load_steps=14 format=3]
+[gd_scene load_steps=15 format=3]
 
 [ext_resource type="Script" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
@@ -8,19 +8,20 @@
 [ext_resource type="Script" path="res://scripts/StarField.gd" id="6_star"]
 [ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="7_vignette"]
 [ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="8_core"]
-[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="9_texture"]
+[ext_resource type="Script" path="res://scripts/T4Guide.gd" id="9_guide"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="10_texture"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
+size = Vector2(480, 30)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platL"]
-size = Vector2(500, 30)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platM"]
-size = Vector2(300, 30)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
+size = Vector2(800, 400)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_root")
@@ -28,51 +29,54 @@ script = ExtResource("1_root")
 [node name="StarField" type="Node2D" parent="."]
 script = ExtResource("6_star")
 
-[node name="PlatformLow" type="StaticBody2D" parent="."]
-position = Vector2(0, 500)
+[node name="T4Guide" type="Node2D" parent="."]
+script = ExtResource("9_guide")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformLow"]
-shape = SubResource("RectangleShape2D_platL")
+[node name="PlatformStart" type="StaticBody2D" parent="."]
+position = Vector2(-400, 520)
 
-[node name="Poly" type="Polygon2D" parent="PlatformLow"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformStart"]
+shape = SubResource("RectangleShape2D_plat")
+
+[node name="Poly" type="Polygon2D" parent="PlatformStart"]
 color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-250, -15, 250, -15, 250, 15, -250, 15)
+polygon = PackedVector2Array(-240, -15, 240, -15, 240, 15, -240, 15)
 
-[node name="PlatformMid" type="StaticBody2D" parent="."]
-position = Vector2(0, 380)
+[node name="PlatformEnd" type="StaticBody2D" parent="."]
+position = Vector2(400, 520)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformMid"]
-shape = SubResource("RectangleShape2D_platM")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformEnd"]
+shape = SubResource("RectangleShape2D_plat")
 
-[node name="Poly" type="Polygon2D" parent="PlatformMid"]
-color = Color(0.45, 0.45, 0.48, 1)
-polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+[node name="Poly" type="Polygon2D" parent="PlatformEnd"]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-240, -15, 240, -15, 240, 15, -240, 15)
 
 [node name="RotatingCore" type="Node2D" parent="."]
+position = Vector2(0, 360)
 script = ExtResource("8_core")
-position = Vector2(0, 250)
-omega = 0.8
-core_radius = 200.0
-influence_radius = 250.0
+omega = 0.6
+core_radius = 105.0
+influence_radius = 170.0
 
 [node name="Player" type="CharacterBody2D" parent="."]
-script = ExtResource("2_player")
 z_index = 1
-position = Vector2(0, 450)
+position = Vector2(-400, 470)
+script = ExtResource("2_player")
 rotating_mode = true
 start_in_rot = false
+safe_ring_radius = 130.0
 speed = 60.0
 jump_velocity = 300.0
 jump_gravity = 200.0
 max_speed_x = 140.0
 jump_cap = 350.0
 max_fall_speed = 350.0
-radial_accel = 60.0
-tang_accel = 60.0
+kill_y = 800.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1
-texture = ExtResource("9_texture")
+texture = ExtResource("10_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("CircleShape2D_player")
@@ -81,11 +85,11 @@ shape = SubResource("CircleShape2D_player")
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="Goal" type="Area2D" parent="RotatingCore"]
+[node name="Goal" type="Area2D" parent="."]
+position = Vector2(400, 460)
 script = ExtResource("3_goal")
-position = Vector2(200, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RotatingCore/Goal"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 shape = SubResource("RectangleShape2D_goal")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
@@ -98,19 +102,22 @@ script = ExtResource("7_vignette")
 script = ExtResource("4_hud")
 
 [node name="TopLeft" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
+anchors_preset = 0
 offset_left = 16.0
 offset_top = 10.0
 offset_right = 420.0
 offset_bottom = 42.0
 
 [node name="GValue" type="Label" parent="PuzzleHUD/TopLeft"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 20
 text = "当前幻觉强度：0.0 G"
 
 [node name="TopRight" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -120,14 +127,14 @@ offset_right = -16.0
 offset_bottom = 42.0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-max_value = 100.0
 value = 100.0
 show_percentage = false
 
 [node name="BottomLeft" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -137,13 +144,14 @@ offset_right = 200.0
 offset_bottom = -10.0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 16
 text = "尘埃：0"
 
 [node name="BottomRight" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -155,12 +163,12 @@ offset_right = -16.0
 offset_bottom = -10.0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 16
-horizontal_alignment = 2
 text = "η = 1.00"
+horizontal_alignment = 2
 
 [node name="SysMsg" type="Label" parent="PuzzleHUD"]
 anchors_preset = 3
@@ -174,11 +182,12 @@ offset_right = -16.0
 offset_bottom = -52.0
 theme_override_font_sizes/font_size = 15
 horizontal_alignment = 2
-text = ""
 
 [node name="PuzzleVictory" type="CanvasLayer" parent="."]
 layer = 100
 
 [node name="VictoryDraw" type="Node2D" parent="PuzzleVictory"]
 script = ExtResource("5_victory")
+return_scene = "res://TeachingSelect.tscn"
+
 

@@ -1,0 +1,153 @@
+[gd_scene format=3 uid="uid://bkja04xvv7q16"]
+
+[ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
+[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://dvsx07o14qyhl" path="res://scripts/Goal.gd" id="3_goal"]
+[ext_resource type="Script" uid="uid://byoakdplxucs8" path="res://scripts/PuzzleHUD.gd" id="4_hud"]
+[ext_resource type="Script" uid="uid://kx8b1e2i7x68" path="res://scripts/PuzzleVictory.gd" id="5_victory"]
+[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="6_star"]
+[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="7_vignette"]
+[ext_resource type="Script" uid="uid://clvlxe7bej24l" path="res://scripts/RotatingCore.gd" id="8_core"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="9_texture"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(60, 40)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[node name="Main" type="Node2D" unique_id=1986580751]
+script = ExtResource("1_root")
+
+[node name="StarField" type="Node2D" parent="." unique_id=947898861]
+script = ExtResource("6_star")
+
+[node name="RotatingCore" type="Node2D" parent="." unique_id=799786892]
+position = Vector2(0, 300)
+script = ExtResource("8_core")
+omega = 0.8
+influence_radius = 250.0
+core_radius = 250.0
+
+[node name="Goal" type="Area2D" parent="RotatingCore" unique_id=1218174260]
+position = Vector2(-200, 0)
+script = ExtResource("3_goal")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RotatingCore/Goal" unique_id=830123004]
+shape = SubResource("RectangleShape2D_goal")
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=860199436]
+z_index = 1
+position = Vector2(200, 300)
+script = ExtResource("2_player")
+rotating_mode = true
+start_in_rot = true
+safe_ring_radius = 200.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=922194899]
+z_index = -1
+texture = ExtResource("9_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1421228885]
+shape = SubResource("CircleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1430281403]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=2128312491]
+layer = 40
+
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=202747695]
+script = ExtResource("7_vignette")
+
+[node name="PuzzleHUD" type="CanvasLayer" parent="." unique_id=2127097374]
+script = ExtResource("4_hud")
+
+[node name="TopLeft" type="Control" parent="PuzzleHUD" unique_id=1915102234]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 42.0
+
+[node name="GValue" type="Label" parent="PuzzleHUD/TopLeft" unique_id=675899]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 20
+text = "当前幻觉强度：0.0 G"
+
+[node name="TopRight" type="Control" parent="PuzzleHUD" unique_id=1532649]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 10.0
+offset_right = -16.0
+offset_bottom = 42.0
+
+[node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=805415804]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+value = 100.0
+show_percentage = false
+
+[node name="BottomLeft" type="Control" parent="PuzzleHUD" unique_id=579558030]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -10.0
+
+[node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=18556921]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "尘埃：0"
+
+[node name="BottomRight" type="Control" parent="PuzzleHUD" unique_id=1540743391]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = -16.0
+offset_bottom = -10.0
+
+[node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=1765982137]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "η = 1.00"
+horizontal_alignment = 2
+
+[node name="SysMsg" type="Label" parent="PuzzleHUD" unique_id=356369695]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -620.0
+offset_top = -95.0
+offset_right = -16.0
+offset_bottom = -52.0
+theme_override_font_sizes/font_size = 15
+horizontal_alignment = 2
+
+[node name="PuzzleVictory" type="CanvasLayer" parent="." unique_id=137748962]
+layer = 100
+
+[node name="VictoryDraw" type="Node2D" parent="PuzzleVictory" unique_id=2008685060]
+script = ExtResource("5_victory")

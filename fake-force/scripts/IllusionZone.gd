@@ -16,7 +16,7 @@ const IllusionFieldScript := preload("res://scripts/IllusionField.gd")
 
 @export_group("幻觉场")
 @export var field_mode : int = 1                 # 0=CONSTANT 1=CYCLE 2=RANDOM
-@export var field_directions : Array = [Vector2.LEFT, Vector2.RIGHT]  # 参考系加速方向池
+@export var field_directions : Array = [Vector2.LEFT, Vector2.RIGHT]  # 参考系加速方向池（幻觉力 = -方向）
 @export var field_interval : float = 3.0         # 加速相位时长（秒）
 @export var field_coast : float = 3.0            # 匀速间歇时长（秒，0=无间歇）
 @export var field_jitter : float = 1.0           # 相位时长随机抖动（±秒）

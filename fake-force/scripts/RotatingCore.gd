@@ -10,7 +10,6 @@ extends Node2D
 
 @export_group("旋转参数")
 @export var omega : float = 1.5            # rad/s（试玩校准）
-@export var gravity_in : float = 250.0     # 向核心的引力加速度（旋转圆盘模型）
 @export var coriolis_scale : float = 0.0   # 科里奥利（剧情模式阶段3已关闭）
 @export var influence_radius : float = 300.0  # 影响/圆盘半径
 @export var core_radius : float = 60.0     # 视觉半径

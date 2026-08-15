@@ -1,34 +1,26 @@
 extends StaticBody2D
 ## 可撞碎幻灵墙：η > 1.5 撞击可粉碎开辟通路；否则被阻挡
-## 自动创建碰撞体 + 接触检测区
+## 自动创建碰撞体 + 距离检测（可靠触发）
 
 var _broken : bool = false
 
 
 func _ready() -> void:
-	# 碰撞体（阻挡）
 	var col := CollisionShape2D.new()
 	var shape := RectangleShape2D.new()
 	shape.size = Vector2(80, 40)
 	col.shape = shape
 	add_child(col)
-	# 接触检测区
-	var area := Area2D.new()
-	var ashape := RectangleShape2D.new()
-	ashape.size = Vector2(80, 40)
-	var acol := CollisionShape2D.new()
-	acol.shape = ashape
-	area.add_child(acol)
-	add_child(area)
-	area.body_entered.connect(_on_touch)
 
 
-func _on_touch(body: Node2D) -> void:
+func _physics_process(_delta: float) -> void:
 	if _broken:
 		return
-	if body.is_in_group("Player") and body.player_eta > 1.5:
-		_broken = true
-		queue_free()
+	var player := get_tree().get_first_node_in_group("Player")
+	if is_instance_valid(player) and player.player_eta > 1.5:
+		if global_position.distance_to(player.global_position) < 60.0:
+			_broken = true
+			queue_free()
 
 
 func _draw() -> void:

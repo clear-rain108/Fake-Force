@@ -26,7 +26,6 @@ extends CharacterBody2D
 @export var tang_accel : float = 60.0      # A/D 切向推力
 @export var sync_radius : float = 30.0     # 同步判定阈值（相对速度）
 @export var safe_ring_radius : float = 0.0 # 安全环半径（0=不启用）
-@export var safe_ring_strength : float = 200.0
 
 enum { ROT_NONE, ROT_SWITCHING, ROT_SYNCED }
 var core_ref : Node2D = null
@@ -34,9 +33,16 @@ var rot_state : int = ROT_NONE             # 0=横向 1=切换中 2=已同步
 var rot_sync_lock : float = 0.0            # 同步后拒绝输入计时
 var _switching : bool = false              # 切换洞察中（无时间限制）
 var _last_insight_in_rot : bool = false
-var _dbg_radial : Vector2 = Vector2.ZERO   # 合力径向分量（切换洞察绘制）
-var _dbg_tang : Vector2 = Vector2.ZERO     # 合力切向分量
-var _dbg_target : Vector2 = Vector2.ZERO   # 目标向心力
+var _last_in_rot_range : bool = false      # 上一帧是否处于旋转核心影响范围（进入提示前沿检测）
+var _dbg_input : Vector2 = Vector2.ZERO    # 洞察：玩家输入加速度（A/D切向+W/S径向）
+var _dbg_inertia : Vector2 = Vector2.ZERO  # 洞察：惯性力（离心+科里奥利）
+var _dbg_target : Vector2 = Vector2.ZERO   # 切换洞察：目标向心力（=ω²r 向心）
+
+# 旋转参考系：常规灰色平台隐身（旋转系内平台渐变隐身，脱出后现身）
+var _platform_polys : Array = []           # 场景中常规平台（StaticBody2D/Poly）的 Polygon2D
+var _platform_alpha : float = 1.0          # 当前平台透明度（1=可见，0=隐身）
+var _platform_target : float = 1.0         # 目标透明度（旋转系=0，横向=1）
+const PLATFORM_FADE_SPEED : float = 0.8    # 渐变速率（alpha/秒）
 
 @export_group("坠落判定")
 @export var kill_y : float = 1000.0        # 低于此高度视为坠落
@@ -72,6 +78,7 @@ func setup_rotating(core: Node2D) -> void:
 		# 开局即已同步：位置随盘，速度=圆盘速度（角速度 ω + 向心力维持）
 		var R : Vector2 = global_position - core_ref.global_position
 		velocity = Vector2(-core_ref.omega * R.y, core_ref.omega * R.x)
+		_set_platform_visibility(true)  # 开局即在旋转系：平台隐身
 
 
 func _ready() -> void:
@@ -81,6 +88,7 @@ func _ready() -> void:
 	insight_energy = energy_max
 	_spawn_point = global_position
 	player_eta = eta_default
+	_collect_platforms()
 
 
 func _physics_process(delta: float) -> void:
@@ -155,10 +163,9 @@ func _rotating_physics(delta: float) -> void:
 		a_abs = -omega * omega * R if rot_state == ROT_SYNCED else Vector2.ZERO
 	velocity += a_abs * delta
 	global_position += velocity * delta
-	# 缓存力（切换洞察显示：径向/切向合力 + 目标向心力）
-	var total_view : Vector2 = a_input + a_cent + a_cor
-	_dbg_radial = r_hat * total_view.dot(r_hat)
-	_dbg_tang = t_hat * total_view.dot(t_hat)
+	# 缓存力（洞察显示：玩家输入 + 惯性力 + 目标向心力）
+	_dbg_input = a_input
+	_dbg_inertia = a_cent + a_cor
 	_dbg_target = -r_hat * (omega * omega * r)
 	# 同步锁定计时
 	if rot_sync_lock > 0.0:
@@ -173,6 +180,7 @@ func _rotating_physics(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	_update_insight(delta)
+	_update_platform_fade(delta)
 	queue_redraw()
 
 
@@ -198,6 +206,7 @@ func reset_level() -> void:
 	failed = false
 	global_position = _spawn_point
 	velocity = Vector2.ZERO
+	_reset_rot_state()
 
 
 func add_dust(n: int) -> void:
@@ -222,6 +231,7 @@ func on_hazard() -> void:
 func _instant_respawn() -> void:
 	global_position = _spawn_point
 	velocity = Vector2.ZERO
+	_reset_rot_state()
 	var hud := get_tree().get_first_node_in_group("HUD")
 	if hud and hud.has_method("show_system_message"):
 		hud.show_system_message("【系统】：发现子操作系统异常，已自动恢复初始状态。（报告已收录）")
@@ -239,19 +249,29 @@ func _on_fallen() -> void:
 	else:
 		global_position = _spawn_point
 		velocity = Vector2.ZERO
+		_reset_rot_state()
 
 
 func _update_insight(delta: float) -> void:
-	# 参考系切换判定（F4）：本次与上次在不同参考系影响范围 → 触发切换
+	# 参考系切换判定：本次按下 Shift 与上次按下时处于不同参考系影响范围 → 触发切换
 	var in_rot_now : bool = rotating_mode and is_instance_valid(core_ref) \
 		and (global_position - core_ref.global_position).length() < core_ref.influence_radius
+	# 由加速度参考系首次进入旋转参考系影响范围：提示"建议切换参考系"（仅横向状态下进入时）
+	if rotating_mode and in_rot_now and not _last_in_rot_range and rot_state == ROT_NONE:
+		var hud := get_tree().get_first_node_in_group("HUD")
+		if hud and hud.has_method("show_system_message"):
+			hud.show_system_message("【系统】：检测到参考系出现较大偏差，建议切换参考系")
+	_last_in_rot_range = in_rot_now
 	if Input.is_action_just_pressed("insight"):
 		if rotating_mode and in_rot_now and not _last_insight_in_rot and rot_state == ROT_NONE:
 			_switching = true
 			rot_state = ROT_SWITCHING
 			is_insight = true
 			Engine.time_scale = insight_time_scale
-	_last_insight_in_rot = in_rot_now
+			_set_platform_visibility(true)  # 进入旋转参考系：平台开始隐身
+		# 仅在按下洞察时记录"本次所在参考系"（供下次按下比对）。
+		# 原实现每帧刷新，导致进入圆盘后 last 恒为 true、永远无法触发切换。
+		_last_insight_in_rot = in_rot_now
 
 	# 切换洞察：无时间限制，直到同步完成
 	if _switching:
@@ -286,6 +306,7 @@ func _on_synced() -> void:
 	rot_state = ROT_SYNCED
 	rot_sync_lock = 1.0
 	_switching = false
+	_set_platform_visibility(true)  # 同步完成：平台完全隐身
 	is_insight = false
 	Engine.time_scale = 1.0
 	# 贴盘速度（随盘转）
@@ -302,10 +323,77 @@ func _exit_rotating() -> void:
 	_switching = false
 	is_insight = false
 	Engine.time_scale = 1.0
+	_last_insight_in_rot = false   # 脱离后重新进入圆盘可再次触发切换
+	_set_platform_visibility(false)  # 脱离旋转参考系：平台重新现身
 	IllusionManager.reset_zone_params()  # 恢复横向参考系幻觉场
 	var hud := get_tree().get_first_node_in_group("HUD")
 	if hud and hud.has_method("show_system_message"):
-		hud.show_system_message("【系统】：检测到参考系出现较大偏差，建议切换参考系")
+		hud.show_system_message("【系统】：检测到当前参考系偏差较大，已自动恢复原参考系")
+
+
+## 重置旋转参考系状态（死亡/重试/坠落重生时统一调用）：
+## 重生点在旋转核心影响范围内 → 直接恢复为"已同步"（随盘转，无需重新切换）；
+## 否则 → 回到横向参考系，并允许下次进入圆盘时再次切换。
+func _reset_rot_state() -> void:
+	if rotating_mode and is_instance_valid(core_ref):
+		var in_rot : bool = (global_position - core_ref.global_position).length() < core_ref.influence_radius
+		if in_rot:
+			rot_state = ROT_SYNCED
+			_switching = false
+			is_insight = false
+			Engine.time_scale = 1.0
+			var R : Vector2 = global_position - core_ref.global_position
+			velocity = Vector2(-core_ref.omega * R.y, core_ref.omega * R.x)
+			_last_insight_in_rot = true
+			_set_platform_visibility(true)  # 圆盘上重生：平台保持隐身
+			return
+	rot_state = ROT_NONE
+	_switching = false
+	is_insight = false
+	Engine.time_scale = 1.0
+	_last_insight_in_rot = false
+	_set_platform_visibility(false)  # 圆盘外重生：平台现身
+	IllusionManager.reset_zone_params()
+
+
+## —— 旋转参考系：常规灰色平台隐身 ——
+## 进入旋转参考系后，关卡中的常规灰色平台（StaticBody2D/Poly）渐变隐身，
+## 脱出旋转参考系后重新显现。对所有旋转参考系关卡统一生效。
+
+## 收集关卡中所有常规平台（StaticBody2D 下名为 "Poly" 的 Polygon2D）。
+## 幻灵/绝对方块、可撞碎墙、隐藏平台等使用 _draw 绘制，不受影响。
+func _collect_platforms() -> void:
+	_platform_polys.clear()
+	_collect_polys(get_tree().current_scene)
+
+
+func _collect_polys(n: Node) -> void:
+	for c in n.get_children():
+		if c is StaticBody2D:
+			var poly : Node = c.get_node_or_null("Poly")
+			if poly is Polygon2D:
+				_platform_polys.append(poly)
+		_collect_polys(c)
+
+
+func _update_platform_fade(delta: float) -> void:
+	if _platform_polys.is_empty():
+		return
+	if absf(_platform_alpha - _platform_target) < 0.002:
+		_platform_alpha = _platform_target
+	else:
+		_platform_alpha = move_toward(_platform_alpha, _platform_target, PLATFORM_FADE_SPEED * delta)
+	for poly in _platform_polys:
+		if is_instance_valid(poly):
+			var c : Color = (poly as Polygon2D).color
+			if absf(c.a - _platform_alpha) > 0.002:
+				c.a = _platform_alpha
+				(poly as Polygon2D).color = c
+
+
+## 设置平台显隐目标：进入旋转参考系 → 隐身（target=0）；脱出 → 现身（target=1）
+func _set_platform_visibility(visible_in_rot: bool) -> void:
+	_platform_target = 0.0 if visible_in_rot else 1.0
 
 
 func _draw() -> void:
@@ -322,21 +410,22 @@ func _draw() -> void:
 	if not is_insight:
 		return
 	var center : Vector2 = Vector2.ZERO
-	# 切换洞察（参考系切换）：目标向心力(金) + 径向力(蓝) + 切向力(红)
+	# 切换洞察（参考系切换）：目标向心力(金) + 玩家输入(蓝) + 惯性力(红)
+	# 与横向洞察同色同义：蓝=你按的方向（A/D切向、W/S径向）；红=离心+科里奥利（系统在推你）；金=同步后需维持的向心力
 	if _switching or rot_state == ROT_SWITCHING:
 		if _dbg_target.length_squared() > 0.01:
 			_draw_arrow(center, _dbg_target.normalized() * 55.0, Color(1.0, 0.84, 0.0), false, 4.0)
-		if _dbg_radial.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_radial.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
-		if _dbg_tang.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_tang.normalized() * 45.0, Color(1.0, 0.3, 0.25), true, 4.0)
+		if _dbg_input.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_input.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
+		if _dbg_inertia.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_inertia.normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
 		return
-	# 旋转参考系洞察：蓝=径向合力、红=切向合力（径向/切向分解）
+	# 旋转参考系洞察：蓝=玩家输入、红=惯性力（离心+科里奥利）
 	if rot_state != ROT_NONE:
-		if _dbg_radial.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_radial.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
-		if _dbg_tang.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_tang.normalized() * 45.0, Color(1.0, 0.3, 0.25), true, 4.0)
+		if _dbg_input.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_input.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
+		if _dbg_inertia.length_squared() > 0.01:
+			_draw_arrow(center, _dbg_inertia.normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
 		return
 	# 横向参考系洞察：蓝=输入、红=虚假力（幻觉场）、绿=重力
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")

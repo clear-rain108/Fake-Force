@@ -21,6 +21,7 @@ func start_ending() -> void:
 	_active = true
 	visible = true
 	_t = 0.0
+	Engine.time_scale = 1.0   # 玩家可能在洞察(0.2x)中通关：复位全局时间，结局按正常速度演出
 	get_tree().paused = true
 
 
