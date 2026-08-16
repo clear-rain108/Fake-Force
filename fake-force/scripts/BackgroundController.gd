@@ -36,14 +36,28 @@ func _process(delta: float) -> void:
 		else:
 			_ship_alpha = move_toward(_ship_alpha, _target_ship, SHIP_FADE * delta)
 		_ship.modulate = Color(1.0, 1.0, 1.0, _ship_alpha)
+	# 公共参数：虚假力方向 / 玩家参考系状态 / 旋转角速度（供太空层 + 飞船仪器层共用）
+	var fake : Vector2 = mgr.get_current_fake_vector()
+	var sync_state : int = 0
+	var player := get_tree().get_first_node_in_group("Player")
+	if is_instance_valid(player) and "rot_state" in player:
+		sync_state = int(player.rot_state)   # 0=横向 1=校准中 2=已同步
+	var core := get_tree().get_first_node_in_group("RotatingCore")
+	var omega : float = mgr.current_omega
+	if is_instance_valid(core) and "omega" in core:
+		omega = float(core.omega)
 	# 1) 传递 G 值与洞察状态给背景着色器
 	if _bg_mat:
 		_bg_mat.set_shader_parameter("g_strength", mgr.current_g_value)
 		_bg_mat.set_shader_parameter("insight_mode", 1 if mgr.is_insight_mode else 0)
+	# 飞船仪器层：G/洞察（定格+校准环）/虚假力指示针/参考系状态/旋转角速度
 	if _ship_mat:
 		_ship_mat.set_shader_parameter("g_strength", mgr.current_g_value)
+		_ship_mat.set_shader_parameter("insight_mode", 1 if mgr.is_insight_mode else 0)
+		_ship_mat.set_shader_parameter("fake_dir", fake)
+		_ship_mat.set_shader_parameter("sync_state", sync_state)
+		_ship_mat.set_shader_parameter("omega", omega)
 	# 2) 尘埃流向 = 虚假力方向（平滑旋转，系数 0.5）
-	var fake : Vector2 = mgr.get_current_fake_vector()
 	if fake.length_squared() > 0.0001:
 		_dust_angle = lerp_angle(_dust_angle, fake.angle() * 0.5, delta * 2.5)
 		_dust.rotation = _dust_angle
