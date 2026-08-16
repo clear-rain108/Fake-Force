@@ -34,6 +34,7 @@ var rot_sync_lock : float = 0.0            # 同步后拒绝输入计时
 var _switching : bool = false              # 切换洞察中（无时间限制）
 var _last_insight_in_rot : bool = false
 var _last_in_rot_range : bool = false      # 上一帧是否处于旋转核心影响范围（进入提示前沿检测）
+var rot_switch_count : int = 0              # 累计完成旋转参考系同步次数（记事本第4页判定）
 var _prev_insight : bool = false           # 上一帧洞察状态（切换扫频音前沿检测）
 
 # 旋转参考系视觉：脚指向核心 / 视野 0.8 / 摄像机锁定核心（脱离回正）
@@ -61,6 +62,7 @@ const PLATFORM_FADE_SPEED : float = 0.8    # 渐变速率（alpha/秒）
 
 var player_eta : float = 1.0
 var dust_count : int = 0
+var dust_collected : int = 0   # 累计收集数（不含消耗，供记事本解锁判定）
 
 @export_group("洞察模式")
 @export var insight_time_scale : float = 0.2
@@ -149,7 +151,7 @@ func _rotating_physics(delta: float) -> void:
 	var input := Input.get_vector("left", "right", "up", "down")
 	var r_hat : Vector2 = R / r
 	var t_hat : Vector2 = r_hat.orthogonal()
-	var a_input : Vector2 = r_hat * input.y * radial_accel + t_hat * input.x * tang_accel
+	var a_input : Vector2 = (r_hat * input.y * radial_accel + t_hat * input.x * tang_accel) / player_eta  # η 影响旋转输入推力（尘埃调重玩法）
 	# 旋转虚假力（幻觉场）：离心 + 科里奥利
 	var a_cent : Vector2 = omega * omega * R
 	var a_cor : Vector2 = Vector2(2.0 * omega * v_rel.y, -2.0 * omega * v_rel.x)
@@ -223,6 +225,7 @@ func reset_level() -> void:
 
 func add_dust(n: int) -> void:
 	dust_count += n
+	dust_collected += n
 
 
 func _consume_dust(delta_eta: float) -> void:
@@ -316,6 +319,7 @@ func _exit_insight() -> void:
 
 func _on_synced() -> void:
 	rot_state = ROT_SYNCED
+	rot_switch_count += 1
 	rot_sync_lock = 1.0
 	_switching = false
 	_set_platform_visibility(true)  # 同步完成：平台完全隐身

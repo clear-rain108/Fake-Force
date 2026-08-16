@@ -1,36 +1,45 @@
-[gd_scene format=3 uid="uid://c7888o5ynbkdj"]
+[gd_scene load_steps=34 format=3]
 
-[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="1_starfield"]
-[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
-[ext_resource type="Script" uid="uid://cwdwx54qndmnj" path="res://scripts/IllusionZone.gd" id="3_zone"]
-[ext_resource type="Script" uid="uid://c2a5py7w4p28b" path="res://scripts/PhantomBlock.gd" id="4_block"]
-[ext_resource type="Script" uid="uid://ktvrk72i67co" path="res://scripts/HUD.gd" id="5_hud"]
-[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="6_texture"]
-[ext_resource type="Script" uid="uid://bx3xsickn4dia" path="res://scripts/StageBuilder.gd" id="8_stage"]
-[ext_resource type="Script" uid="uid://c2r5ktdwdbnh1" path="res://scripts/Dust.gd" id="9_dust"]
-[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="10_hint"]
-[ext_resource type="Script" uid="uid://qeflfrpjpb8y" path="res://scripts/Checkpoint.gd" id="11_checkpoint"]
-[ext_resource type="Script" uid="uid://ccywmpee4h0qw" path="res://scripts/Notebook.gd" id="12_notebook"]
-[ext_resource type="Script" uid="uid://d00i24ln7k3ut" path="res://scripts/NotebookTrigger.gd" id="13_trigger"]
-[ext_resource type="Script" uid="uid://clvlxe7bej24l" path="res://scripts/RotatingCore.gd" id="14_rotating"]
-[ext_resource type="Script" uid="uid://ckvwtfasg3qqv" path="res://scripts/VictoryTrigger.gd" id="15_victory"]
-[ext_resource type="Script" uid="uid://6v6xh2m4brrh" path="res://scripts/EndingSequence.gd" id="16_ending"]
-[ext_resource type="Script" uid="uid://bb2dk5syesbbk" path="res://scripts/HiddenPlatform.gd" id="17_hidden"]
-[ext_resource type="Script" uid="uid://d0oinyw3wf1v1" path="res://scripts/OpeningSequence.gd" id="18_opening"]
-[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="19_vignette"]
-[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="20_bg"]
+[ext_resource type="Script" path="res://scripts/StoryRoot.gd" id="1_root"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" path="res://scripts/IllusionZone.gd" id="3_zone"]
+[ext_resource type="Script" path="res://scripts/PhantomBlock.gd" id="4_block"]
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="5_hud"]
+[ext_resource type="Texture2D" path="res://Art_Chsr_Main.png" id="6_texture"]
+[ext_resource type="Script" path="res://scripts/StarField.gd" id="7_star"]
+[ext_resource type="Script" path="res://scripts/StageBuilder.gd" id="8_stage"]
+[ext_resource type="Script" path="res://scripts/Dust.gd" id="9_dust"]
+[ext_resource type="Script" path="res://scripts/HintZone.gd" id="10_hint"]
+[ext_resource type="Script" path="res://scripts/Checkpoint.gd" id="11_checkpoint"]
+[ext_resource type="Script" path="res://scripts/Notebook.gd" id="12_notebook"]
+[ext_resource type="Script" path="res://scripts/NotebookTrigger.gd" id="13_trigger"]
+[ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="14_rotating"]
+[ext_resource type="Script" path="res://scripts/Switch.gd" id="15_switch"]
+[ext_resource type="Script" path="res://scripts/StageTransition.gd" id="16_trans"]
+[ext_resource type="Script" path="res://scripts/OpeningSequence.gd" id="17_opening"]
+[ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="18_vignette"]
+[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="19_bg"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone1"]
-size = Vector2(3400, 700)
+size = Vector2(3800, 700)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone2"]
-size = Vector2(2600, 700)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneMaze"]
+size = Vector2(1650, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneCorr"]
+size = Vector2(600, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneCorrD"]
+size = Vector2(500, 500)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_block"]
 size = Vector2(100, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_blockBig"]
+size = Vector2(200, 40)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
 radius = 8.0
@@ -41,184 +50,297 @@ size = Vector2(1000, 600)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpoint"]
 size = Vector2(200, 300)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_zone3"]
-size = Vector2(1800, 900)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate"]
+size = Vector2(40, 400)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_exit"]
-size = Vector2(280, 14)
+[sub_resource type="CircleShape2D" id="CircleShape2D_switch"]
+radius = 26.0
 
-[node name="Main" type="Node2D" unique_id=726544362]
+[sub_resource type="CircleShape2D" id="CircleShape2D_trans"]
+radius = 30.0
 
-[node name="Background" parent="." instance=ExtResource("20_bg")]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(40, 160)
 
-[node name="StarField" type="Node2D" parent="." unique_id=1855930004]
-script = ExtResource("1_starfield")
+[node name="Main" type="Node2D"]
+script = ExtResource("1_root")
 
-[node name="StageBuilder" type="Node2D" parent="." unique_id=1388974266]
+[node name="Background" parent="." instance=ExtResource("19_bg")]
+
+[node name="StarField" type="Node2D" parent="."]
+script = ExtResource("7_star")
+
+[node name="StageBuilder" type="Node2D" parent="."]
 script = ExtResource("8_stage")
 
-[node name="Player" type="CharacterBody2D" parent="." unique_id=1584464065]
-script = ExtResource("2_player")
+[node name="Player" type="CharacterBody2D" parent="."]
 z_index = 1
 position = Vector2(0, 650)
+script = ExtResource("2_player")
+rotating_mode = true
 
-[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1737745893]
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1
 texture = ExtResource("6_texture")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=729081976]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 shape = SubResource("CircleShape2D_player")
 
-[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1760167967]
+[node name="Camera2D" type="Camera2D" parent="Player"]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="IllusionZone" type="Area2D" parent="." unique_id=960067489]
+[node name="Stage1Zone" type="Area2D" parent="."]
+position = Vector2(1350, 500)
 script = ExtResource("3_zone")
-position = Vector2(1300, 500)
+g_value = 0.8
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone" unique_id=1506165767]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Stage1Zone"]
 shape = SubResource("RectangleShape2D_zone1")
 
-[node name="IllusionZone2" type="Area2D" parent="." unique_id=2128675839]
-script = ExtResource("3_zone")
-position = Vector2(4200, 400)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone2" unique_id=657009234]
-shape = SubResource("RectangleShape2D_zone2")
-
-[node name="PhantomBlock" type="RigidBody2D" parent="." unique_id=689967856]
-script = ExtResource("4_block")
-position = Vector2(3700, 120)
-gravity_scale = 0.0
-linear_damp = 2.5
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PhantomBlock" unique_id=34684357]
-shape = SubResource("RectangleShape2D_block")
-
-[node name="AbsoluteBlock" type="RigidBody2D" parent="." unique_id=2027522240]
-script = ExtResource("4_block")
-position = Vector2(3750, 40)
-gravity_scale = 0.0
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsoluteBlock" unique_id=2127302447]
-shape = SubResource("RectangleShape2D_block")
-
-[node name="Dust1" type="Area2D" parent="." unique_id=28016895]
+[node name="Dust1" type="Area2D" parent="."]
+position = Vector2(1300, 400)
 script = ExtResource("9_dust")
-position = Vector2(3400, 130)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1" unique_id=1588464951]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Dust2" type="Area2D" parent="." unique_id=953347504]
-script = ExtResource("9_dust")
-position = Vector2(3650, 60)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2" unique_id=489975918]
-shape = SubResource("CircleShape2D_dust")
-
-[node name="Dust3" type="Area2D" parent="." unique_id=1065906747]
-script = ExtResource("9_dust")
-position = Vector2(4100, 130)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3" unique_id=1080568924]
-shape = SubResource("CircleShape2D_dust")
-
-[node name="HintZone1" type="Area2D" parent="." unique_id=634349191]
-script = ExtResource("10_hint")
-position = Vector2(3200, 350)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone1" unique_id=1325654096]
-shape = SubResource("RectangleShape2D_hint")
-
-[node name="HintZone2" type="Area2D" parent="." unique_id=1984327387]
-script = ExtResource("10_hint")
-position = Vector2(3700, 300)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone2" unique_id=623944279]
-shape = SubResource("RectangleShape2D_hint")
-
-[node name="Checkpoint" type="Area2D" parent="." unique_id=1619015248]
+[node name="Checkpoint1" type="Area2D" parent="."]
+position = Vector2(1350, 400)
 script = ExtResource("11_checkpoint")
-position = Vector2(3200, 150)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint" unique_id=1931628056]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint1"]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="NotebookTrigger" type="Area2D" parent="." unique_id=651759332]
+[node name="Switch" type="Area2D" parent="."]
+position = Vector2(3300, 190)
+script = ExtResource("15_switch")
+unlock_page = 2
+gate_path = NodePath("Gate")
+hint = "【系统】：机关已启动，舱门开启。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Switch"]
+shape = SubResource("CircleShape2D_switch")
+
+[node name="Gate" type="StaticBody2D" parent="."]
+position = Vector2(3400, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate"]
+shape = SubResource("RectangleShape2D_gate")
+
+[node name="Poly" type="Polygon2D" parent="Gate"]
+color = Color(0.35, 0.6, 0.9, 0.85)
+polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
+
+[node name="MazeZone" type="Area2D" parent="."]
+position = Vector2(4125, 560)
+script = ExtResource("3_zone")
+g_value = 1.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeZone"]
+shape = SubResource("RectangleShape2D_zoneMaze")
+
+[node name="WallA" type="StaticBody2D" parent="."]
+position = Vector2(3480, 470)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallA"]
+shape = SubResource("RectangleShape2D_wall")
+
+[node name="Poly" type="Polygon2D" parent="WallA"]
+color = Color(0.5, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-20, -80, 20, -80, 20, 80, -20, 80)
+
+[node name="PB1" type="RigidBody2D" parent="."]
+position = Vector2(3725, 470)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+size_x = 100.0
+x_min = 3650.0
+x_max = 3800.0
+counts_as_occupant = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PB1"]
+shape = SubResource("RectangleShape2D_block")
+
+[node name="PB2" type="RigidBody2D" parent="."]
+position = Vector2(4620, 470)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+size_x = 200.0
+x_min = 4580.0
+x_max = 4700.0
+counts_as_occupant = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PB2"]
+shape = SubResource("RectangleShape2D_blockBig")
+
+[node name="AbsRef" type="RigidBody2D" parent="."]
+position = Vector2(4050, 400)
+gravity_scale = 0.0
+script = ExtResource("4_block")
+is_phantom = false
+size_x = 100.0
+counts_as_occupant = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsRef"]
+shape = SubResource("RectangleShape2D_block")
+
+[node name="Dust2" type="Area2D" parent="."]
+position = Vector2(3850, 480)
+script = ExtResource("9_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust3" type="Area2D" parent="."]
+position = Vector2(4550, 470)
+script = ExtResource("9_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="MazeExit" type="Area2D" parent="."]
+position = Vector2(4900, 500)
 script = ExtResource("13_trigger")
-position = Vector2(3200, 150)
+unlock_count = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger" unique_id=487141764]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExit"]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="RotatingCore" type="Node2D" parent="." unique_id=1084522036]
+[node name="HintZoneMaze" type="Area2D" parent="."]
+position = Vector2(3900, 500)
+script = ExtResource("10_hint")
+hint_text = "【系统】：蓝色方块会被虚假力吹动——等它漂到缺口处踩上去，通过迷宫。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZoneMaze"]
+shape = SubResource("RectangleShape2D_hint")
+
+[node name="Zone2A" type="Area2D" parent="."]
+position = Vector2(5300, 500)
+script = ExtResource("3_zone")
+g_value = 1.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(-1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2A"]
+shape = SubResource("RectangleShape2D_zoneCorr")
+
+[node name="Zone2B" type="Area2D" parent="."]
+position = Vector2(5950, 500)
+script = ExtResource("3_zone")
+g_value = 1.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2B"]
+shape = SubResource("RectangleShape2D_zoneCorr")
+
+[node name="Zone2C" type="Area2D" parent="."]
+position = Vector2(6600, 500)
+script = ExtResource("3_zone")
+g_value = 1.0
+damping = 0.5
+field_mode = 1
+field_directions = [Vector2(1, 0), Vector2(-1, 0)]
+field_interval = 3.0
+field_coast = 1.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2C"]
+shape = SubResource("RectangleShape2D_zoneCorr")
+
+[node name="Zone2D" type="Area2D" parent="."]
+position = Vector2(7200, 450)
+script = ExtResource("3_zone")
+g_value = 1.2
+damping = 0.5
+field_mode = 2
+field_directions = [Vector2(-1, 0), Vector2(1, 0)]
+field_interval = 2.2
+field_coast = 0.8
+field_jitter = 0.5
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2D"]
+shape = SubResource("RectangleShape2D_zoneCorrD")
+
+[node name="Dust4" type="Area2D" parent="."]
+position = Vector2(5450, 420)
+script = ExtResource("9_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust4"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust5" type="Area2D" parent="."]
+position = Vector2(6400, 420)
+script = ExtResource("9_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust5"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="HintZoneStage2" type="Area2D" parent="."]
+position = Vector2(5750, 420)
+script = ExtResource("10_hint")
+hint_text = "【系统】：多段加速度场方向各异——按住Shift解析受力方向后再前进。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZoneStage2"]
+shape = SubResource("RectangleShape2D_hint")
+
+[node name="RotatingCore" type="Node2D" parent="."]
+position = Vector2(7900, 350)
 script = ExtResource("14_rotating")
-position = Vector2(6400, 500)
+omega = 0.8
+influence_radius = 220.0
+core_radius = 150.0
 
-[node name="IllusionZone3" type="Area2D" parent="." unique_id=2016796592]
-script = ExtResource("3_zone")
-position = Vector2(6000, 300)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone3" unique_id=1480084375]
-shape = SubResource("RectangleShape2D_zone3")
-
-[node name="HiddenPlatform" type="StaticBody2D" parent="." unique_id=19315623]
-script = ExtResource("17_hidden")
-position = Vector2(6260, 270)
-
-[node name="NotebookTrigger2" type="Area2D" parent="." unique_id=1520601675]
-script = ExtResource("13_trigger")
-position = Vector2(5600, 140)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger2" unique_id=67019060]
-shape = SubResource("RectangleShape2D_checkpoint")
-
-[node name="Checkpoint2" type="Area2D" parent="." unique_id=1117076933]
+[node name="Checkpoint2" type="Area2D" parent="."]
+position = Vector2(7900, 560)
 script = ExtResource("11_checkpoint")
-position = Vector2(5600, 120)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2" unique_id=1699558322]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2"]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="NotebookTrigger3" type="Area2D" parent="." unique_id=468086708]
-script = ExtResource("13_trigger")
-position = Vector2(6260, 260)
+[node name="HintZoneRing" type="Area2D" parent="."]
+position = Vector2(7900, 500)
+script = ExtResource("10_hint")
+hint_text = "【系统】：旋转参考系——跳上圆盘，靠近核心后按Shift切换参考系并同步。"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="NotebookTrigger3" unique_id=607028738]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZoneRing"]
 shape = SubResource("RectangleShape2D_hint")
 
-[node name="VictoryTrigger" type="Area2D" parent="." unique_id=1381090267]
-script = ExtResource("15_victory")
-position = Vector2(6400, 60)
+[node name="StageTransition" type="Area2D" parent="."]
+position = Vector2(8900, 150)
+script = ExtResource("16_trans")
+unlock_page = 5
+hint = "【系统】：航路尽头是黑洞。在那里，过去会重新显现。"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="VictoryTrigger" unique_id=1359320880]
-position = Vector2(-1, -45)
-shape = SubResource("RectangleShape2D_exit")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StageTransition"]
+shape = SubResource("CircleShape2D_trans")
 
-[node name="Ending" type="CanvasLayer" parent="." unique_id=314854200]
-layer = 100
-
-[node name="EndingDraw" type="Node2D" parent="Ending" unique_id=782604766]
-script = ExtResource("16_ending")
-
-[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=184992310]
+[node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40
 
-[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=1879706826]
-script = ExtResource("19_vignette")
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette"]
+script = ExtResource("18_vignette")
 
-[node name="Opening" type="CanvasLayer" parent="." unique_id=272291037]
+[node name="Opening" type="CanvasLayer" parent="."]
 layer = 50
 
-[node name="OpeningDraw" type="Node2D" parent="Opening" unique_id=1753314697]
-script = ExtResource("18_opening")
+[node name="OpeningDraw" type="Node2D" parent="Opening"]
+script = ExtResource("17_opening")
 
-[node name="HUD" type="CanvasLayer" parent="." unique_id=385699299]
+[node name="HUD" type="CanvasLayer" parent="."]
 script = ExtResource("5_hud")
 
-[node name="GValue" type="Label" parent="HUD" unique_id=128421507]
+[node name="GValue" type="Label" parent="HUD"]
 offset_left = 16.0
 offset_top = 10.0
 offset_right = 420.0
@@ -226,7 +348,7 @@ offset_bottom = 42.0
 theme_override_font_sizes/font_size = 24
 text = "当前幻觉强度：0.0 G"
 
-[node name="EnergyBar" type="ProgressBar" parent="HUD" unique_id=2060205221]
+[node name="EnergyBar" type="ProgressBar" parent="HUD"]
 offset_left = 16.0
 offset_top = 50.0
 offset_right = 260.0
@@ -234,14 +356,14 @@ offset_bottom = 70.0
 value = 100.0
 show_percentage = false
 
-[node name="Message" type="Label" parent="HUD" unique_id=418954582]
+[node name="Message" type="Label" parent="HUD"]
 offset_left = 16.0
 offset_top = 120.0
 offset_right = 900.0
 offset_bottom = 160.0
 theme_override_font_sizes/font_size = 20
 
-[node name="DustInfo" type="Label" parent="HUD" unique_id=483300740]
+[node name="DustInfo" type="Label" parent="HUD"]
 offset_left = 16.0
 offset_top = 175.0
 offset_right = 400.0
@@ -249,7 +371,7 @@ offset_bottom = 205.0
 theme_override_font_sizes/font_size = 16
 text = "马赫尘埃：0"
 
-[node name="EtaInfo" type="Label" parent="HUD" unique_id=143246248]
+[node name="EtaInfo" type="Label" parent="HUD"]
 offset_left = 16.0
 offset_top = 205.0
 offset_right = 500.0
@@ -257,5 +379,8 @@ offset_bottom = 235.0
 theme_override_font_sizes/font_size = 16
 text = "η：1.00"
 
-[node name="Notebook" type="Node2D" parent="HUD" unique_id=1590121712]
+[node name="Notebook" type="Node2D" parent="HUD"]
 script = ExtResource("12_notebook")
+
+
+

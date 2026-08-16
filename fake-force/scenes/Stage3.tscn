@@ -1,0 +1,208 @@
+[gd_scene load_steps=20 format=3]
+
+[ext_resource type="Script" path="res://scripts/Stage3Root.gd" id="1_root"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="3_core"]
+[ext_resource type="Script" path="res://scripts/Dust.gd" id="4_dust"]
+[ext_resource type="Script" path="res://scripts/VictoryTrigger.gd" id="5_victory"]
+[ext_resource type="Script" path="res://scripts/EndingSequence.gd" id="6_ending"]
+[ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="7_vignette"]
+[ext_resource type="Script" path="res://scripts/HUD.gd" id="8_hud"]
+[ext_resource type="Script" path="res://scripts/Notebook.gd" id="9_notebook"]
+[ext_resource type="Script" path="res://scripts/HiddenPlatform.gd" id="10_hidden"]
+[ext_resource type="Script" path="res://scripts/StarField.gd" id="11_star"]
+[ext_resource type="PackedScene" path="res://scenes/background.tscn" id="12_bg"]
+[ext_resource type="Texture2D" path="res://Art_Chsr_Main.png" id="13_texture"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
+radius = 8.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platStart"]
+size = Vector2(300, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platMid"]
+size = Vector2(360, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platOuter"]
+size = Vector2(400, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(80, 40)
+
+[node name="Stage3" type="Node2D"]
+script = ExtResource("1_root")
+
+[node name="Background" parent="." instance=ExtResource("12_bg")]
+
+[node name="StarField" type="Node2D" parent="."]
+script = ExtResource("11_star")
+
+[node name="RotatingCore" type="Node2D" parent="."]
+position = Vector2(0, 0)
+script = ExtResource("3_core")
+omega = 1.0
+influence_radius = 10000.0
+core_radius = 180.0
+
+[node name="Player" type="CharacterBody2D" parent="."]
+z_index = 1
+position = Vector2(0, -220)
+script = ExtResource("2_player")
+rotating_mode = true
+start_in_rot = true
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+z_index = -1
+texture = ExtResource("13_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("CircleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player"]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="StartRing" type="StaticBody2D" parent="."]
+position = Vector2(0, -220)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StartRing"]
+shape = SubResource("RectangleShape2D_platStart")
+
+[node name="Poly" type="Polygon2D" parent="StartRing"]
+color = Color(0.45, 0.45, 0.5, 1)
+polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+
+[node name="MidRing" type="StaticBody2D" parent="."]
+position = Vector2(0, -340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidRing"]
+shape = SubResource("RectangleShape2D_platMid")
+
+[node name="Poly" type="Polygon2D" parent="MidRing"]
+color = Color(0.48, 0.48, 0.53, 1)
+polygon = PackedVector2Array(-180, -15, 180, -15, 180, 15, -180, 15)
+
+[node name="OuterRing" type="StaticBody2D" parent="."]
+position = Vector2(0, -470)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="OuterRing"]
+shape = SubResource("RectangleShape2D_platOuter")
+
+[node name="Poly" type="Polygon2D" parent="OuterRing"]
+color = Color(0.5, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-200, -15, 200, -15, 200, 15, -200, 15)
+
+[node name="Dust1" type="Area2D" parent="."]
+position = Vector2(120, -260)
+script = ExtResource("4_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust2" type="Area2D" parent="."]
+position = Vector2(-140, -300)
+script = ExtResource("4_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust3" type="Area2D" parent="."]
+position = Vector2(260, -380)
+script = ExtResource("4_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust4" type="Area2D" parent="."]
+position = Vector2(-260, -420)
+script = ExtResource("4_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust4"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust5" type="Area2D" parent="."]
+position = Vector2(0, -455)
+script = ExtResource("4_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust5"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Hidden1" type="StaticBody2D" parent="."]
+position = Vector2(140, -400)
+script = ExtResource("10_hidden")
+
+[node name="Hidden2" type="StaticBody2D" parent="."]
+position = Vector2(-160, -450)
+script = ExtResource("10_hidden")
+
+[node name="Hidden3" type="StaticBody2D" parent="."]
+position = Vector2(0, -500)
+script = ExtResource("10_hidden")
+
+[node name="VictoryTrigger" type="Area2D" parent="."]
+position = Vector2(0, -455)
+script = ExtResource("5_victory")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="VictoryTrigger"]
+shape = SubResource("RectangleShape2D_goal")
+
+[node name="GrimVignette" type="CanvasLayer" parent="."]
+layer = 40
+
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette"]
+script = ExtResource("7_vignette")
+
+[node name="HUD" type="CanvasLayer" parent="."]
+script = ExtResource("8_hud")
+
+[node name="GValue" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 42.0
+theme_override_font_sizes/font_size = 24
+text = "当前幻觉强度：0.0 G"
+
+[node name="EnergyBar" type="ProgressBar" parent="HUD"]
+offset_left = 16.0
+offset_top = 50.0
+offset_right = 260.0
+offset_bottom = 70.0
+value = 100.0
+show_percentage = false
+
+[node name="Message" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 120.0
+offset_right = 900.0
+offset_bottom = 160.0
+theme_override_font_sizes/font_size = 20
+
+[node name="DustInfo" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 175.0
+offset_right = 400.0
+offset_bottom = 205.0
+theme_override_font_sizes/font_size = 16
+text = "马赫尘埃：0"
+
+[node name="EtaInfo" type="Label" parent="HUD"]
+offset_left = 16.0
+offset_top = 205.0
+offset_right = 500.0
+offset_bottom = 235.0
+theme_override_font_sizes/font_size = 16
+text = "η：1.00"
+
+[node name="Notebook" type="Node2D" parent="HUD"]
+script = ExtResource("9_notebook")
+
+[node name="Ending" type="CanvasLayer" parent="."]
+layer = 100
+
+[node name="EndingDraw" type="Node2D" parent="Ending"]
+script = ExtResource("6_ending")
+

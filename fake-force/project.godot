@@ -23,19 +23,20 @@ buses/default_bus_layout="res://audio_buses.tres"
 
 IllusionManager="*res://scripts/IllusionManager.gd"
 AudioManager="*res://scripts/AudioManager.gd"
+StageFade="*res://scripts/StageFade.gd"
 
 [display]
 
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
 
-[gui]
-
-theme/custom_font="res://fusion-pixel.ttf"
-
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/godot_mcp/plugin.cfg")
+
+[gui]
+
+theme/custom_font="res://fusion-pixel.ttf"
 
 [input]
 

@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="7_texture"]
 [ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="8_star"]
 [ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="9_vignette"]
-[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="10_hint"]
 [ext_resource type="Script" uid="uid://cqqkuhfg1bcva" path="res://scripts/Spikes.gd" id="11_spikes"]
 [ext_resource type="Script" uid="uid://c2r5ktdwdbnh1" path="res://scripts/Dust.gd" id="12_dust"]
 [ext_resource type="Script" uid="uid://c8ohrxr03nk8s" path="res://scripts/CrushableWall.gd" id="13_wall"]
@@ -44,9 +43,6 @@ size = Vector2(1000, 350)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
-size = Vector2(800, 160)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
 radius = 8.0
@@ -364,30 +360,6 @@ script = ExtResource("4_goal")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 shape = SubResource("RectangleShape2D_goal")
-
-[node name="HintZone1" type="Area2D" parent="."]
-position = Vector2(-100, 400)
-script = ExtResource("10_hint")
-hint_text = "【系统】：幻灵方块会被虚假力吹动——等它飘到合适位置，踩上去借力过深渊。橙色方块是绝对参照物。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone1"]
-shape = SubResource("RectangleShape2D_hint")
-
-[node name="HintZone2" type="Area2D" parent="."]
-position = Vector2(700, 400)
-script = ExtResource("10_hint")
-hint_text = "【系统】：按住E吸附马赫尘埃｜Q变重/Z变轻｜尖刺需变轻(η<0.6)飘过，蓝墙需变重(η>1.5)撞碎"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone2"]
-shape = SubResource("RectangleShape2D_hint")
-
-[node name="HintZone3" type="Area2D" parent="."]
-position = Vector2(1500, 400)
-script = ExtResource("10_hint")
-hint_text = "【系统】：相位走廊——加速度方向周期摆动，幻灵方块随之漂移，请读节奏跳越。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone3"]
-shape = SubResource("RectangleShape2D_hint")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40

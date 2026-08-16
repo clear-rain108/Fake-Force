@@ -20,6 +20,17 @@ var current_omega : float = 0.0
 var current_eta : float = 1.0
 var current_damping : float = 0.5
 
+var zone_count : int = 0           # 已进入的不同幻觉区域数（阶段2 记事本第4页判定）
+var _zones_seen : Dictionary = {}  # zone instance_id → true
+var notebook_unlocked : int = 0    # 记事本已解锁页数（跨场景持久）
+
+
+## 记录玩家进入过的幻觉区域（按实例去重）
+func note_zone(id: int) -> void:
+	if not _zones_seen.has(id):
+		_zones_seen[id] = true
+		zone_count = _zones_seen.size()
+
 
 ## 切换游戏模式（剧情/解密），并切换 G→加速度 换算系数
 func set_mode(mode: String) -> void:

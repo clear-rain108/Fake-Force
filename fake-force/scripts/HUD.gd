@@ -65,3 +65,8 @@ func _show_message(text: String, duration: float) -> void:
 func show_message(text: String, duration: float) -> void:
 	_show_message(text, duration)
 
+
+## 供玩家/系统事件调用（与解密 HUD 接口一致）
+func show_system_message(text: String) -> void:
+	_show_message(text, 5.0)
+

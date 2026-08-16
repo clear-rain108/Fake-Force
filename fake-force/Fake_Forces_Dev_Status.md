@@ -23,23 +23,26 @@
 
 ## 二、已实现系统
 
-### 剧情模式（Main.tscn，阶段1+2+3）
+### 剧情模式（阶段1+2 = `Main.tscn`，阶段3 = `scenes/Stage3.tscn`，黑屏淡入淡出过渡）
 | 系统 | 脚本 | 说明 |
 | :--- | :--- | :--- |
-| 幻觉管理器 | `IllusionManager.gd` | 双模式 G_TO_ACCEL：剧情 40 / 解密 10；`rotating_accel`；`get_current_effective_g` |
-| 玩家 | `Player.gd` | 三分量移动；瞬时起跳（η影响）；空中微重力；洞察1秒；坠落计数；尘埃Q/Z；存档点；η光晕；旋转圆盘模式（`rotating_mode`）；**旋转系常规平台隐身（渐变）**；重生/重试重置旋转状态 |
-| 幻觉区域 | `IllusionZone.gd` + `IllusionField.gd` | G/η/k/ω 导出；CONSTANT/CYCLE/RANDOM；匀速间歇；G正弦渐变；时长抖动 |
-| 幻灵/绝对方块 | `PhantomBlock.gd` | `is_phantom`；漂移范围限制 |
-| 马赫尘埃 | `Dust.gd` | E收集 |
+| 幻觉管理器 | `IllusionManager.gd` | 双模式 G_TO_ACCEL：剧情 40 / 解密 10；`rotating_accel`；`get_current_effective_g`；**区域计数/记事本解锁持久化** |
+| 玩家 | `Player.gd` | 三分量移动；瞬时起跳（η影响）；空中微重力；洞察1秒；坠落计数；尘埃Q/Z（**旋转输入推力÷η**）；存档点；η光晕；旋转圆盘模式；**旋转同步计数**；重生/重试重置旋转状态 |
+| 幻觉区域 | `IllusionZone.gd` + `IllusionField.gd` | G/η/k/ω 导出；CONSTANT/CYCLE/RANDOM；匀速间歇；G正弦渐变；时长抖动；**进入记录（note_zone）** |
+| 幻灵/绝对方块 | `PhantomBlock.gd` | `is_phantom`；漂移范围限制；`bounce` 反弹；`counts_as_occupant` |
+| 马赫尘埃 | `Dust.gd` | E收集（累计数供记事本判定） |
 | 粒子星空 | `StarField.gd` | 跟随玩家；G=0摆动；加速度拖曳；黑洞弧线 |
-| HUD | `HUD.gd` | 剧情布局 |
-| 关卡生成 | `StageBuilder.gd` | 三阶段平台 |
-| 记事本 | `Notebook.gd` + `NotebookTrigger.gd` | 5页剧情碎片；翻页 |
+| HUD | `HUD.gd` | 剧情布局 + `show_system_message` |
+| 关卡生成 | `StageBuilder.gd` | 阶段1+2 平台（偏转回廊→机关/迷宫→多场走廊→旋转环廊→黑洞舱门） |
+| 记事本 | `Notebook.gd` + `NotebookTrigger.gd` | 5页剧情碎片；**事件驱动解锁**（尘埃/机关/迷宫出口/多场+旋转同步/衔接处）；跨场景持久 |
+| 机关 | `Switch.gd`（新） | 触碰解锁记事本页 + 开启舱门 |
+| 阶段过渡 | `StageFade.gd`（新，Autoload）+ `StageTransition.gd`（新） | 黑屏淡入淡出跨场景切换 |
+| 根节点 | `StoryRoot.gd`（新）/ `Stage3Root.gd`（新） | 阶段1+2 飞船内部背景 / 阶段3 宇宙背景 + 核心绑定 |
 | 存档点/提示区 | `Checkpoint.gd` / `HintZone.gd` | |
-| 旋转核心 | `RotatingCore.gd` | 离心ω²r；**新增 `gravity_in`（向心引力）** |
-| 隐藏平台/出口 | `HiddenPlatform.gd` / `VictoryTrigger.gd` | |
-| 结局演出 | `EndingSequence.gd` | 多阶段黑洞结局 |
-| 开场导言 | `OpeningSequence.gd` | 8段多行 |
+| 旋转核心 | `RotatingCore.gd` | 离心ω²r（阶段2 环廊 + 阶段3 无重环带） |
+| 隐藏平台/出口 | `HiddenPlatform.gd` / `VictoryTrigger.gd` | 阶段3 隐藏路径 + 黑洞视界出口 |
+| 结局演出 | `EndingSequence.gd` | 多阶段黑洞结局（阶段3 内） |
+| 开场导言 | `OpeningSequence.gd` | 8段多行（阶段1 开场） |
 | 边缘红晕 | `GrimVignette.gd` | 破碎光带，0~0.8G渐变 |
 
 ### 解密模式（levels/T*.tscn / Q*.tscn，9关：教学4 + 主线5）
@@ -121,10 +124,11 @@
 - [x] **关卡内背景与选关按钮一致**：`background.tscn` 增加飞船内部层（`ship_interior.gdshader`），`BackgroundController.set_theme` 平滑淡化；`PuzzleLevelRoot.bg_theme` 配置——T1~T4/Q1/Q2=飞船内部、Q3~Q5=太空（与选关页完全一致）；飞船背景复用尘埃粒子（舱内漂浮微粒）+ 游戏配色
 - [x] **飞船背景重写（金属科幻风）**：去掉格栅/格子，改为拉丝金属 + 分块面板（接缝+四角铆钉）+ 斜切金属板高光 + 发光灯条 + 指示灯 + 扫描光 + 弯曲管线
 - [x] **全局字体 fusion-pixel**：`project.godot [gui] theme/custom_font`；关闭像素字体抗锯齿（antialiasing=0）；6 个脚本 `_draw` 文字改用 fusion-pixel；全部 Label/文字字号规整为像素友好整数（14/15→16、18→20、22/26/34→24/32 等）
-- [ ] **各关难度/手感逐关校准（用户测试反馈中）**
+- [x] **剧情模式重构（三幕分场景）**：阶段1+2 = `Main.tscn`（飞船内部背景）——偏转回廊（缺口教学+第1枚尘埃）→ 机关舱门（`Switch.gd`，第2页）→ 迷宫（幻灵方块垫脚+绝对方块参照，出口第3页）→ 多场走廊（4区：右/左/CYCLE/RANDOM）→ 旋转环廊（同步后第4页）→ 黑洞舱门（第5页+黑屏淡出）；阶段3 = `Stage3.tscn`（宇宙背景·全局无重力·尘埃调η·隐藏路径·结局）；记事本改为事件驱动解锁并跨场景持久（`IllusionManager.notebook_unlocked`）；`StageFade.gd`（Autoload 黑屏过渡）；`StoryRoot.gd`/`Stage3Root.gd`
+- [ ] 各关难度/手感逐关校准（用户测试反馈中）
 - [ ] 旋转关卡手感（Q5/Q6）最终验收
 - [ ] 解密模式音效
-- [ ] 剧情模式：场景拆分（阶段3独立 Stage3.tscn）、音效、尘埃η谜题、收尾打磨
+- [ ] 剧情模式音效、阶段3手感与演出细节收尾打磨
 
 ---
 

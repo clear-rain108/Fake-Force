@@ -1,4 +1,4 @@
-[gd_scene load_steps=21 format=3]
+[gd_scene load_steps=19 format=3]
 
 [ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="7_texture"]
 [ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="8_star"]
 [ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="9_vignette"]
-[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="10_hint"]
 [ext_resource type="Script" uid="uid://cqqkuhfg1bcva" path="res://scripts/Spikes.gd" id="11_spikes"]
 [ext_resource type="Script" uid="uid://c2r5ktdwdbnh1" path="res://scripts/Dust.gd" id="12_dust"]
 
@@ -30,9 +29,6 @@ size = Vector2(1300, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
-size = Vector2(800, 160)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
 radius = 8.0
@@ -170,14 +166,6 @@ script = ExtResource("4_goal")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 shape = SubResource("RectangleShape2D_goal")
-
-[node name="HintZone" type="Area2D" parent="."]
-position = Vector2(0, 300)
-script = ExtResource("10_hint")
-hint_text = "【系统】：同一恒定加速度场——去程顺风、回程逆风。返回时请反向补偿。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone"]
-shape = SubResource("RectangleShape2D_hint")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40

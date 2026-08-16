@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=18 format=3]
 
 [ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
@@ -9,7 +9,6 @@
 [ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="7_texture"]
 [ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="8_star"]
 [ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="9_vignette"]
-[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="10_hint"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_plat"]
 size = Vector2(260, 30)
@@ -34,9 +33,6 @@ size = Vector2(1200, 160)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
-size = Vector2(700, 160)
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_root")
@@ -222,22 +218,6 @@ script = ExtResource("4_goal")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 shape = SubResource("RectangleShape2D_goal")
-
-[node name="HintZone1" type="Area2D" parent="."]
-position = Vector2(-380, 470)
-script = ExtResource("10_hint")
-hint_text = "【系统】：加速度方向随楼层切换——留意红色风向标，或按住Shift解析受力。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone1"]
-shape = SubResource("RectangleShape2D_hint")
-
-[node name="HintZone2" type="Area2D" parent="."]
-position = Vector2(-330, 0)
-script = ExtResource("10_hint")
-hint_text = "【系统】：顶层参考系方向随机，请用洞察预判后起跳。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone2"]
-shape = SubResource("RectangleShape2D_hint")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40

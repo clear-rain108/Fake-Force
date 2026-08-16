@@ -26,19 +26,19 @@ var pages : Array = [
 	},
 	{
 		"title": "（第二页）",
-		"text": "我们还是失败了，他们把人运回地球了，连带着我们出师不利的消息。",
+		"text": "我们失败了，他们把人运回地球了，连带着我们出师不利的消息。",
 		"require_g": 1.0,
 		"require_g_time": 1.5,
 	},
 	{
 		"title": "（第三页）",
-		"text": "所有人都在看，所有人都在骂，连联合国都通过的那个xx的临时方案。难道，我们真的要在这止步吗...",
+		"text": "所有人都在看，所有人都在骂，连联合国都通过的那个沟槽的临时方案。难道，我们真的要在这止步吗...",
 		"require_g": 1.0,
 		"require_g_time": 1.5,
 	},
 	{
 		"title": "（第四页·黑洞前）",
-		"text": "引力是时空告诉物质如何弯曲。虚假力是系统告诉船员如何移动。黑洞是引力把光压回原点。你是系统把记忆压回原点的那个点。",
+		"text": "引力是时空在告诉物质如何弯曲。虚假力是系统在告诉船员如何移动。黑洞是引力把光压回原点。你是系统把记忆压回原点的那个点。",
 		"require_g": 0.0,
 		"require_g_time": 0.0,
 	},
@@ -61,6 +61,8 @@ var _font_size : int = 16
 
 func _ready() -> void:
 	add_to_group("Notebook")
+	# 跨场景持久化解锁进度（阶段2→阶段3 切换后仍可阅读已解锁页）
+	unlocked = IllusionManager.notebook_unlocked
 	# 屏幕左下角（自适应视口高度）
 	position = Vector2(24, get_viewport_rect().size.y - 62)
 
@@ -68,6 +70,7 @@ func _ready() -> void:
 ## 由 NotebookTrigger 区域事件调用：解锁前 n 页（可逐页翻看）
 func unlock_pages(n: int) -> void:
 	unlocked = maxi(unlocked, mini(n, pages.size()))
+	IllusionManager.notebook_unlocked = unlocked
 	_g_high_time = 0.0
 
 
@@ -104,23 +107,22 @@ func _unhandled_input(event: InputEvent) -> void:
 				_prev_page()
 
 
-func _update_unlock(delta: float) -> void:
+func _update_unlock(_delta: float) -> void:
 	# 有"已解锁但未读"的碎片 → 持续发光（直到阅读）
 	glowing = unlocked > page_index
 	if page_index >= pages.size():
 		return
 	if page_index < unlocked:
 		return  # 当前页已解锁，等待阅读
-	var p : Dictionary = pages[page_index]
-	var g : float = IllusionManager.get_current_effective_g()
-	if g > float(p.get("require_g", 0.0)):
-		_g_high_time += delta
-		if _g_high_time >= float(p.get("require_g_time", 0.0)):
-			unlocked += 1
-			_g_high_time = 0.0
-	else:
-		# 匀速间歇等情况下缓慢衰减而非立即清零，避免相位切换瞬间丢失进度
-		_g_high_time = maxf(_g_high_time - delta * 2.0, 0.0)
+	# —— 事件驱动解锁（v3.0 约束4：由物理/区域事件触发，非计时器）——
+	var player := get_tree().get_first_node_in_group("Player")
+	# 第1页：阶段1 收集第一枚马赫尘埃（老人数据碎片）
+	if unlocked < 1 and is_instance_valid(player) and player.dust_collected >= 1:
+		unlock_pages(1)
+	# 第4页：阶段2 穿越多个加速度场 + 完成旋转参考系同步
+	if unlocked < 4 and is_instance_valid(player) \
+			and IllusionManager.zone_count >= 3 and player.rot_switch_count >= 1:
+		unlock_pages(4)
 
 
 func _close_page() -> void:
