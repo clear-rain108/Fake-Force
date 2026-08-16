@@ -114,6 +114,12 @@
 - [x] **关卡音乐循环修复**：`LOOP1sp.test.ogg` 导入 loop=false → true
 - [x] **音量控制**：暂停菜单内"音乐/音效"双滑块（Music / SFX+Ambient+Voice 总线），持久化 `user://settings.cfg`
 - [x] **程序化音效系统**：`AudioManager`（Autoload）——常驻 Ambient Drone（双 Generator 流，G/洞察实时联动）、移动风声（粉红噪声带通）、洞察扫频、尘埃/记事本/区域过渡/黑洞序列音效；`audio_buses.tres`（Master/Music/Ambient+LPF+Reverb/SFX/Voice）
+- [x] **开始页/选关页背景**：开始页太空星云背景（`menu_background.tscn`，替换旧白点星空）；选关页 `select_background.tscn` 太空默认 + 悬停平滑交叉淡化——教学页固定飞船内部（`ship_interior.gdshader`）、解密页 Q1/Q2 飞船内部 / Q3~Q5 太空
+- [x] **旋转参考系玩家表现**：脚指向核心 + 视野 0.8（zoom）+ 摄像机锁定核心固定屏幕上方（相对位置不变）+ 脱离自动回正（`_update_rot_visual`）
+- [x] **旋转参考系按键/箭头修复**：W/S 径向映射反转（W=向心↑、S=离心↓，与屏幕一致）；A=逆时针 / D=顺时针；`_draw` 箭头 `.rotated(-rotation)` 修正被玩家旋转污染的受力箭头；新增 `RotKeyHint`（旋转系内持续显示 WASD 方向）；ArrowLegend 注释更新（A/D 逆/顺时针、删"系统在推你"）
+- [x] **关卡内背景与选关按钮一致**：`background.tscn` 增加飞船内部层（`ship_interior.gdshader`），`BackgroundController.set_theme` 平滑淡化；`PuzzleLevelRoot.bg_theme` 配置——T1~T4/Q1/Q2=飞船内部、Q3~Q5=太空（与选关页完全一致）；飞船背景复用尘埃粒子（舱内漂浮微粒）+ 游戏配色
+- [x] **飞船背景重写（金属科幻风）**：去掉格栅/格子，改为拉丝金属 + 分块面板（接缝+四角铆钉）+ 斜切金属板高光 + 发光灯条 + 指示灯 + 扫描光 + 弯曲管线
+- [x] **全局字体 fusion-pixel**：`project.godot [gui] theme/custom_font`；关闭像素字体抗锯齿（antialiasing=0）；6 个脚本 `_draw` 文字改用 fusion-pixel；全部 Label/文字字号规整为像素友好整数（14/15→16、18→20、22/26/34→24/32 等）
 - [ ] **各关难度/手感逐关校准（用户测试反馈中）**
 - [ ] 旋转关卡手感（Q4/Q5）最终验收
 - [ ] 解密模式音效
@@ -159,5 +165,5 @@
 
 ---
 
-> 文档版本：v2.8（开发状态记录，2026-08-15：关卡音乐循环修复 / 暂停页音量控制 / 程序化音效系统）
+> 文档版本：v3.1（开发状态记录，2026-08-15：飞船背景金属科幻化 + 全局字体 fusion-pixel）
 > 说明：每次开发迭代后更新本文件。

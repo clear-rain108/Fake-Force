@@ -27,6 +27,7 @@ size = Vector2(60, 40)
 
 [node name="Main" type="Node2D" unique_id=1857466616]
 script = ExtResource("1_root")
+bg_theme = 1
 
 [node name="StarField" type="Node2D" parent="." unique_id=143625925]
 script = ExtResource("8_star")
@@ -194,7 +195,7 @@ offset_left = -620.0
 offset_top = -95.0
 offset_right = -16.0
 offset_bottom = -52.0
-theme_override_font_sizes/font_size = 15
+theme_override_font_sizes/font_size = 16
 horizontal_alignment = 2
 
 [node name="PuzzleVictory" type="CanvasLayer" parent="." unique_id=2030106711]

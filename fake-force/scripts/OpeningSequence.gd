@@ -46,7 +46,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	var vp := get_viewport_rect().size
-	var font := ThemeDB.fallback_font
+	var font : Font = load("res://fusion-pixel.ttf")
 	draw_rect(Rect2(Vector2.ZERO, vp), Color(0.0, 0.0, 0.0, 0.96))
 	var idx : int = int(_t / SEG_DURATION)
 	if idx >= SEGMENTS.size():
@@ -57,5 +57,5 @@ func _draw() -> void:
 	var start_y : float = -18.0 * float(lines.size() - 1)
 	for i in lines.size():
 		draw_string(font, vp * 0.5 + Vector2(-380, start_y + float(i) * 34.0), String(lines[i]), \
-			HORIZONTAL_ALIGNMENT_CENTER, 760, 22, Color(0.9, 0.95, 1.0, alpha))
+			HORIZONTAL_ALIGNMENT_CENTER, 760, 24, Color(0.9, 0.95, 1.0, alpha))
 

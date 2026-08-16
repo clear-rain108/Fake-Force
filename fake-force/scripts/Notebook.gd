@@ -56,7 +56,7 @@ var reading : bool = false
 var glowing : bool = false
 
 var _g_high_time : float = 0.0
-var _font_size : int = 15
+var _font_size : int = 16
 
 
 func _ready() -> void:
@@ -131,7 +131,7 @@ func _close_page() -> void:
 
 
 func _draw() -> void:
-	var font := ThemeDB.fallback_font
+	var font : Font = load("res://fusion-pixel.ttf")
 	# 发光提示环
 	if glowing and not reading:
 		draw_circle(Vector2.ZERO, 34.0, Color(GLOW_COLOR, 0.14))

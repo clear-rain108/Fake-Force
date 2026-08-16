@@ -35,6 +35,12 @@ var _switching : bool = false              # 切换洞察中（无时间限制�
 var _last_insight_in_rot : bool = false
 var _last_in_rot_range : bool = false      # 上一帧是否处于旋转核心影响范围（进入提示前沿检测）
 var _prev_insight : bool = false           # 上一帧洞察状态（切换扫频音前沿检测）
+
+# 旋转参考系视觉：脚指向核心 / 视野 0.8 / 摄像机锁定核心（脱离回正）
+@onready var _rot_camera : Camera2D = $Camera2D
+var _rot_vis_rot : float = 0.0    # 玩家自身旋转（平滑）
+var _rot_vis_cam : float = 0.0    # 摄像机旋转（平滑，使核心固定屏幕上方）
+var _rot_vis_zoom : float = 1.0   # 摄像机缩放（旋转系=0.8）
 var _dbg_input : Vector2 = Vector2.ZERO    # 洞察：玩家输入加速度（A/D切向+W/S径向）
 var _dbg_inertia : Vector2 = Vector2.ZERO  # 洞察：惯性力（离心+科里奥利）
 var _dbg_target : Vector2 = Vector2.ZERO   # 切换洞察：目标向心力（=ω²r 向心）
@@ -131,7 +137,7 @@ func _physics_process(delta: float) -> void:
 ## - 圆盘速度 disk_v = (-ω·R.y, ω·R.x)（随盘转）
 ## - 相对速度 v_rel = velocity − disk_v
 ## - 惯性力（虚假力，幻觉场）：离心 ω²·R + 科里奥利 (2ω·v_rel.y, −2ω·v_rel.x)
-## - 输入：W/S 径向（W 向心）、A/D 切向
+## - 输入：W 向心（靠近核心，屏幕上方）/ S 离心（远离核心，屏幕下方）；A 逆时针 / D 顺时针（绕核心）
 func _rotating_physics(delta: float) -> void:
 	var core_pos : Vector2 = core_ref.global_position
 	var R : Vector2 = global_position - core_pos
@@ -143,7 +149,7 @@ func _rotating_physics(delta: float) -> void:
 	var input := Input.get_vector("left", "right", "up", "down")
 	var r_hat : Vector2 = R / r
 	var t_hat : Vector2 = r_hat.orthogonal()
-	var a_input : Vector2 = r_hat * (-input.y) * radial_accel + t_hat * input.x * tang_accel
+	var a_input : Vector2 = r_hat * input.y * radial_accel + t_hat * input.x * tang_accel
 	# 旋转虚假力（幻觉场）：离心 + 科里奥利
 	var a_cent : Vector2 = omega * omega * R
 	var a_cor : Vector2 = Vector2(2.0 * omega * v_rel.y, -2.0 * omega * v_rel.x)
@@ -185,6 +191,7 @@ func _process(delta: float) -> void:
 		_prev_insight = is_insight
 		AudioManager.transition_insight_mode(is_insight)  # 洞察进入/退出扫频音
 	_update_insight(delta)
+	_update_rot_visual(delta)  # 旋转参考系视觉（脚指向核心/视野0.8/摄像机锁定）
 	_update_platform_fade(delta)
 	queue_redraw()
 
@@ -401,6 +408,31 @@ func _set_platform_visibility(visible_in_rot: bool) -> void:
 	_platform_target = 0.0 if visible_in_rot else 1.0
 
 
+## 旋转参考系视觉表现：
+## - 切换至旋转系时，玩家"脚"（素材正下方）转向旋转核心方向；
+## - 视野范围缩小至 0.8（camera.zoom）；
+## - 摄像机随玩家绕核心公转而旋转，使核心始终固定在屏幕正上方（相对位置不变）；
+## - 脱离旋转系后自动回正（rotation=0 / zoom=1），全部平滑过渡。
+func _update_rot_visual(delta: float) -> void:
+	var target_rot : float = 0.0
+	var target_cam : float = 0.0
+	var target_zoom : float = 1.0
+	if rotating_mode and is_instance_valid(core_ref) and rot_state != ROT_NONE:
+		var dir : Vector2 = core_ref.global_position - global_position
+		if dir.length_squared() > 0.001:
+			var ang : float = dir.angle()
+			target_rot = ang - PI / 2.0   # 脚（默认朝 +Y）指向核心
+			target_cam = ang + PI / 2.0   # 核心映射到屏幕正上方
+		target_zoom = 0.8
+	_rot_vis_rot = lerp_angle(_rot_vis_rot, target_rot, minf(delta * 6.0, 1.0))
+	_rot_vis_cam = lerp_angle(_rot_vis_cam, target_cam, minf(delta * 6.0, 1.0))
+	_rot_vis_zoom = lerpf(_rot_vis_zoom, target_zoom, minf(delta * 5.0, 1.0))
+	rotation = _rot_vis_rot
+	if is_instance_valid(_rot_camera):
+		_rot_camera.rotation = _rot_vis_cam
+		_rot_camera.zoom = Vector2(_rot_vis_zoom, _rot_vis_zoom)
+
+
 func _draw() -> void:
 	# η 光晕反馈：仅在 η≠1 时出现（重=红 / 轻=蓝），范围较小
 	var eta_r : float = clampf((player_eta - 1.0) / 0.5, -1.0, 1.0)
@@ -415,33 +447,34 @@ func _draw() -> void:
 	if not is_insight:
 		return
 	var center : Vector2 = Vector2.ZERO
+	var inv_rot : float = -rotation   # 世界方向 → 局部坐标（玩家自身旋转时箭头不跟着转错）
 	# 切换洞察（参考系切换）：目标向心力(金) + 玩家输入(蓝) + 惯性力(红)
-	# 与横向洞察同色同义：蓝=你按的方向（A/D切向、W/S径向）；红=离心+科里奥利（系统在推你）；金=同步后需维持的向心力
+	# 蓝=你按的方向（A逆时针/D顺时针/W向心/S离心）；红=惯性力；金=同步后需维持的向心力
 	if _switching or rot_state == ROT_SWITCHING:
 		if _dbg_target.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_target.normalized() * 55.0, Color(1.0, 0.84, 0.0), false, 4.0)
+			_draw_arrow(center, _dbg_target.rotated(inv_rot).normalized() * 55.0, Color(1.0, 0.84, 0.0), false, 4.0)
 		if _dbg_input.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_input.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
+			_draw_arrow(center, _dbg_input.rotated(inv_rot).normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
 		if _dbg_inertia.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_inertia.normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
+			_draw_arrow(center, _dbg_inertia.rotated(inv_rot).normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
 		return
 	# 旋转参考系洞察：蓝=玩家输入、红=惯性力（离心+科里奥利）
 	if rot_state != ROT_NONE:
 		if _dbg_input.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_input.normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
+			_draw_arrow(center, _dbg_input.rotated(inv_rot).normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
 		if _dbg_inertia.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_inertia.normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
+			_draw_arrow(center, _dbg_inertia.rotated(inv_rot).normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
 		return
 	# 横向参考系洞察：蓝=输入、红=虚假力（幻觉场）、绿=重力
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")
 	if input_dir.length_squared() > 0.01:
-		_draw_arrow(center, input_dir.normalized() * 60.0, Color(0.25, 0.6, 1.0), false, 4.0)
+		_draw_arrow(center, input_dir.rotated(inv_rot).normalized() * 60.0, Color(0.25, 0.6, 1.0), false, 4.0)
 	var fake_vec : Vector2 = IllusionManager.get_current_fake_vector()
 	if fake_vec.length_squared() > 0.01:
 		var len_px : float = clampf(fake_vec.length() * 2.5, 20.0, 140.0)
-		_draw_arrow(center, fake_vec.normalized() * len_px, Color(1.0, 0.3, 0.25), true, 4.0)
+		_draw_arrow(center, fake_vec.rotated(inv_rot).normalized() * len_px, Color(1.0, 0.3, 0.25), true, 4.0)
 	if rot_state == ROT_NONE:
-		_draw_arrow(center, Vector2(0.0, 40.0), Color(0.3, 1.0, 0.4), false, 3.0)
+		_draw_arrow(center, Vector2(0.0, 40.0).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, 3.0)
 
 
 func _draw_arrow(from: Vector2, vec: Vector2, color: Color, dashed: bool, width: float) -> void:

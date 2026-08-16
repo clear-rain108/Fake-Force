@@ -38,26 +38,26 @@ func _draw() -> void:
 	if _player.rot_state == _player.ROT_SWITCHING:
 		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.84, 0.0, a), false, "金色实线 = 目标向心力（同步后维持圆周）")
 		y += 38.0
-		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A/D切向、W/S径向）")
+		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A逆时针 / D顺时针 / W向心 / S离心）")
 		y += 38.0
 		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 惯性力（离心+科里奥利）")
 		return
 	# 旋转参考系
 	if _player.rot_state != _player.ROT_NONE:
-		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A/D切向、W/S径向）")
+		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A逆时针 / D顺时针 / W向心 / S离心）")
 		y += 38.0
-		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 惯性力（离心+科里奥利，系统在推你）")
+		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 惯性力（离心+科里奥利）")
 		return
 	# 横向参考系
 	_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向")
 	y += 38.0
-	_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 虚假力（系统在推你）")
+	_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 虚假力")
 	y += 38.0
 	_draw_item(x, y, Vector2(0, 36), Color(0.3, 1.0, 0.4, a), false, "绿色实线 = 重力（向下）")
 
 
 func _draw_item(x: float, y: float, vec: Vector2, color: Color, dashed: bool, text: String) -> void:
-	var font := ThemeDB.fallback_font
+	var font : Font = load("res://fusion-pixel.ttf")
 	var from : Vector2 = Vector2(x, y)
 	var to : Vector2 = from + vec
 	# 虚线/实线
@@ -83,4 +83,4 @@ func _draw_item(x: float, y: float, vec: Vector2, color: Color, dashed: bool, te
 		draw_line(to, head_base - perp, color, 2.5)
 	# 文字
 	draw_string(font, Vector2(x + vec.length() + 14.0, y + 4.0), text,
-		HORIZONTAL_ALIGNMENT_LEFT, -1, 14, color)
+		HORIZONTAL_ALIGNMENT_LEFT, -1, 16, color)

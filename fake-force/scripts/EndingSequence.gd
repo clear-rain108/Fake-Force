@@ -40,7 +40,7 @@ func _unhandled_input(event: InputEvent) -> void:
 
 func _draw() -> void:
 	var vp := get_viewport_rect().size
-	var font := ThemeDB.fallback_font
+	var font : Font = load("res://fusion-pixel.ttf")
 	var center : Vector2 = vp * 0.5
 	# 黑底
 	draw_rect(Rect2(Vector2.ZERO, vp), Color(0.0, 0.0, 0.0))

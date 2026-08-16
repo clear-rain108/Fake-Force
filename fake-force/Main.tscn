@@ -223,7 +223,7 @@ offset_left = 16.0
 offset_top = 10.0
 offset_right = 420.0
 offset_bottom = 42.0
-theme_override_font_sizes/font_size = 22
+theme_override_font_sizes/font_size = 24
 text = "当前幻觉强度：0.0 G"
 
 [node name="EnergyBar" type="ProgressBar" parent="HUD" unique_id=2060205221]
@@ -239,7 +239,7 @@ offset_left = 16.0
 offset_top = 120.0
 offset_right = 900.0
 offset_bottom = 160.0
-theme_override_font_sizes/font_size = 18
+theme_override_font_sizes/font_size = 20
 
 [node name="DustInfo" type="Label" parent="HUD" unique_id=483300740]
 offset_left = 16.0

@@ -268,6 +268,7 @@ func play_blackhole_sequence() -> void:
 	_pulse_sent = false
 
 
+
 # ==================== 波形生成 ====================
 
 func _triangle(ph: float) -> float:

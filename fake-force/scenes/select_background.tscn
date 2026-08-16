@@ -1,0 +1,37 @@
+[gd_scene load_steps=5 format=3]
+
+[ext_resource type="Shader" path="res://shaders/star_bg.gdshader" id="1_space"]
+[ext_resource type="Shader" path="res://shaders/ship_interior.gdshader" id="2_ship"]
+[ext_resource type="Script" path="res://scripts/SelectBackground.gd" id="3_script"]
+
+[sub_resource type="ShaderMaterial" id="space_mat"]
+shader = ExtResource("1_space")
+shader_parameter/g_strength = 0.0
+shader_parameter/insight_mode = 0
+
+[sub_resource type="ShaderMaterial" id="ship_mat"]
+shader = ExtResource("2_ship")
+shader_parameter/g_strength = 0.0
+
+[node name="SelectBackground" type="CanvasLayer"]
+layer = -1
+script = ExtResource("3_script")
+
+[node name="SpaceBG" type="ColorRect" parent="."]
+material = SubResource("space_mat")
+color = Color(0, 0, 0, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ShipBG" type="ColorRect" parent="."]
+material = SubResource("ship_mat")
+color = Color(0, 0, 0, 1)
+modulate = Color(1, 1, 1, 0)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2

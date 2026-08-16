@@ -1,5 +1,9 @@
 extends Control
-## 教学关卡：入门教程（T1 初识偏转 / T2 幻灵垫脚 / T3 尘埃轻重）
+## 教学关卡：入门教程（T1 初识偏转 / T2 幻灵垫脚 / T3 尘埃轻重 / T4 旋转参考系）
+## 背景：整页固定"飞船内部"风格
+
+const THEME_SPACE : int = 0
+const THEME_SHIP : int = 1
 
 const LEVELS : Array = [
 	["res://levels/T1.tscn", "T1  初识偏转"],
@@ -8,8 +12,14 @@ const LEVELS : Array = [
 	["res://levels/T4.tscn", "T4  旋转参考系"],
 ]
 
+var _bg : CanvasLayer = null
+
 
 func _ready() -> void:
+	# 选关背景：固定飞船内部
+	_bg = load("res://scenes/select_background.tscn").instantiate()
+	add_child(_bg)
+	_bg.set_theme(THEME_SHIP)
 	$BackButton.pressed.connect(_on_back)
 	for i in LEVELS.size():
 		var btn := Button.new()

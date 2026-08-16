@@ -21,6 +21,11 @@ func _ready() -> void:
 		var legend : Node = load("res://scripts/ArrowLegend.gd").new()
 		legend.name = "ArrowLegend"
 		add_child(legend)
+	# 旋转参考系按键方向图例（进入旋转系显示，脱离消失）
+	if not has_node("RotKeyHint"):
+		var kh : Node = load("res://scripts/RotKeyHint.gd").new()
+		kh.name = "RotKeyHint"
+		add_child(kh)
 
 
 func _process(delta: float) -> void:

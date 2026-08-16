@@ -1,0 +1,53 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Shader" path="res://shaders/star_bg.gdshader" id="1_shader"]
+[ext_resource type="Script" path="res://scripts/BackgroundController.gd" id="2_script"]
+[ext_resource type="ParticleProcessMaterial" path="res://materials/dust_material.tres" id="3_dust"]
+
+[sub_resource type="ShaderMaterial" id="bg_mat"]
+shader = ExtResource("1_shader")
+shader_parameter/g_strength = 0.0
+shader_parameter/insight_mode = 0
+
+[sub_resource type="Shader" id="warp_shader"]
+code = "shader_type canvas_item; uniform sampler2D SCREEN_TEXTURE : hint_screen_texture, filter_linear_mipmap; uniform float warp_amount : hint_range(0.0, 0.08) = 0.0; void fragment() { vec2 uv = SCREEN_UV; vec2 d = uv - vec2(0.5); float dist = length(d); vec2 off = d * warp_amount * (0.5 + 0.5 * (1.0 - dist)); uv += off; COLOR = texture(SCREEN_TEXTURE, uv); }"
+
+[sub_resource type="ShaderMaterial" id="warp_mat"]
+shader = SubResource("warp_shader")
+shader_parameter/warp_amount = 0.0
+
+[sub_resource type="Gradient" id="dust_gradient"]
+offsets = PackedFloat32Array(0, 0.4, 0.8, 1)
+colors = PackedColorArray(0.5, 0.6, 1, 0, 0.7, 0.82, 1, 0.5, 0.9, 0.95, 1, 0.25, 0.6, 0.7, 1, 0)
+
+[node name="MenuBackground" type="CanvasLayer"]
+layer = -1
+script = ExtResource("2_script")
+
+[node name="Nebula" type="ColorRect" parent="."]
+material = SubResource("bg_mat")
+color = Color(0, 0, 0, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Dust" type="GPUParticles2D" parent="."]
+process_material = ExtResource("3_dust")
+color_ramp = SubResource("dust_gradient")
+amount = 260
+lifetime = 16.0
+preprocess = 16.0
+randomness = 0.3
+local_coords = true
+
+[node name="WarpLayer" type="ColorRect" parent="."]
+visible = false
+material = SubResource("warp_mat")
+color = Color(1, 1, 1, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
