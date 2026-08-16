@@ -24,7 +24,7 @@ func _ready() -> void:
 	for i in LEVELS.size():
 		var btn := Button.new()
 		btn.text = String(LEVELS[i][1])
-		btn.custom_minimum_size = Vector2(260, 70)
+		btn.custom_minimum_size = Vector2(300, 96)
 		btn.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		var scene_path : String = String(LEVELS[i][0])
 		btn.pressed.connect(_on_level.bind(scene_path))

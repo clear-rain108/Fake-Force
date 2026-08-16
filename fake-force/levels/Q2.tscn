@@ -1,32 +1,41 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=21 format=3]
 
-[ext_resource type="Script" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
-[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
-[ext_resource type="Script" path="res://scripts/IllusionZone.gd" id="3_zone"]
-[ext_resource type="Script" path="res://scripts/Goal.gd" id="4_goal"]
-[ext_resource type="Script" path="res://scripts/PuzzleHUD.gd" id="5_hud"]
-[ext_resource type="Script" path="res://scripts/PuzzleVictory.gd" id="6_victory"]
-[ext_resource type="Script" path="res://scripts/StarField.gd" id="8_star"]
-[ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="9_vignette"]
+[ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
+[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://cwdwx54qndmnj" path="res://scripts/IllusionZone.gd" id="3_zone"]
+[ext_resource type="Script" uid="uid://dvsx07o14qyhl" path="res://scripts/Goal.gd" id="4_goal"]
+[ext_resource type="Script" uid="uid://byoakdplxucs8" path="res://scripts/PuzzleHUD.gd" id="5_hud"]
+[ext_resource type="Script" uid="uid://kx8b1e2i7x68" path="res://scripts/PuzzleVictory.gd" id="6_victory"]
 [ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="7_texture"]
+[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="8_star"]
+[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="9_vignette"]
+[ext_resource type="Script" uid="uid://b8oclv06vb4xe" path="res://scripts/HintZone.gd" id="10_hint"]
+[ext_resource type="Script" uid="uid://cqqkuhfg1bcva" path="res://scripts/Spikes.gd" id="11_spikes"]
+[ext_resource type="Script" uid="uid://c2r5ktdwdbnh1" path="res://scripts/Dust.gd" id="12_dust"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platL"]
+size = Vector2(320, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platR"]
+size = Vector2(440, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platTop"]
+size = Vector2(220, 30)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
-size = Vector2(40, 500)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_bottom"]
-size = Vector2(600, 30)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
-size = Vector2(700, 600)
+size = Vector2(1300, 400)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_step"]
-size = Vector2(80, 20)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
+size = Vector2(800, 160)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
+radius = 8.0
 
 [node name="Main" type="Node2D"]
 script = ExtResource("1_root")
@@ -35,40 +44,107 @@ bg_theme = 1
 [node name="StarField" type="Node2D" parent="."]
 script = ExtResource("8_star")
 
-[node name="LeftWall" type="StaticBody2D" parent="."]
-position = Vector2(-280, 250)
+[node name="BottomL" type="StaticBody2D" parent="."]
+position = Vector2(-310, 520)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="LeftWall"]
-shape = SubResource("RectangleShape2D_wall")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomL"]
+shape = SubResource("RectangleShape2D_platL")
 
-[node name="Poly" type="Polygon2D" parent="LeftWall"]
+[node name="Poly" type="Polygon2D" parent="BottomL"]
 color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-20, -250, 20, -250, 20, 250, -20, 250)
+polygon = PackedVector2Array(-160, -15, 160, -15, 160, 15, -160, 15)
 
-[node name="Bottom" type="StaticBody2D" parent="."]
-position = Vector2(0, 450)
+[node name="BottomR" type="StaticBody2D" parent="."]
+position = Vector2(300, 520)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Bottom"]
-shape = SubResource("RectangleShape2D_bottom")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomR"]
+shape = SubResource("RectangleShape2D_platR")
 
-[node name="Poly" type="Polygon2D" parent="Bottom"]
+[node name="Poly" type="Polygon2D" parent="BottomR"]
 color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-300, -15, 300, -15, 300, 15, -300, 15)
+polygon = PackedVector2Array(-220, -15, 220, -15, 220, 15, -220, 15)
 
-[node name="RightWall" type="StaticBody2D" parent="."]
-position = Vector2(280, 250)
+[node name="MidL" type="StaticBody2D" parent="."]
+position = Vector2(-310, 380)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RightWall"]
-shape = SubResource("RectangleShape2D_wall")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidL"]
+shape = SubResource("RectangleShape2D_platL")
 
-[node name="Poly" type="Polygon2D" parent="RightWall"]
-color = Color(0.4, 0.4, 0.4, 1)
-polygon = PackedVector2Array(-20, -250, 20, -250, 20, 250, -20, 250)
+[node name="Poly" type="Polygon2D" parent="MidL"]
+color = Color(0.45, 0.45, 0.48, 1)
+polygon = PackedVector2Array(-160, -15, 160, -15, 160, 15, -160, 15)
+
+[node name="MidR" type="StaticBody2D" parent="."]
+position = Vector2(300, 380)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidR"]
+shape = SubResource("RectangleShape2D_platR")
+
+[node name="Poly" type="Polygon2D" parent="MidR"]
+color = Color(0.45, 0.45, 0.48, 1)
+polygon = PackedVector2Array(-220, -15, 220, -15, 220, 15, -220, 15)
+
+[node name="TopRow" type="StaticBody2D" parent="."]
+position = Vector2(-470, 240)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopRow"]
+shape = SubResource("RectangleShape2D_platTop")
+
+[node name="Poly" type="Polygon2D" parent="TopRow"]
+color = Color(0.5, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-110, -15, 110, -15, 110, 15, -110, 15)
+
+[node name="ArrowBottom" type="Polygon2D" parent="."]
+position = Vector2(-300, 475)
+color = Color(0.95, 0.35, 0.35, 0.85)
+polygon = PackedVector2Array(-18, -13, -18, 13, 24, 0)
+
+[node name="ArrowMid" type="Polygon2D" parent="."]
+position = Vector2(300, 335)
+color = Color(0.95, 0.35, 0.35, 0.85)
+polygon = PackedVector2Array(-18, -13, -18, 13, 24, 0)
+
+[node name="IllusionZone" type="Area2D" parent="."]
+position = Vector2(0, 380)
+script = ExtResource("3_zone")
+g_value = 1.5
+damping = 0.35
+field_mode = 0
+field_directions = [Vector2(-1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
+shape = SubResource("RectangleShape2D_zone")
+
+[node name="Spike1" type="Area2D" parent="."]
+position = Vector2(-100, 560)
+script = ExtResource("11_spikes")
+
+[node name="Spike2" type="Area2D" parent="."]
+position = Vector2(-50, 560)
+script = ExtResource("11_spikes")
+
+[node name="Spike3" type="Area2D" parent="."]
+position = Vector2(0, 560)
+script = ExtResource("11_spikes")
+
+[node name="Dust1" type="Area2D" parent="."]
+position = Vector2(-350, 350)
+script = ExtResource("12_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
+shape = SubResource("CircleShape2D_dust")
+
+[node name="Dust2" type="Area2D" parent="."]
+position = Vector2(200, 350)
+script = ExtResource("12_dust")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
+shape = SubResource("CircleShape2D_dust")
 
 [node name="Player" type="CharacterBody2D" parent="."]
-script = ExtResource("2_player")
 z_index = 1
-position = Vector2(-260, 100)
+position = Vector2(-380, 470)
+script = ExtResource("2_player")
 speed = 60.0
 jump_velocity = 300.0
 jump_gravity = 200.0
@@ -88,53 +164,20 @@ shape = SubResource("CircleShape2D_player")
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="IllusionZone" type="Area2D" parent="."]
-script = ExtResource("3_zone")
-position = Vector2(0, 250)
-g_value = 1.5
-damping = 0.4
-field_mode = 0
-field_directions = [Vector2(-1, 0)]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
-shape = SubResource("RectangleShape2D_zone")
-
-[node name="Step1" type="StaticBody2D" parent="."]
-position = Vector2(250, 350)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Step1"]
-shape = SubResource("RectangleShape2D_step")
-
-[node name="Poly" type="Polygon2D" parent="Step1"]
-color = Color(0.45, 0.45, 0.48, 1)
-polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
-
-[node name="Step2" type="StaticBody2D" parent="."]
-position = Vector2(250, 250)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Step2"]
-shape = SubResource("RectangleShape2D_step")
-
-[node name="Poly" type="Polygon2D" parent="Step2"]
-color = Color(0.45, 0.45, 0.48, 1)
-polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
-
-[node name="Step3" type="StaticBody2D" parent="."]
-position = Vector2(250, 150)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Step3"]
-shape = SubResource("RectangleShape2D_step")
-
-[node name="Poly" type="Polygon2D" parent="Step3"]
-color = Color(0.45, 0.45, 0.48, 1)
-polygon = PackedVector2Array(-40, -10, 40, -10, 40, 10, -40, 10)
-
 [node name="Goal" type="Area2D" parent="."]
+position = Vector2(-500, 220)
 script = ExtResource("4_goal")
-position = Vector2(260, 100)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
 shape = SubResource("RectangleShape2D_goal")
+
+[node name="HintZone" type="Area2D" parent="."]
+position = Vector2(0, 300)
+script = ExtResource("10_hint")
+hint_text = "【系统】：同一恒定加速度场——去程顺风、回程逆风。返回时请反向补偿。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone"]
+shape = SubResource("RectangleShape2D_hint")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40
@@ -146,19 +189,22 @@ script = ExtResource("9_vignette")
 script = ExtResource("5_hud")
 
 [node name="TopLeft" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
+anchors_preset = 0
 offset_left = 16.0
 offset_top = 10.0
 offset_right = 420.0
 offset_bottom = 42.0
 
 [node name="GValue" type="Label" parent="PuzzleHUD/TopLeft"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 20
 text = "当前幻觉强度：0.0 G"
 
 [node name="TopRight" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
@@ -168,14 +214,14 @@ offset_right = -16.0
 offset_bottom = 42.0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
-max_value = 100.0
 value = 100.0
 show_percentage = false
 
 [node name="BottomLeft" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
 anchors_preset = 2
 anchor_top = 1.0
 anchor_bottom = 1.0
@@ -185,13 +231,14 @@ offset_right = 200.0
 offset_bottom = -10.0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 16
 text = "尘埃：0"
 
 [node name="BottomRight" type="Control" parent="PuzzleHUD"]
+layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -203,12 +250,12 @@ offset_right = -16.0
 offset_bottom = -10.0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight"]
-anchors_preset = 15
+layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 16
-horizontal_alignment = 2
 text = "η = 1.00"
+horizontal_alignment = 2
 
 [node name="SysMsg" type="Label" parent="PuzzleHUD"]
 anchors_preset = 3
@@ -222,7 +269,6 @@ offset_right = -16.0
 offset_bottom = -52.0
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 2
-text = ""
 
 [node name="PuzzleVictory" type="CanvasLayer" parent="."]
 layer = 100

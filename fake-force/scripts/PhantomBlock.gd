@@ -12,10 +12,15 @@ extends RigidBody2D
 @export var size_y : float = 40.0
 @export var x_min : float = -INF
 @export var x_max : float = INF
+@export var bounce : float = 0.0
+## bounce>0 时撞到漂移边界按该系数反弹（往复摆动，供综合关“移动浮桥”使用）；默认 0=撞边停（原行为）
+@export var counts_as_occupant : bool = true
+## false 时不作为 IllusionZone 的占用体计数（避免多区域关卡中“无人区”的方块干扰当前幻觉场写入）
 
 
 func _ready() -> void:
-	add_to_group("IllusionGroup")
+	if counts_as_occupant:
+		add_to_group("IllusionGroup")
 
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
@@ -26,7 +31,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		# 幻觉力 + 阻尼（力 = m×a）
 		var f : Vector2 = fake_accel * strength * mass - k * state.linear_velocity * mass
 		state.apply_central_force(f)
-	# 漂移范围限制（无重力悬浮物的"边界"）
+	# 漂移范围限制（无重力悬浮物的"边界"；bounce>0 时反弹往复）
 	var p : Vector2 = state.transform.origin
 	var moved : bool = false
 	if p.x < x_min:
@@ -37,7 +42,7 @@ func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 		moved = true
 	if moved:
 		state.transform.origin = p
-		state.linear_velocity.x = 0.0
+		state.linear_velocity.x = -state.linear_velocity.x * bounce if bounce > 0.0 else 0.0
 
 
 func _draw() -> void:

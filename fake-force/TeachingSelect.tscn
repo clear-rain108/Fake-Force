@@ -1,15 +1,16 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://cs00it4jw8j5j"]
 
-[ext_resource type="Script" path="res://scripts/TeachingSelect.gd" id="1_select"]
+[ext_resource type="Script" uid="uid://qlyfk8jaqqxv" path="res://scripts/TeachingSelect.gd" id="1_select"]
 
-[node name="TeachingSelect" type="Control"]
+[node name="TeachingSelect" type="Control" unique_id=908053740]
+layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource("1_select")
 
-[node name="Title" type="Label" parent="."]
-anchors_preset = 5
+[node name="Title" type="Label" parent="." unique_id=393552403]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
 offset_left = -200.0
@@ -17,25 +18,25 @@ offset_top = 30.0
 offset_right = 200.0
 offset_bottom = 80.0
 theme_override_font_sizes/font_size = 32
-horizontal_alignment = 1
 text = "教学关卡 · 入门"
+horizontal_alignment = 1
 
-[node name="Grid" type="GridContainer" parent="."]
-anchors_preset = 5
+[node name="Grid" type="GridContainer" parent="." unique_id=1904072888]
+layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
-offset_left = -330.0
-offset_top = 130.0
-offset_right = 330.0
-offset_bottom = 420.0
-columns = 3
+offset_left = -312.0
+offset_top = 160.0
+offset_right = 312.0
+offset_bottom = 376.0
 theme_override_constants/h_separation = 24
 theme_override_constants/v_separation = 24
+columns = 2
 
-[node name="BackButton" type="Button" parent="."]
-anchors_preset = 3
-anchor_left = 0.0
+[node name="BackButton" type="Button" parent="." unique_id=1566922032]
+layout_mode = 0
 anchor_top = 1.0
+anchor_bottom = 1.0
 offset_left = 20.0
 offset_top = -60.0
 offset_right = 150.0

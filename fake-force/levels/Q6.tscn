@@ -1,0 +1,186 @@
+[gd_scene format=3 uid="uid://ivoyn2d7yv5j"]
+
+[ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
+[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://dvsx07o14qyhl" path="res://scripts/Goal.gd" id="3_goal"]
+[ext_resource type="Script" uid="uid://byoakdplxucs8" path="res://scripts/PuzzleHUD.gd" id="4_hud"]
+[ext_resource type="Script" uid="uid://kx8b1e2i7x68" path="res://scripts/PuzzleVictory.gd" id="5_victory"]
+[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="6_star"]
+[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="7_vignette"]
+[ext_resource type="Script" uid="uid://clvlxe7bej24l" path="res://scripts/RotatingCore.gd" id="8_core"]
+[ext_resource type="Script" uid="uid://c3a5yn73aah6o" path="res://scripts/RotatingObstacle.gd" id="9_obstacle"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="10_texture"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_exitplat"]
+size = Vector2(200, 30)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(60, 40)
+
+[node name="Main" type="Node2D" unique_id=1035738335]
+script = ExtResource("1_root")
+
+[node name="StarField" type="Node2D" parent="." unique_id=78796044]
+script = ExtResource("6_star")
+
+[node name="ExitPlatform" type="StaticBody2D" parent="." unique_id=1312549436]
+position = Vector2(350, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ExitPlatform" unique_id=1881311403]
+shape = SubResource("RectangleShape2D_exitplat")
+
+[node name="Poly" type="Polygon2D" parent="ExitPlatform" unique_id=777418470]
+color = Color(0.5, 0.5, 0.55, 1)
+polygon = PackedVector2Array(-100, -15, 100, -15, 100, 15, -100, 15)
+
+[node name="RotatingCore" type="Node2D" parent="." unique_id=115458231]
+position = Vector2(0, 300)
+script = ExtResource("8_core")
+omega = 0.8
+influence_radius = 320.0
+
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1809640970]
+z_index = 1
+position = Vector2(200, 300)
+script = ExtResource("2_player")
+rotating_mode = true
+start_in_rot = true
+safe_ring_radius = 200.0
+
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1891258747]
+z_index = -1
+texture = ExtResource("10_texture")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1436884386]
+shape = SubResource("CircleShape2D_player")
+
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1143978484]
+position_smoothing_enabled = true
+position_smoothing_speed = 8.0
+
+[node name="Obstacle1" type="Node2D" parent="." unique_id=1958782911]
+position = Vector2(0, 300)
+script = ExtResource("9_obstacle")
+orbit_radius = 230.0
+arc_size = 0.7
+
+[node name="Obstacle2" type="Node2D" parent="." unique_id=1091433705]
+position = Vector2(0, 300)
+script = ExtResource("9_obstacle")
+orbit_radius = 230.0
+arc_size = 0.7
+start_angle = 2.09
+
+[node name="Obstacle3" type="Node2D" parent="." unique_id=1889534520]
+position = Vector2(0, 300)
+script = ExtResource("9_obstacle")
+orbit_radius = 230.0
+arc_size = 0.7
+start_angle = 4.19
+
+[node name="Goal" type="Area2D" parent="." unique_id=183867692]
+position = Vector2(350, 340)
+script = ExtResource("3_goal")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal" unique_id=191482979]
+shape = SubResource("RectangleShape2D_goal")
+
+[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=260330542]
+layer = 40
+
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=1360019571]
+script = ExtResource("7_vignette")
+
+[node name="PuzzleHUD" type="CanvasLayer" parent="." unique_id=1982893004]
+script = ExtResource("4_hud")
+
+[node name="TopLeft" type="Control" parent="PuzzleHUD" unique_id=1364791447]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 16.0
+offset_top = 10.0
+offset_right = 420.0
+offset_bottom = 42.0
+
+[node name="GValue" type="Label" parent="PuzzleHUD/TopLeft" unique_id=1227974415]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 20
+text = "当前幻觉强度：0.0 G"
+
+[node name="TopRight" type="Control" parent="PuzzleHUD" unique_id=1847659565]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -280.0
+offset_top = 10.0
+offset_right = -16.0
+offset_bottom = 42.0
+
+[node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=1406318093]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+value = 100.0
+show_percentage = false
+
+[node name="BottomLeft" type="Control" parent="PuzzleHUD" unique_id=1142753577]
+layout_mode = 3
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 16.0
+offset_top = -40.0
+offset_right = 200.0
+offset_bottom = -10.0
+
+[node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=1550999321]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "尘埃：0"
+
+[node name="BottomRight" type="Control" parent="PuzzleHUD" unique_id=957548644]
+layout_mode = 3
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -200.0
+offset_top = -40.0
+offset_right = -16.0
+offset_bottom = -10.0
+
+[node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=1847906166]
+layout_mode = 0
+anchor_right = 1.0
+anchor_bottom = 1.0
+theme_override_font_sizes/font_size = 16
+text = "η = 1.00"
+horizontal_alignment = 2
+
+[node name="SysMsg" type="Label" parent="PuzzleHUD" unique_id=2042945241]
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -620.0
+offset_top = -95.0
+offset_right = -16.0
+offset_bottom = -52.0
+theme_override_font_sizes/font_size = 16
+horizontal_alignment = 2
+
+[node name="PuzzleVictory" type="CanvasLayer" parent="." unique_id=1627720601]
+layer = 100
+
+[node name="VictoryDraw" type="Node2D" parent="PuzzleVictory" unique_id=1485199119]
+script = ExtResource("5_victory")

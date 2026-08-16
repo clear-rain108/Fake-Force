@@ -25,7 +25,7 @@ func _process(_delta: float) -> void:
 	# 首次同步完成 → 教学"已进入旋转参考系"
 	if in_rot and not _notified_enter:
 		_notified_enter = true
-		_msg("已进入旋转参考系：A 逆时针 / D 顺时针（绕核心），W 向心（靠近核心）/ S 离心（远离核心）。灰色平台已隐身！移动到圆盘对侧后，持续切向加速甩出圆盘，落到对岸平台。")
+		_msg("已进入旋转参考系：A 顺时针 / D 逆时针（绕核心），W 向心（靠近核心）/ S 离心（远离核心）。灰色平台已隐身！移动到圆盘对侧后，持续切向加速甩出圆盘，落到对岸平台。")
 	# 首次脱离 → 教学"已脱离旋转参考系"
 	elif not in_rot and _notified_enter and not _notified_exit:
 		_notified_exit = true

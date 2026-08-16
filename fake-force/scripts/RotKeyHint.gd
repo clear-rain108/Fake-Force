@@ -32,5 +32,5 @@ func _draw() -> void:
 	var c : Color = Color(0.85, 0.92, 1.0, a)
 	draw_string(font, Vector2(cx - 230.0, y), "W ↑ 向心（靠近核心）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
 	draw_string(font, Vector2(cx + 30.0, y), "S ↓ 离心（远离核心）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
-	draw_string(font, Vector2(cx - 230.0, y + 22.0), "A ↺ 逆时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
-	draw_string(font, Vector2(cx + 30.0, y + 22.0), "D ↻ 顺时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx - 230.0, y + 22.0), "A ↺ 顺时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx + 30.0, y + 22.0), "D ↻ 逆时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
