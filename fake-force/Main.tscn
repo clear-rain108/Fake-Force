@@ -78,6 +78,14 @@ z_index = 1
 position = Vector2(0, 650)
 script = ExtResource("2_player")
 rotating_mode = true
+speed = 60.0
+jump_velocity = 300.0
+jump_gravity = 200.0
+max_speed_x = 140.0
+jump_cap = 350.0
+max_fall_speed = 350.0
+kill_y = 800.0
+dust_eta_step = 0.7
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1
@@ -93,7 +101,7 @@ position_smoothing_speed = 8.0
 [node name="Stage1Zone" type="Area2D" parent="."]
 position = Vector2(1350, 500)
 script = ExtResource("3_zone")
-g_value = 0.8
+g_value = 1.5
 damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
@@ -138,7 +146,7 @@ polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
 [node name="MazeZone" type="Area2D" parent="."]
 position = Vector2(4125, 560)
 script = ExtResource("3_zone")
-g_value = 1.0
+g_value = 1.2
 damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
@@ -165,6 +173,7 @@ size_x = 100.0
 x_min = 3650.0
 x_max = 3800.0
 counts_as_occupant = false
+activation_distance = 450.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PB1"]
 shape = SubResource("RectangleShape2D_block")
@@ -178,6 +187,7 @@ size_x = 200.0
 x_min = 4580.0
 x_max = 4700.0
 counts_as_occupant = false
+activation_distance = 450.0
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PB2"]
 shape = SubResource("RectangleShape2D_blockBig")
@@ -226,7 +236,7 @@ shape = SubResource("RectangleShape2D_hint")
 [node name="Zone2A" type="Area2D" parent="."]
 position = Vector2(5300, 500)
 script = ExtResource("3_zone")
-g_value = 1.0
+g_value = 1.2
 damping = 0.5
 field_mode = 0
 field_directions = [Vector2(-1, 0)]
@@ -237,7 +247,7 @@ shape = SubResource("RectangleShape2D_zoneCorr")
 [node name="Zone2B" type="Area2D" parent="."]
 position = Vector2(5950, 500)
 script = ExtResource("3_zone")
-g_value = 1.0
+g_value = 1.2
 damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
@@ -248,7 +258,7 @@ shape = SubResource("RectangleShape2D_zoneCorr")
 [node name="Zone2C" type="Area2D" parent="."]
 position = Vector2(6600, 500)
 script = ExtResource("3_zone")
-g_value = 1.0
+g_value = 1.2
 damping = 0.5
 field_mode = 1
 field_directions = [Vector2(1, 0), Vector2(-1, 0)]
@@ -261,7 +271,7 @@ shape = SubResource("RectangleShape2D_zoneCorr")
 [node name="Zone2D" type="Area2D" parent="."]
 position = Vector2(7200, 450)
 script = ExtResource("3_zone")
-g_value = 1.2
+g_value = 1.5
 damping = 0.5
 field_mode = 2
 field_directions = [Vector2(-1, 0), Vector2(1, 0)]

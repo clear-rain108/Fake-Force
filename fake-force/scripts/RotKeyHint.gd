@@ -4,6 +4,7 @@ extends Node2D
 
 var _player : CharacterBody2D = null
 var _alpha : float = 0.0
+var _font : Font = null
 
 
 func _ready() -> void:
@@ -25,12 +26,16 @@ func _draw() -> void:
 	if _alpha <= 0.01 or not is_instance_valid(_player):
 		return
 	var vp := get_viewport_rect().size
-	var font : Font = load("res://fusion-pixel.ttf")
+	var font : Font = _font
+	if font == null:
+		font = load("res://fusion-pixel.ttf")
+		_font = font
 	var a : float = _alpha
 	var cx : float = vp.x * 0.5
 	var y : float = vp.y - 44.0
 	var c : Color = Color(0.85, 0.92, 1.0, a)
-	draw_string(font, Vector2(cx - 230.0, y), "W ↑ 向心（靠近核心）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
-	draw_string(font, Vector2(cx + 30.0, y), "S ↓ 离心（远离核心）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
-	draw_string(font, Vector2(cx - 230.0, y + 22.0), "A ↺ 顺时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
-	draw_string(font, Vector2(cx + 30.0, y + 22.0), "D ↻ 逆时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx - 240.0, y), "W 向心（朝向核心）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx + 40.0, y), "S 离心（远离核心）", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx - 240.0, y + 22.0), "A ↻ 顺时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx + 40.0, y + 22.0), "D ↺ 逆时针", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)
+	draw_string(font, Vector2(cx - 240.0, y + 44.0), "滚轮 缩放视野", HORIZONTAL_ALIGNMENT_LEFT, -1, 16, c)

@@ -9,16 +9,18 @@ layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
 script = ExtResource("1_menu")
 
-[node name="Background" parent="." instance=ExtResource("2_bg")]
+[node name="Background" parent="." unique_id=1161848445 instance=ExtResource("2_bg")]
 
 [node name="Music" type="AudioStreamPlayer" parent="." unique_id=2100000011]
-bus = &"Music"
 stream = ExtResource("3_music")
 volume_db = -4.0
+bus = &"Music"
 
-[node name="Title" type="Label" parent="." unique_id=1230914245]
+[node name="Title" type="RichTextLabel" parent="." unique_id=1230914245]
 layout_mode = 0
 anchor_left = 0.5
 anchor_right = 0.5
@@ -26,8 +28,11 @@ offset_left = -320.0
 offset_top = 90.0
 offset_right = 320.0
 offset_bottom = 160.0
-theme_override_font_sizes/font_size = 48
-text = "Fake Forces 善假于物"
+theme_override_font_sizes/normal_font_size = 48
+bbcode_enabled = true
+fit_content = true
+scroll_active = false
+text = "Fake Forces 善[color=#ff4433]假[/color]于[color=#4488ff]物[/color]"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="." unique_id=242274313]

@@ -57,10 +57,12 @@ var glowing : bool = false
 
 var _g_high_time : float = 0.0
 var _font_size : int = 16
+var _font : Font = null
 
 
 func _ready() -> void:
 	add_to_group("Notebook")
+	process_mode = Node.PROCESS_MODE_ALWAYS   # 阅读时游戏暂停，记事本仍需响应输入
 	# 跨场景持久化解锁进度（阶段2→阶段3 切换后仍可阅读已解锁页）
 	unlocked = IllusionManager.notebook_unlocked
 	# 屏幕左下角（自适应视口高度）
@@ -93,11 +95,12 @@ func _unhandled_input(event: InputEvent) -> void:
 	if not (event is InputEventKey and event.pressed and not event.echo):
 		return
 	match event.physical_keycode:
-		KEY_F, KEY_ESCAPE:
+		KEY_F:
 			if reading:
 				_close_page()
-			elif glowing and page_index < unlocked:
+			elif glowing and page_index < unlocked and not get_tree().paused:
 				reading = true
+				get_tree().paused = true   # 阅读时暂停游戏（记事本 PROCESS_MODE_ALWAYS）
 				AudioManager.play_notebook_reveal()  # 档案解锁拍频音
 		KEY_RIGHT, KEY_D:
 			if reading:
@@ -129,11 +132,15 @@ func _close_page() -> void:
 	reading = false
 	glowing = false
 	page_index += 1
+	get_tree().paused = false   # 关闭阅读恢复游戏
 	_g_high_time = 0.0
 
 
 func _draw() -> void:
-	var font : Font = load("res://fusion-pixel.ttf")
+	var font : Font = _font
+	if font == null:
+		font = load("res://fusion-pixel.ttf")
+		_font = font
 	# 发光提示环
 	if glowing and not reading:
 		draw_circle(Vector2.ZERO, 34.0, Color(GLOW_COLOR, 0.14))
@@ -161,7 +168,7 @@ func _draw() -> void:
 		for i in lines.size():
 			draw_string(font, panel_origin + Vector2(20, 92 + i * 27), lines[i], \
 				HORIZONTAL_ALIGNMENT_LEFT, -1, _font_size, PAGE_TEXT_COLOR)
-		draw_string(font, panel_origin + Vector2(20, PANEL_SIZE.y - 18), "← → 翻页 ｜ F / Esc 关闭", \
+		draw_string(font, panel_origin + Vector2(20, PANEL_SIZE.y - 18), "← → 翻页 ｜ F 关闭", \
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 12, Color(0.6, 0.7, 0.8))
 
 

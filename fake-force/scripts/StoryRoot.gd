@@ -17,3 +17,6 @@ func _ready() -> void:
 	var core := get_tree().get_first_node_in_group("RotatingCore")
 	if player and core and player.rotating_mode:
 		player.setup_rotating(core)
+	# 剧情模式暂停菜单（Esc）
+	var pm = load("res://scripts/PauseMenu.gd").new()
+	add_child(pm)

@@ -9,6 +9,7 @@ extends CanvasLayer
 
 var _player : CharacterBody2D = null
 var _sys_time : float = 0.0
+var _persistent_text : String = ""
 
 
 func _ready() -> void:
@@ -46,9 +47,16 @@ func _process(delta: float) -> void:
 	if _sys_time > 0.0:
 		_sys_time -= delta
 		if _sys_time <= 0.0:
-			sys_msg.text = ""
+			sys_msg.text = _persistent_text   # 临时提示结束 → 恢复持续显示的教学提示
 
 
 func show_system_message(text: String) -> void:
 	sys_msg.text = text
 	_sys_time = 4.5
+
+
+## 持续显示的提示（教学关卡）：不随计时消失；临时提示结束后恢复
+func show_system_message_persistent(text: String) -> void:
+	_persistent_text = text
+	sys_msg.text = text
+	_sys_time = 0.0

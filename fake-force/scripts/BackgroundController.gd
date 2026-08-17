@@ -20,6 +20,8 @@ const SHIP_FADE : float = 2.5   # 飞船层淡化速度（alpha/秒）
 var _dust_angle : float = 0.0
 var _ship_alpha : float = 0.0
 var _target_ship : float = 0.0
+var _player : Node = null
+var _core : Node = null
 
 
 func _ready() -> void:
@@ -36,16 +38,18 @@ func _process(delta: float) -> void:
 		else:
 			_ship_alpha = move_toward(_ship_alpha, _target_ship, SHIP_FADE * delta)
 		_ship.modulate = Color(1.0, 1.0, 1.0, _ship_alpha)
-	# 公共参数：虚假力方向 / 玩家参考系状态 / 旋转角速度（供太空层 + 飞船仪器层共用）
+	# 公共参数：虚假力方向 / 玩家参考系状态 / 旋转角速度（缓存引用，失效时重查）
 	var fake : Vector2 = mgr.get_current_fake_vector()
 	var sync_state : int = 0
-	var player := get_tree().get_first_node_in_group("Player")
-	if is_instance_valid(player) and "rot_state" in player:
-		sync_state = int(player.rot_state)   # 0=横向 1=校准中 2=已同步
-	var core := get_tree().get_first_node_in_group("RotatingCore")
+	if not is_instance_valid(_player):
+		_player = get_tree().get_first_node_in_group("Player")
+	if is_instance_valid(_player) and "rot_state" in _player:
+		sync_state = int(_player.rot_state)   # 0=横向 1=校准中 2=已同步
+	if not is_instance_valid(_core):
+		_core = get_tree().get_first_node_in_group("RotatingCore")
 	var omega : float = mgr.current_omega
-	if is_instance_valid(core) and "omega" in core:
-		omega = float(core.omega)
+	if is_instance_valid(_core) and "omega" in _core:
+		omega = float(_core.omega)
 	# 1) 传递 G 值与洞察状态给背景着色器
 	if _bg_mat:
 		_bg_mat.set_shader_parameter("g_strength", mgr.current_g_value)

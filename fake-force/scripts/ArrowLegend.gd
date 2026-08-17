@@ -3,12 +3,13 @@ extends Node2D
 ##
 ## 玩家按住 Shift（洞察模式）时，在屏幕左下角淡入各箭头的含义。
 ## 按当前参考系显示对应条目（与 Player._draw 的箭头绘制保持一致）：
-## - 横向参考系：蓝=输入、红=虚假力、绿=重力
-## - 旋转参考系：蓝=输入（A/D切向、W/S径向）、红=惯性力（离心+科里奥利）
-## - 切换洞察：额外显示金=目标向心力
+## - 横向参考系：蓝=输入、红=虚假力、绿=系统阻力（阻尼+空中重力）
+## - 旋转参考系：蓝=输入（A/D切向、W/S径向）、红=惯性力（离心+科里奥利）、绿=系统阻力（圆盘向心力）
+## - 切换洞察：额外显示金=目标向心力、紫=合力（蓝+红）
 ## 由 PuzzleHUD / HUD 自动挂载（挂于 CanvasLayer 下，坐标为视口坐标）。
 
 var _alpha : float = 0.0
+var _font : Font = null
 var _player : CharacterBody2D = null
 
 
@@ -38,26 +39,33 @@ func _draw() -> void:
 	if _player.rot_state == _player.ROT_SWITCHING:
 		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.84, 0.0, a), false, "金色实线 = 目标向心力（同步后维持圆周）")
 		y += 38.0
-		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A逆时针 / D顺时针 / W向心 / S离心）")
+		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A顺时针 / D逆时针 / W向心 / S离心）")
 		y += 38.0
 		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 惯性力（离心+科里奥利）")
+		y += 38.0
+		_draw_item(x, y, Vector2(36, 0), Color(0.7, 0.35, 0.95, a), false, "紫色实线 = 合力（蓝+红，旋转系内你的实际加速度方向）")
 		return
 	# 旋转参考系
 	if _player.rot_state != _player.ROT_NONE:
-		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A逆时针 / D顺时针 / W向心 / S离心）")
+		_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向（A顺时针 / D逆时针 / W向心 / S离心）")
 		y += 38.0
 		_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 惯性力（离心+科里奥利）")
+		y += 38.0
+		_draw_item(x, y, Vector2(36, 0), Color(0.3, 1.0, 0.4, a), false, "绿色实线 = 系统阻力（圆盘向心力，抵消离心）")
 		return
 	# 横向参考系
 	_draw_item(x, y, Vector2(36, 0), Color(0.25, 0.6, 1.0, a), false, "蓝色实线 = 你的输入方向")
 	y += 38.0
 	_draw_item(x, y, Vector2(36, 0), Color(1.0, 0.3, 0.25, a), true, "红色虚线 = 虚假力")
 	y += 38.0
-	_draw_item(x, y, Vector2(0, 36), Color(0.3, 1.0, 0.4, a), false, "绿色实线 = 重力（向下）")
+	_draw_item(x, y, Vector2(0, 36), Color(0.3, 1.0, 0.4, a), false, "绿色实线 = 系统阻力（阻尼 + 空中重力）")
 
 
 func _draw_item(x: float, y: float, vec: Vector2, color: Color, dashed: bool, text: String) -> void:
-	var font : Font = load("res://fusion-pixel.ttf")
+	var font : Font = _font
+	if font == null:
+		font = load("res://fusion-pixel.ttf")
+		_font = font
 	var from : Vector2 = Vector2(x, y)
 	var to : Vector2 = from + vec
 	# 虚线/实线

@@ -10,6 +10,7 @@ extends CanvasLayer
 var _player : CharacterBody2D = null
 var _hint_shown : bool = false
 var _msg_time : float = 0.0
+var _persistent_text : String = ""
 
 
 func _ready() -> void:
@@ -47,13 +48,13 @@ func _process(delta: float) -> void:
 			_show_message("没有人在推你。你看到的红色箭头，是你所在参考系正在加速的证明——或者说，是系统在推你。", 6.0)
 		# 失败提示
 		if _player.failed:
-			_show_message("挑战失败：坠落次数过多。按 R 重新挑战", 3.0)
+			_show_message("挑战失败：坠落次数过多。按 R 恢复存档点", 3.0)
 			_player.failed = false
 
 	if _msg_time > 0.0:
 		_msg_time -= delta
 		if _msg_time <= 0.0:
-			msg_label.text = ""
+			msg_label.text = _persistent_text   # 临时提示结束 → 恢复持续显示的教学提示
 
 
 func _show_message(text: String, duration: float) -> void:
@@ -69,4 +70,11 @@ func show_message(text: String, duration: float) -> void:
 ## 供玩家/系统事件调用（与解密 HUD 接口一致）
 func show_system_message(text: String) -> void:
 	_show_message(text, 5.0)
+
+
+## 持续显示的提示（教学）：不随计时消失；临时提示结束后恢复
+func show_system_message_persistent(text: String) -> void:
+	_persistent_text = text
+	msg_label.text = text
+	_msg_time = 0.0
 

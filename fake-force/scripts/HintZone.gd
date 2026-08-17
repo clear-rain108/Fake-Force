@@ -3,6 +3,7 @@ extends Area2D
 
 @export_multiline var hint_text : String = ""
 @export var hint_duration : float = 6.0
+@export var persistent : bool = false   # true=持续显示（教学关卡），不随计时消失
 
 var _shown : bool = false
 
@@ -18,7 +19,9 @@ func _on_body_entered(body: Node2D) -> void:
 		_shown = true
 		var hud := get_tree().get_first_node_in_group("HUD")
 		if hud:
-			if hud.has_method("show_system_message"):
+			if persistent and hud.has_method("show_system_message_persistent"):
+				hud.show_system_message_persistent(hint_text)
+			elif hud.has_method("show_system_message"):
 				hud.show_system_message(hint_text)
 			elif hud.has_method("show_message"):
 				hud.show_message(hint_text, hint_duration)

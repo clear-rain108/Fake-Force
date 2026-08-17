@@ -53,6 +53,14 @@ position = Vector2(0, -220)
 script = ExtResource("2_player")
 rotating_mode = true
 start_in_rot = true
+speed = 60.0
+jump_velocity = 300.0
+jump_gravity = 200.0
+max_speed_x = 140.0
+jump_cap = 350.0
+max_fall_speed = 350.0
+kill_y = 800.0
+dust_eta_step = 0.7
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1

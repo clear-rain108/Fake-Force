@@ -6,6 +6,7 @@ extends Node2D
 
 var _active : bool = false
 var _t : float = 0.0
+var _font : Font = null
 
 
 func _ready() -> void:
@@ -36,7 +37,10 @@ func _process(delta: float) -> void:
 
 func _draw() -> void:
 	var vp := get_viewport_rect().size
-	var font : Font = load("res://fusion-pixel.ttf")
+	var font : Font = _font
+	if font == null:
+		font = load("res://fusion-pixel.ttf")
+		_font = font
 	# 白闪
 	if _t < 0.5:
 		draw_rect(Rect2(Vector2.ZERO, vp), Color(1.0, 1.0, 1.0, 1.0 - _t / 0.5))

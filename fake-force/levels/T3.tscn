@@ -154,6 +154,7 @@ shape = SubResource("RectangleShape2D_goal")
 position = Vector2(-150, 450)
 script = ExtResource("13_hint")
 hint_text = "按住 E 吸附马赫尘埃 ｜ Q 变重 / Z 变轻 ｜ 尖刺需变轻(η<0.6)飘过，蓝色墙需变重(η>1.5)撞碎"
+persistent = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone" unique_id=76182082]
 shape = SubResource("RectangleShape2D_hint")

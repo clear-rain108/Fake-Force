@@ -16,6 +16,8 @@ extends RigidBody2D
 ## bounce>0 时撞到漂移边界按该系数反弹（往复摆动，供综合关“移动浮桥”使用）；默认 0=撞边停（原行为）
 @export var counts_as_occupant : bool = true
 ## false 时不作为 IllusionZone 的占用体计数（避免多区域关卡中“无人区”的方块干扰当前幻觉场写入）
+@export var activation_distance : float = 0.0
+## 玩家进入该距离内才受幻觉力驱动（0=始终激活）；防止玩家未到时幻灵方块提前漂移乱跑
 
 
 func _ready() -> void:
@@ -25,12 +27,20 @@ func _ready() -> void:
 
 func _integrate_forces(state: PhysicsDirectBodyState2D) -> void:
 	if is_phantom:
-		var fake_accel : Vector2 = IllusionManager.get_current_fake_vector()
-		var k : float = IllusionManager.get_current_damping()
-		var strength : float = IllusionManager.global_influence_strength
-		# 幻觉力 + 阻尼（力 = m×a）
-		var f : Vector2 = fake_accel * strength * mass - k * state.linear_velocity * mass
-		state.apply_central_force(f)
+		# 玩家未到附近时不激活（防止幻灵方块提前漂移乱跑）
+		var active : bool = activation_distance <= 0.0
+		if not active:
+			var player := get_tree().get_first_node_in_group("Player")
+			active = is_instance_valid(player) and global_position.distance_to(player.global_position) <= activation_distance
+		if active:
+			var fake_accel : Vector2 = IllusionManager.get_current_fake_vector()
+			var k : float = IllusionManager.get_current_damping()
+			var strength : float = IllusionManager.global_influence_strength
+			# 幻觉力 + 阻尼（力 = m×a）
+			var f : Vector2 = fake_accel * strength * mass - k * state.linear_velocity * mass
+			state.apply_central_force(f)
+		else:
+			state.linear_velocity = Vector2.ZERO
 	# 漂移范围限制（无重力悬浮物的"边界"；bounce>0 时反弹往复）
 	var p : Vector2 = state.transform.origin
 	var moved : bool = false

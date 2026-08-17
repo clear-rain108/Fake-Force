@@ -15,6 +15,7 @@ extends Node2D
 
 var _stars : PackedVector2Array = PackedVector2Array()
 var _core : Node2D = null
+var _player : CharacterBody2D = null
 var _t : float = 0.0
 var _drag_vel : Vector2 = Vector2.ZERO
 var _offset : Vector2 = Vector2.ZERO
@@ -30,9 +31,10 @@ func _ready() -> void:
 
 func _process(delta: float) -> void:
 	_t += delta
-	# 跟随玩家
-	var player := get_tree().get_first_node_in_group("Player")
-	var base : Vector2 = player.global_position if is_instance_valid(player) else Vector2.ZERO
+	# 跟随玩家（缓存引用，失效时重查）
+	if not is_instance_valid(_player):
+		_player = get_tree().get_first_node_in_group("Player")
+	var base : Vector2 = _player.global_position if is_instance_valid(_player) else Vector2.ZERO
 
 	# 幻觉场加速度改变 → 星空向参考系加速度方向拖曳（短暂视觉）
 	var fake : Vector2 = IllusionManager.get_current_fake_vector()

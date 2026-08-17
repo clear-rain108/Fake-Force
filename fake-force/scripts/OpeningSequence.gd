@@ -15,10 +15,12 @@ const SEGMENTS : Array = [
 	["这似乎，就是你们一生的使命。"],
 	["偶然一日，你发现了一位停止呼吸的老人。", "他的身边，有一本发着苍蓝光芒的记事本。"],
 	["航路图上只有一条简单的航线——", "指向离你们最近的黑洞。"],
+	["去哪？或许，唯一的线索，只会在那儿。"],
 	["那就去吧。"],
 ]
 
 var _t : float = 0.0
+var _font : Font = null
 var _done : bool = false
 
 
@@ -36,17 +38,12 @@ func _process(delta: float) -> void:
 		queue_free()
 
 
-func _unhandled_input(event: InputEvent) -> void:
-	if _done:
-		return
-	if event is InputEventKey and event.pressed:
-		_done = true
-		queue_free()
-
-
 func _draw() -> void:
 	var vp := get_viewport_rect().size
-	var font : Font = load("res://fusion-pixel.ttf")
+	var font : Font = _font
+	if font == null:
+		font = load("res://fusion-pixel.ttf")
+		_font = font
 	draw_rect(Rect2(Vector2.ZERO, vp), Color(0.0, 0.0, 0.0, 0.96))
 	var idx : int = int(_t / SEG_DURATION)
 	if idx >= SEGMENTS.size():
@@ -58,4 +55,16 @@ func _draw() -> void:
 	for i in lines.size():
 		draw_string(font, vp * 0.5 + Vector2(-380, start_y + float(i) * 34.0), String(lines[i]), \
 			HORIZONTAL_ALIGNMENT_CENTER, 760, 24, Color(0.9, 0.95, 1.0, alpha))
+	# 底部跳过提示
+	draw_string(font, vp * 0.5 + Vector2(-160, vp.y * 0.5 + 200), "按 空格 跳过开幕剧情",
+		HORIZONTAL_ALIGNMENT_CENTER, 320, 14, Color(0.5, 0.62, 0.72, 0.65))
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _done:
+		return
+	if event is InputEventKey and event.pressed and not event.echo:
+		if event.physical_keycode == KEY_SPACE:
+			_done = true
+			queue_free()
 

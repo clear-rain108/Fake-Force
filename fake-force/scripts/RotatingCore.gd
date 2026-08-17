@@ -22,7 +22,13 @@ func _ready() -> void:
 
 func _physics_process(_delta: float) -> void:
 	var player := get_tree().get_first_node_in_group("Player")
-	if is_instance_valid(player):
+	# 旋转物理模式（rotating_mode=true）下，旋转惯性力由 Player._rotating_physics
+	# 全权管理（set_rot_inertia 写入 current_fake_vector 并清零 rotating_accel）。
+	# 若此处仍重复注入 rotating_accel，会出现：
+	#   ① 横向状态（ROT_NONE）靠近核心时，玩家被"看不见的离心力"推挤；
+	#   ② 旋转状态下 G 值/洞察箭头双计数（取决于场景树顺序）。
+	# 因此仅在"非旋转物理"（旧式简单离心推挤）关卡中写入。
+	if is_instance_valid(player) and not player.rotating_mode:
 		var r : Vector2 = player.global_position - global_position
 		var dist : float = r.length()
 		if dist < influence_radius and dist > 1.0:

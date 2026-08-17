@@ -15,10 +15,18 @@ func _ready() -> void:
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_ESCAPE:
+			if _notebook_reading():
+				return   # 记事本阅读中：ESC 不打开暂停菜单
 			if _open:
 				resume()
 			else:
 				pause()
+
+
+## 剧情记事本阅读中（此时游戏已因阅读而暂停），ESC 不再开暂停菜单
+func _notebook_reading() -> bool:
+	var nb := get_tree().get_first_node_in_group("Notebook")
+	return is_instance_valid(nb) and nb.reading
 
 
 func pause() -> void:
@@ -33,6 +41,13 @@ func resume() -> void:
 	_open = false
 	get_tree().paused = false
 	_panel.visible = false
+
+
+## 重开当前关卡：解除暂停并重载场景（回到关卡起点）
+func _restart() -> void:
+	get_tree().paused = false
+	Engine.time_scale = 1.0
+	get_tree().reload_current_scene()
 
 
 func _to_menu() -> void:
@@ -77,6 +92,10 @@ func _build_ui() -> void:
 	var resume_btn := _make_button("继续游戏")
 	resume_btn.pressed.connect(resume)
 	box.add_child(resume_btn)
+
+	var restart_btn := _make_button("重开游戏")
+	restart_btn.pressed.connect(_restart)
+	box.add_child(restart_btn)
 
 	var menu_btn := _make_button("返回主菜单")
 	menu_btn.pressed.connect(_to_menu)

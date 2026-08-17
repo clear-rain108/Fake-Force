@@ -3,9 +3,8 @@ extends Node
 ##
 ## 全局存储当前幻觉场的核心参数，供玩家、幻灵方块等统一读取。
 ## 物理层永远不因洞察模式分支，所有虚假力计算都从这里取值。
-## 双模式：剧情模式（G_TO_ACCEL=40）/ 解密模式（G_TO_ACCEL=10，文档规范）
-
-const G_TO_ACCEL_STORY : float = 40.0
+## 双模式统一 G→加速度 换算（剧情与解密手感完全一致）
+const G_TO_ACCEL_STORY : float = 10.0
 const G_TO_ACCEL_PUZZLE : float = 10.0
 
 var g_to_accel : float = G_TO_ACCEL_STORY

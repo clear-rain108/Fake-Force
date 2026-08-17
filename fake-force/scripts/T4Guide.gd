@@ -34,5 +34,8 @@ func _process(_delta: float) -> void:
 
 func _msg(text: String) -> void:
 	var hud := get_tree().get_first_node_in_group("HUD")
-	if hud and hud.has_method("show_system_message"):
-		hud.show_system_message(text)
+	if hud:
+		if hud.has_method("show_system_message_persistent"):
+			hud.show_system_message_persistent(text)
+		elif hud.has_method("show_system_message"):
+			hud.show_system_message(text)

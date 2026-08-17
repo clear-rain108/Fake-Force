@@ -118,6 +118,7 @@ shape = SubResource("RectangleShape2D_block")
 position = Vector2(150, 350)
 script = ExtResource("11_hint")
 hint_text = "橙色方块＝绝对路标（纹丝不动）；蓝色方块会被吹动——等它漂到中间，踩着它过深渊"
+persistent = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone" unique_id=748787132]
 shape = SubResource("RectangleShape2D_hint")

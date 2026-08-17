@@ -26,6 +26,9 @@ extends CharacterBody2D
 @export var tang_accel : float = 60.0      # A/D 切向推力
 @export var sync_radius : float = 30.0     # 同步判定阈值（相对速度）
 @export var safe_ring_radius : float = 0.0 # 安全环半径（0=不启用）
+@export var rot_zoom_min : float = 0.35    # 旋转系滚轮缩放下限（倍率）
+@export var rot_zoom_max : float = 2.5     # 旋转系滚轮缩放上限（倍率）
+@export var rot_zoom_step : float = 0.1    # 滚轮每格缩放步长
 
 enum { ROT_NONE, ROT_SWITCHING, ROT_SYNCED }
 var core_ref : Node2D = null
@@ -37,14 +40,24 @@ var _last_in_rot_range : bool = false      # 上一帧是否处于旋转核心�
 var rot_switch_count : int = 0              # 累计完成旋转参考系同步次数（记事本第4页判定）
 var _prev_insight : bool = false           # 上一帧洞察状态（切换扫频音前沿检测）
 
-# 旋转参考系视觉：脚指向核心 / 视野 0.8 / 摄像机锁定核心（脱离回正）
+# 旋转参考系视觉（Model B：踩在盘上）：玩家与摄像机整体随盘旋转，转盘屏显静止、角色屏显固定
 @onready var _rot_camera : Camera2D = $Camera2D
-var _rot_vis_rot : float = 0.0    # 玩家自身旋转（平滑）
-var _rot_vis_cam : float = 0.0    # 摄像机旋转（平滑，使核心固定屏幕上方）
-var _rot_vis_zoom : float = 1.0   # 摄像机缩放（旋转系=0.8）
+var _rot_vis_rot : float = 0.0    # 玩家自身旋转（平滑，追踪盘旋转 core_ref.rotation）
+var _rot_vis_cam : float = 0.0    # 摄像机全局旋转（平滑，追踪盘旋转；局部=全局-玩家旋转）
+var _rot_vis_zoom : float = 1.0   # 摄像机缩放（旋转系=0.8×滚轮倍率）
+var _rot_user_zoom : float = 1.0  # 滚轮缩放倍率（仅旋转参考系内生效，脱离复位）
+var _rot_cam_smooth_initial : bool = true  # 摄像机位置平滑初始值（旋转系内禁用，保证转盘屏显静止）
 var _dbg_input : Vector2 = Vector2.ZERO    # 洞察：玩家输入加速度（A/D切向+W/S径向）
 var _dbg_inertia : Vector2 = Vector2.ZERO  # 洞察：惯性力（离心+科里奥利）
+var _dbg_system : Vector2 = Vector2.ZERO   # 洞察：系统阻力（同步态=圆盘向心力 -ω²R；横向=阻尼+空中重力）
+var _dbg_net : Vector2 = Vector2.ZERO      # 洞察：合力（切换态=蓝+红）
 var _dbg_target : Vector2 = Vector2.ZERO   # 切换洞察：目标向心力（=ω²r 向心）
+
+# 同比例箭头（需求1：合力=运动可验证）：长度 = |力| × ARROW_SCALE，截断到 [MIN, MAX]
+const ARROW_SCALE := 1.0      # px / (px·s⁻²)，输入 60 → 60px
+const ARROW_MIN_LEN := 8.0    # 最短箭长（过小不可见）
+const ARROW_MAX_LEN := 150.0  # 最长箭长（极端值防占屏）
+const ARROW_GOLD_MIN := 20.0  # 金色目标箭头最小长度（始终可见作引导）
 
 # 旋转参考系：常规灰色平台隐身（旋转系内平台渐变隐身，脱出后现身）
 var _platform_polys : Array = []           # 场景中常规平台（StaticBody2D/Poly）的 Polygon2D
@@ -67,8 +80,8 @@ var dust_collected : int = 0   # 累计收集数（不含消耗，供记事本�
 @export_group("洞察模式")
 @export var insight_time_scale : float = 0.2
 @export var energy_max : float = 100.0
-@export var energy_drain : float = 100.0   # 每秒消耗（1秒耗尽）
-@export var energy_recovery : float = 33.3 # 每秒恢复（3秒满格）
+@export var insight_duration_base : float = 5.0   # 洞察最长持续秒数（每收集1枚马赫尘埃 +1s）
+@export var energy_recovery : float = 100.0       # 每秒恢复（1秒满格）
 
 var insight_energy : float = 100.0
 var is_insight : bool = false
@@ -97,6 +110,8 @@ func _ready() -> void:
 	insight_energy = energy_max
 	_spawn_point = global_position
 	player_eta = eta_default
+	if is_instance_valid(_rot_camera):
+		_rot_cam_smooth_initial = _rot_camera.position_smoothing_enabled
 	_collect_platforms()
 
 
@@ -172,10 +187,19 @@ func _rotating_physics(delta: float) -> void:
 		a_abs = -omega * omega * R if rot_state == ROT_SYNCED else Vector2.ZERO
 	velocity += a_abs * delta
 	global_position += velocity * delta
-	# 缓存力（洞察显示：玩家输入 + 惯性力 + 目标向心力）
+	# 缓存力（洞察显示：输入 + 惯性力 + 系统阻力 + 合力 + 目标向心力）
 	_dbg_input = a_input
 	_dbg_inertia = a_cent + a_cor
 	_dbg_target = -r_hat * (omega * omega * r)
+	# 系统阻力：同步态 = 圆盘提供的向心力 -ω²R（+安全环弹簧）；切换态无向心力 → ZERO
+	var a_system : Vector2 = Vector2.ZERO
+	if rot_state == ROT_SYNCED:
+		a_system = -omega * omega * R
+		if safe_ring_radius > 0.0:
+			a_system += -r_hat * (r - safe_ring_radius) * 3.0
+	_dbg_system = a_system
+	# 合力（旋转系内观测）：切换态 = 蓝 + 红（无向心力抵消）
+	_dbg_net = a_input + a_cent + a_cor
 	# 同步锁定计时
 	if rot_sync_lock > 0.0:
 		rot_sync_lock -= delta
@@ -193,17 +217,29 @@ func _process(delta: float) -> void:
 		_prev_insight = is_insight
 		AudioManager.transition_insight_mode(is_insight)  # 洞察进入/退出扫频音
 	_update_insight(delta)
-	_update_rot_visual(delta)  # 旋转参考系视觉（脚指向核心/视野0.8/摄像机锁定）
+	_update_rot_visual(delta)  # 旋转参考系视觉（Model B：随盘旋转/转盘屏显静止/滚轮缩放）
 	_update_platform_fade(delta)
 	queue_redraw()
 
 
 func _unhandled_input(event: InputEvent) -> void:
+	# 旋转参考系：鼠标滚轮缩放视野（0.8 基准 × 用户倍率）
+	if event is InputEventMouseButton and event.pressed:
+		if rotating_mode and is_instance_valid(core_ref) and rot_state != ROT_NONE:
+			if event.button_index == MOUSE_BUTTON_WHEEL_UP:
+				_rot_user_zoom = clampf(_rot_user_zoom + rot_zoom_step, rot_zoom_min, rot_zoom_max)
+				return
+			if event.button_index == MOUSE_BUTTON_WHEEL_DOWN:
+				_rot_user_zoom = clampf(_rot_user_zoom - rot_zoom_step, rot_zoom_min, rot_zoom_max)
+				return
 	if not (event is InputEventKey and event.pressed and not event.echo):
 		return
 	match event.physical_keycode:
 		KEY_R:
-			reset_level()
+			if IllusionManager.game_mode == "story":
+				reset_level()     # 剧情模式：恢复最近存档点
+			else:
+				restart_level()   # 解密模式：重开当前关卡
 		KEY_Q:
 			_consume_dust(dust_eta_step)   # 消耗1份尘埃：变重（η+）
 		KEY_Z:
@@ -223,6 +259,13 @@ func reset_level() -> void:
 	_reset_rot_state()
 
 
+## 重开当前关卡：完整重置（重载场景，回到关卡起点，清空尘埃/η/能量等）
+func restart_level() -> void:
+	if Engine.time_scale != 1.0:
+		Engine.time_scale = 1.0
+	get_tree().reload_current_scene()
+
+
 func add_dust(n: int) -> void:
 	dust_count += n
 	dust_collected += n
@@ -235,12 +278,9 @@ func _consume_dust(delta_eta: float) -> void:
 	player_eta = clampf(player_eta + delta_eta, 0.3, 2.5)
 
 
-## 危险入口（尖刺/旋转障碍等调用）：解密=即时重生+系统提示；剧情=坠落计数
+## 危险入口（尖刺/旋转障碍等调用）：统一即时重生（与解密模式手感一致）
 func on_hazard() -> void:
-	if IllusionManager.game_mode == "puzzle":
-		_instant_respawn()
-	else:
-		_on_fallen()
+	_instant_respawn()
 
 
 func _instant_respawn() -> void:
@@ -304,7 +344,10 @@ func _update_insight(delta: float) -> void:
 
 	if is_insight:
 		var real_delta : float = delta / maxf(Engine.time_scale, 0.001)
-		insight_energy = maxf(insight_energy - energy_drain * real_delta, 0.0)
+		# 普通洞察最长持续 = 5s 基础 + 本关累计收集的马赫尘埃数 ×1s → 动态消耗速率
+		var max_duration : float = insight_duration_base + float(dust_collected)
+		var drain : float = energy_max / maxf(max_duration, 0.1)
+		insight_energy = maxf(insight_energy - drain * real_delta, 0.0)
 		if insight_energy <= 0.0:
 			_exit_insight()
 	else:
@@ -339,6 +382,7 @@ func _exit_rotating() -> void:
 	_switching = false
 	is_insight = false
 	Engine.time_scale = 1.0
+	_rot_user_zoom = 1.0   # 滚轮缩放复位（下次进入旋转系从默认视野开始）
 	_last_insight_in_rot = false   # 脱离后重新进入圆盘可再次触发切换
 	_set_platform_visibility(false)  # 脱离旋转参考系：平台重新现身
 	IllusionManager.reset_zone_params()  # 恢复横向参考系幻觉场
@@ -367,6 +411,7 @@ func _reset_rot_state() -> void:
 	_switching = false
 	is_insight = false
 	Engine.time_scale = 1.0
+	_rot_user_zoom = 1.0   # 滚轮缩放复位
 	_last_insight_in_rot = false
 	_set_platform_visibility(false)  # 圆盘外重生：平台现身
 	IllusionManager.reset_zone_params()
@@ -412,29 +457,30 @@ func _set_platform_visibility(visible_in_rot: bool) -> void:
 	_platform_target = 0.0 if visible_in_rot else 1.0
 
 
-## 旋转参考系视觉表现：
-## - 切换至旋转系时，玩家"脚"（素材正下方）转向旋转核心方向；
-## - 视野范围缩小至 0.8（camera.zoom）；
-## - 摄像机随玩家绕核心公转而旋转，使核心始终固定在屏幕正上方（相对位置不变）；
+## 旋转参考系视觉表现（Model B：踩在盘上）：
+## - 玩家与摄像机整体追踪圆盘旋转（core_ref.rotation）：
+##   同步后转盘屏显静止、角色屏显固定（不再因公转而自转）；
+## - 视野 = 0.8 基准 × 滚轮用户倍率（rot_zoom_min~rot_zoom_max）；
+## - 旋转系内禁用摄像机位置平滑（保证转盘/核心屏显精确静止）；
 ## - 脱离旋转系后自动回正（rotation=0 / zoom=1），全部平滑过渡。
 func _update_rot_visual(delta: float) -> void:
 	var target_rot : float = 0.0
 	var target_cam : float = 0.0
 	var target_zoom : float = 1.0
 	if rotating_mode and is_instance_valid(core_ref) and rot_state != ROT_NONE:
-		var dir : Vector2 = core_ref.global_position - global_position
-		if dir.length_squared() > 0.001:
-			var ang : float = dir.angle()
-			target_rot = ang - PI / 2.0   # 脚（默认朝 +Y）指向核心
-			target_cam = ang + PI / 2.0   # 核心映射到屏幕正上方
-		target_zoom = 0.8
+		target_rot = core_ref.rotation   # 角色随盘旋转（盘内屏显静止）
+		target_cam = core_ref.rotation   # 摄像机全局旋转 = 盘旋转（核心/转盘屏显静止）
+		target_zoom = 0.8 * _rot_user_zoom
 	_rot_vis_rot = lerp_angle(_rot_vis_rot, target_rot, minf(delta * 6.0, 1.0))
 	_rot_vis_cam = lerp_angle(_rot_vis_cam, target_cam, minf(delta * 6.0, 1.0))
 	_rot_vis_zoom = lerpf(_rot_vis_zoom, target_zoom, minf(delta * 5.0, 1.0))
 	rotation = _rot_vis_rot
 	if is_instance_valid(_rot_camera):
-		_rot_camera.rotation = _rot_vis_cam
+		# 摄像机是玩家子节点，2D 旋转沿父链相加：局部 = 目标全局 − 玩家自身旋转
+		_rot_camera.rotation = _rot_vis_cam - _rot_vis_rot
 		_rot_camera.zoom = Vector2(_rot_vis_zoom, _rot_vis_zoom)
+		var in_rot : bool = rotating_mode and is_instance_valid(core_ref) and rot_state != ROT_NONE
+		_rot_camera.position_smoothing_enabled = false if in_rot else _rot_cam_smooth_initial
 
 
 func _draw() -> void:
@@ -452,33 +498,42 @@ func _draw() -> void:
 		return
 	var center : Vector2 = Vector2.ZERO
 	var inv_rot : float = -rotation   # 世界方向 → 局部坐标（玩家自身旋转时箭头不跟着转错）
-	# 切换洞察（参考系切换）：目标向心力(金) + 玩家输入(蓝) + 惯性力(红)
-	# 蓝=你按的方向（A逆时针/D顺时针/W向心/S离心）；红=惯性力；金=同步后需维持的向心力
+	# 切换洞察（参考系切换）：目标向心力(金) + 玩家输入(蓝) + 惯性力(红) + 合力(紫)
+	# 蓝=你按的方向（A顺时针/D逆时针/W向心/S离心）；红=惯性力；金=同步后需维持的向心力；紫=合力（蓝+红）
 	if _switching or rot_state == ROT_SWITCHING:
-		if _dbg_target.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_target.rotated(inv_rot).normalized() * 55.0, Color(1.0, 0.84, 0.0), false, 4.0)
-		if _dbg_input.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_input.rotated(inv_rot).normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
-		if _dbg_inertia.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_inertia.rotated(inv_rot).normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_target, ARROW_GOLD_MIN).rotated(inv_rot), Color(1.0, 0.84, 0.0), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_input).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_inertia).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_net).rotated(inv_rot), Color(0.7, 0.35, 0.95), false, 4.0)
 		return
-	# 旋转参考系洞察：蓝=玩家输入、红=惯性力（离心+科里奥利）
+	# 旋转参考系洞察：蓝=输入、红=惯性力（离心+科里奥利）、绿=系统阻力（圆盘向心力 -ω²R）
 	if rot_state != ROT_NONE:
-		if _dbg_input.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_input.rotated(inv_rot).normalized() * 50.0, Color(0.25, 0.6, 1.0), false, 4.0)
-		if _dbg_inertia.length_squared() > 0.01:
-			_draw_arrow(center, _dbg_inertia.rotated(inv_rot).normalized() * 50.0, Color(1.0, 0.3, 0.25), true, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_input).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_inertia).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_system).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, 4.0)
 		return
-	# 横向参考系洞察：蓝=输入、红=虚假力（幻觉场）、绿=重力
+	# 横向参考系洞察：蓝=输入、红=虚假力（幻觉场）、绿=系统阻力（阻尼+空中重力）
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")
-	if input_dir.length_squared() > 0.01:
-		_draw_arrow(center, input_dir.rotated(inv_rot).normalized() * 60.0, Color(0.25, 0.6, 1.0), false, 4.0)
+	var input_force : Vector2 = input_dir * speed / maxf(player_eta, 0.001)
+	if input_force.length_squared() > 0.001:
+		_draw_arrow(center, _scaled_arrow(input_force).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, 4.0)
 	var fake_vec : Vector2 = IllusionManager.get_current_fake_vector()
-	if fake_vec.length_squared() > 0.01:
-		var len_px : float = clampf(fake_vec.length() * 2.5, 20.0, 140.0)
-		_draw_arrow(center, fake_vec.rotated(inv_rot).normalized() * len_px, Color(1.0, 0.3, 0.25), true, 4.0)
-	if rot_state == ROT_NONE:
-		_draw_arrow(center, Vector2(0.0, 40.0).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, 3.0)
+	if fake_vec.length_squared() > 0.001:
+		_draw_arrow(center, _scaled_arrow(fake_vec).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, 4.0)
+	var system_vec : Vector2 = -IllusionManager.get_current_damping() * velocity
+	if not is_on_floor():
+		system_vec += Vector2(0.0, jump_gravity)
+	if system_vec.length_squared() > 0.001:
+		_draw_arrow(center, _scaled_arrow(system_vec).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, 4.0)
+
+
+## 同比例箭头：长度 = |v| × ARROW_SCALE，截断到 [min_len, ARROW_MAX_LEN]（需求1：合力=运动可验证）
+func _scaled_arrow(v: Vector2, min_len: float = ARROW_MIN_LEN) -> Vector2:
+	var L : float = v.length()
+	if L < 0.001:
+		return Vector2.ZERO
+	var scaled : float = clampf(L * ARROW_SCALE, min_len, ARROW_MAX_LEN)
+	return v * (scaled / L)
 
 
 func _draw_arrow(from: Vector2, vec: Vector2, color: Color, dashed: bool, width: float) -> void:
