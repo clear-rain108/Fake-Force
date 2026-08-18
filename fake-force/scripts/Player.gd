@@ -8,7 +8,7 @@ extends CharacterBody2D
 ## - 决策2：幻觉力 = 系统不定时向某方向加速产生的惯性力（IllusionZone 驱动）
 ## - 决策3：瞬时起跳——平台上轻点 W 触发一次跳跃（无持续喷气）
 ## - 决策4：物理层永不因洞察模式分支
-## - 决策5：坠落 > 最大次数判定失败，按 R 重新挑战（可设存档点）
+## - 决策5：坠落 > 最大次数判定失败——剧情模式触发强制休眠死亡演出（DeathSequence→回开始页），R 键仍可手动恢复最近存档点
 ## - 已确认：空中微重力（跳跃/悬空时小幅下落，落地即停）
 
 @export_group("移动参数")
@@ -26,6 +26,10 @@ extends CharacterBody2D
 @export var tang_accel : float = 60.0      # A/D 切向推力
 @export var sync_radius : float = 30.0     # 同步判定阈值（相对速度）
 @export var safe_ring_radius : float = 0.0 # 安全环半径（0=不启用）
+@export var inertia_scale : float = 0.5    # 旋转系惯性力缩放（离心+科里奥利；调小=更轻手感：G/红箭/幻灵/星空同步变弱，不影响玩家实际受力与轨道）
+@export var linear_g_visual_ref : float = 1.5   # 普通参考系：幻觉强度边框满强度对应 G（1.5G 已很大）
+@export var rot_g_visual_ref : float = 20.0     # 旋转参考系：幻觉强度边框满强度对应 G（十余 G 仅普通/中等，20G 才满）
+@export var rot_feet_to_core : bool = false  # 真：脚(+Y)指向核心→核心恒屏显正下方、精灵头朝上、世界旋转（部分场景）；假：随盘自转角（Model B）
 @export var rot_zoom_min : float = 0.35    # 旋转系滚轮缩放下限（倍率）
 @export var rot_zoom_max : float = 2.5     # 旋转系滚轮缩放上限（倍率）
 @export var rot_zoom_step : float = 0.1    # 滚轮每格缩放步长
@@ -167,10 +171,12 @@ func _rotating_physics(delta: float) -> void:
 	var r_hat : Vector2 = R / r
 	var t_hat : Vector2 = r_hat.orthogonal()
 	var a_input : Vector2 = (r_hat * input.y * radial_accel + t_hat * input.x * tang_accel) / player_eta  # η 影响旋转输入推力（尘埃调重玩法）
-	# 旋转虚假力（幻觉场）：离心 + 科里奥利
+	# 旋转虚假力（幻觉场）：离心 + 科里奥利，乘以惯性力缩放（inertia_scale）调手感
+	# （仅写入幻觉显示系统：G 值/洞察红箭/幻灵/星空；不影响玩家实际受力 a_abs 与轨道）
 	var a_cent : Vector2 = omega * omega * R
 	var a_cor : Vector2 = Vector2(2.0 * omega * v_rel.y, -2.0 * omega * v_rel.x)
-	IllusionManager.set_rot_inertia(a_cent + a_cor)
+	var a_inertia : Vector2 = (a_cent + a_cor) * inertia_scale
+	IllusionManager.set_rot_inertia(a_inertia)
 	# 绝对加速度：
 	# - 切换中：无向心力 → 输入直接作用（直线/惯性，旋转参考系中表现为"被甩"）
 	# - 已同步：向心加速度 -ω²R（圆盘提供）维持圆周运动 → 无输入也随盘转；输入叠加
@@ -189,7 +195,7 @@ func _rotating_physics(delta: float) -> void:
 	global_position += velocity * delta
 	# 缓存力（洞察显示：输入 + 惯性力 + 系统阻力 + 合力 + 目标向心力）
 	_dbg_input = a_input
-	_dbg_inertia = a_cent + a_cor
+	_dbg_inertia = a_inertia
 	_dbg_target = -r_hat * (omega * omega * r)
 	# 系统阻力：同步态 = 圆盘提供的向心力 -ω²R（+安全环弹簧）；切换态无向心力 → ZERO
 	var a_system : Vector2 = Vector2.ZERO
@@ -199,7 +205,7 @@ func _rotating_physics(delta: float) -> void:
 			a_system += -r_hat * (r - safe_ring_radius) * 3.0
 	_dbg_system = a_system
 	# 合力（旋转系内观测）：切换态 = 蓝 + 红（无向心力抵消）
-	_dbg_net = a_input + a_cent + a_cor
+	_dbg_net = a_input + a_inertia
 	# 同步锁定计时
 	if rot_sync_lock > 0.0:
 		rot_sync_lock -= delta
@@ -213,6 +219,8 @@ func _rotating_physics(delta: float) -> void:
 
 func _process(delta: float) -> void:
 	IllusionManager.is_insight_mode = is_insight  # 同步洞察状态（背景星空定格）
+	# 幻觉强度边框参考由参考系决定：普通=1.5G 已很大；旋转=rot_g_visual_ref 十余G 仅普通
+	IllusionManager.vignette_g_ref = rot_g_visual_ref if rot_state != ROT_NONE else linear_g_visual_ref
 	if is_insight != _prev_insight:
 		_prev_insight = is_insight
 		AudioManager.transition_insight_mode(is_insight)  # 洞察进入/退出扫频音
@@ -293,14 +301,22 @@ func _instant_respawn() -> void:
 
 
 func _on_fallen() -> void:
+	if failed:
+		return   # 已触发死亡演出：一次性保护（避免每物理帧重触发、黑屏无法淡入）
 	if IllusionManager.game_mode == "puzzle":
 		_instant_respawn()
 		return
-	# 剧情模式：坠落计数（>max_falls 失败）
+	# 剧情模式：坠落计数（>max_falls 失败 → 强制休眠剧情演出，不再提示按 R 重开）
 	fall_count += 1
 	if fall_count > max_falls:
 		failed = true
 		velocity = Vector2.ZERO
+		Engine.time_scale = 1.0
+		var layer := CanvasLayer.new()
+		layer.layer = 60
+		var seq : Node2D = load("res://scripts/DeathSequence.gd").new()
+		layer.add_child(seq)
+		get_tree().current_scene.add_child(layer)
 	else:
 		global_position = _spawn_point
 		velocity = Vector2.ZERO
@@ -421,7 +437,8 @@ func _reset_rot_state() -> void:
 ## 进入旋转参考系后，关卡中的常规灰色平台（StaticBody2D/Poly）渐变隐身，
 ## 脱出旋转参考系后重新显现。对所有旋转参考系关卡统一生效。
 
-## 收集关卡中所有常规平台（StaticBody2D 下名为 "Poly" 的 Polygon2D）。
+## 收集关卡中所有常规平台（StaticBody2D 下的 Polygon2D 子节点）。
+## 兼容场景定义（子节点名 "Poly"）与 StageBuilder 程序生成（Polygon2D 默认名）两种平台。
 ## 幻灵/绝对方块、可撞碎墙、隐藏平台等使用 _draw 绘制，不受影响。
 func _collect_platforms() -> void:
 	_platform_polys.clear()
@@ -431,9 +448,9 @@ func _collect_platforms() -> void:
 func _collect_polys(n: Node) -> void:
 	for c in n.get_children():
 		if c is StaticBody2D:
-			var poly : Node = c.get_node_or_null("Poly")
-			if poly is Polygon2D:
-				_platform_polys.append(poly)
+			for child in c.get_children():
+				if child is Polygon2D:
+					_platform_polys.append(child)
 		_collect_polys(c)
 
 
@@ -468,11 +485,29 @@ func _update_rot_visual(delta: float) -> void:
 	var target_cam : float = 0.0
 	var target_zoom : float = 1.0
 	if rotating_mode and is_instance_valid(core_ref) and rot_state != ROT_NONE:
-		target_rot = core_ref.rotation   # 角色随盘旋转（盘内屏显静止）
-		target_cam = core_ref.rotation   # 摄像机全局旋转 = 盘旋转（核心/转盘屏显静止）
+		if rot_feet_to_core:
+			# 脚（局部 +Y）指向核心：target = 玩家→核心方向 − π/2。
+			# 摄像机全局取同一值（局部≈0），使精灵屏显头朝上、核心恒屏显正下方、世界旋转。
+			# 注意：绝不在摄像机局部叠加 ang+π/2（会沿父链相加成 2·ang，重新引入 2 倍角速度 bug）。
+			var dir : Vector2 = core_ref.global_position - global_position
+			if dir.length_squared() > 0.001:
+				var ang : float = dir.angle()
+				target_rot = ang - PI / 2.0
+				target_cam = ang - PI / 2.0
+			else:
+				# 玩家恰在核心中心（退化）：回退为随盘自转角
+				target_rot = core_ref.rotation
+				target_cam = core_ref.rotation
+		else:
+			target_rot = core_ref.rotation   # 角色随盘旋转（盘内屏显静止）
+			target_cam = core_ref.rotation   # 摄像机全局旋转 = 盘旋转（核心/转盘屏显静止）
 		target_zoom = 0.8 * _rot_user_zoom
-	_rot_vis_rot = lerp_angle(_rot_vis_rot, target_rot, minf(delta * 6.0, 1.0))
-	_rot_vis_cam = lerp_angle(_rot_vis_cam, target_cam, minf(delta * 6.0, 1.0))
+	# 旋转跟踪速率：脚指向核心模式需更紧的朝向跟踪（指数平滑恒滞后 ≈ω/rate，
+	# rate 6 → ~7.6°（核心偏离脚下 ~28px@R200）；rate 20 → ~2°），
+	# 同时保持平滑过渡；非脚指核心（Model B）沿用原 rate 6。
+	var track_rate : float = 20.0 if rot_feet_to_core else 6.0
+	_rot_vis_rot = lerp_angle(_rot_vis_rot, target_rot, minf(delta * track_rate, 1.0))
+	_rot_vis_cam = lerp_angle(_rot_vis_cam, target_cam, minf(delta * track_rate, 1.0))
 	_rot_vis_zoom = lerpf(_rot_vis_zoom, target_zoom, minf(delta * 5.0, 1.0))
 	rotation = _rot_vis_rot
 	if is_instance_valid(_rot_camera):

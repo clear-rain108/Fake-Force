@@ -69,6 +69,7 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Music" type="AudioStreamPlayer" parent="."]
+process_mode = 3
 bus = &"Music"
 stream = ExtResource("4_music")
 autoplay = true

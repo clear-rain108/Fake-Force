@@ -26,6 +26,16 @@ var _done : bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# 开场即暂停游戏树：玩家静止，不会在开场期间被幻觉推力推落而误触发死亡演出。
+	# （本节点 PROCESS_MODE_ALWAYS，暂停期间仍可显示文字并响应空格跳过。）
+	get_tree().paused = true
+
+
+func _exit_tree() -> void:
+	# 兜底：无论开场以何种方式结束（自动播放完/空格跳过/被外部释放/场景切换），
+	# 确保游戏树恢复运行，避免卡在暂停导致"开场后游戏静止"。
+	if get_tree() != null:
+		get_tree().paused = false
 
 
 func _process(delta: float) -> void:
@@ -35,6 +45,7 @@ func _process(delta: float) -> void:
 	queue_redraw()
 	if _t >= SEGMENTS.size() * SEG_DURATION:
 		_done = true
+		get_tree().paused = false
 		queue_free()
 
 
@@ -66,5 +77,6 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and not event.echo:
 		if event.physical_keycode == KEY_SPACE:
 			_done = true
+			get_tree().paused = false
 			queue_free()
 

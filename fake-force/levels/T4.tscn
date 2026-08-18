@@ -65,6 +65,7 @@ z_index = 1
 position = Vector2(-400, 470)
 script = ExtResource("2_player")
 rotating_mode = true
+rot_feet_to_core = true
 start_in_rot = false
 safe_ring_radius = 130.0
 speed = 60.0

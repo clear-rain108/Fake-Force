@@ -30,9 +30,9 @@ offset_right = 320.0
 offset_bottom = 160.0
 theme_override_font_sizes/normal_font_size = 48
 bbcode_enabled = true
+text = "[color=#ff4433]Fake[/color] [color=#4488ff]Forces[/color] 善[color=#ff4433]假[/color]于[color=#4488ff]物[/color]"
 fit_content = true
 scroll_active = false
-text = "Fake Forces 善[color=#ff4433]假[/color]于[color=#4488ff]物[/color]"
 horizontal_alignment = 1
 
 [node name="Subtitle" type="Label" parent="." unique_id=242274313]

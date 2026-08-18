@@ -5,7 +5,28 @@
 > - `Fake_Forces_Design_Puzzle.md`（解密模式设计）
 > - `Fake_Forces_Lore.md`（剧情集）
 > 记录当前工程实现进度、参数配置与待办事项
-> 最后更新：2026-08-13（v2.2：教学/解密 TQ 分类 + 幻觉方向语义修复 + 蓝色墙/返回场景修复）
+> 最后更新：2026-08-18（v2.5.4：结局动画重写 / 剧情集同步 / 探针清理）
+> - [x] **结局动画重写**（`EndingSequence.gd`）：删除老人面孔与"Demo 结束"；结局文本改为**逐段淡入淡出**（如开场动画）——引号段=老人遗言（暖色）、纯文本段=旁白（苍蓝），共 12 段；黑洞本体重绘；Esc 退出保留。`tests/EndingProbe.tscn` 验证进入文字阶段无错误
+> - [x] **结局演出细化（v3.5）**：黑洞仅在**老人遗言期间**显示，遗言结束（第4段播完）后**黑洞消失**、**黑屏 1s** 再开始播放旁白；结局**不播放音乐**（`start_ending` 静音 Music 总线）（v3.7 起改为播放结局背景音乐 "The thinking of star"，此条被取代）；`tests/EndingProbe.tscn` 验证文字阶段 + 音乐静音全 PASS
+> - [x] **通关致谢 + 自动退出（v3.6）**：旁白结束后显示致谢字幕"**感谢游玩《Fake Forces 善假于物》**"（停留约 4.5s），随后**自动结束游戏**（`EndingSequence` 在 `_process` 中 `get_tree().quit()`，无需按键）；`tests/EndingProbe.tscn` 全流程验证（文字阶段 / 音乐静音 / 感谢字幕进入 / 自动退出）全 PASS
+> - [x] **结局背景音乐 + 时间轴对齐（v3.7）**：结局背景音乐改为 **"The thinking of star.ogg"**（`Music` 总线、音量 -6dB；`start_ending` 时停止关卡背景音乐 `background.tscn/Music` 再播放结局曲）；**演出时间按音乐时长等比缩放**——设计总长 54.2s × k（k=音乐长/54.2，结局曲 110.55s→k≈2.039），白闪/滑入/每段文字/黑屏/致谢全部同步放大，**演出结束时刻 = 音乐结束时刻**（110.553337s，逐项核对相等）；致谢字幕在旁白播完（~101.4s）后进入；`tests/EndingProbe.tscn` 验证文字阶段 / 背景音乐播放（关卡曲停止）/ 时间轴对齐 / 感谢字幕 / 自动退出全 PASS
+> - [x] **剧情集同步**（`Fake_Forces_Lore.md` v1.6）：结局文本全量更新（老人遗言+旁白）、人物条目/三幕结构去掉"老人面孔"、补充强制休眠死亡演出全台词
+> - [x] **探针清理**：删除不涉及真实关卡的合成探针（`RotCamTest`、`StoryDeathProbe`——程序化搭建玩家/核心），保留全部加载真实关卡（Main/Q5/T4/Stage3）的探针
+> - [x] **旋转环廊平台重构**：RingGround(顶625) 与 CorePlatform(圆盘,顶525) 拉开 100px 间距、阶梯逐级 +90（Step1 顶435→Step2 345→Step3 255→Transition 165），修复"玩家传送后被卡在两平台之间"；中控室跃迁传送点改到 (7900,605)（安全网正上方）
+> - [x] **旋转参考系行为修复**：①平台透明——`_collect_polys` 改为收集 StaticBody2D 下**所有 Polygon2D**（此前只认名为 `Poly` 的子节点，StageBuilder 生成的平台永不透明）；②玩家被核心掩盖——`RotatingCore.z_index=-1`（玩家绘制在核心之上）；③切入前无推力（环廊重构后圆盘处无交叠卡顿，`tests/RotFadeProbe.tscn` 验证漂移 4px、切入后平台 alpha≈0）
+> - [x] **移除剧情关卡 HintZone 关卡提示**（HintZoneMaze/Stage2/Ring 已删），仅保留左上 HUD 系统消息（进入/脱离参考系、机关、尘埃等）
+> - [x] **阶段3黑洞本体**：新增 `BlackHole.gd`（暗黑视界+吸积盘亮环+引力透镜光弧+绕转粒子），替换 Stage3 的 RotatingCore（保留 omega/influence_radius 与 "RotatingCore" 组绑定，旋转物理无缝）；**准备阶段3重构与结局动画联动**
+> - [x] **打磨①：开场动画播放关卡音乐**——开场暂停游戏树会把 `background.tscn` 的 `Music` 与 `AudioManager` 常驻 Drone 一起停掉；已把二者设为 `process_mode=ALWAYS`（开场暂停期间音乐/环境音继续）
+> - [x] **打磨②：走廊房间加墙 + 丰富内饰**——走廊加整条天花板 `RoomCeiling`(x0~3200) 与左端墙 `RoomWallLeft`(x=0)，隔墙视觉延伸至天花板（碰撞保持门洞不变，不影响通行）；每个房间新增衣柜/顶灯（共10个装饰节点）
+> - [x] **打磨③：初始位置不易摔死**——出生点 (0,650)→(120,650)（不再贴走廊左缘），配合左端墙，开场后玩家被 G=0.6 推力推向左端时被挡住不会坠出走廊。`tests/SpawnSafetyProbe.tscn` 验证：玩家存活、最小 x≈87（被墙挡在走廊内）
+> - [x] **Bug修复①：开场动画期间玩家死亡触发死亡演出**——`OpeningSequence` 开场即暂停游戏树（玩家静止不被幻觉推力推落），播放完/空格跳过/被释放时经 `_exit_tree` 兜底自动恢复（防卡暂停）
+> - [x] **Bug修复②：死亡演出结束游戏被强制退出**——根因：死亡演出 `change_scene` 销毁场景时，房间5尘埃(Dust1)的 `tree_exiting` 在销毁中触发 `Stage1Controller._on_room5_dust_collected`，此时 `get_tree()` 已失效 → 崩溃；已改为 `is_inside_tree()` 守卫忽略销毁中的回调。`tests/DeathFlowProbe.tscn` 验证：死亡演出完整播放 → 无错误切回 MainMenu
+> - [x] **阶段1重构（走廊过道→迷宫→中控室）**：`StageBuilder` 阶段1平台改为连续走廊地板（x0~3200，5间房间由薄墙+门洞分隔，装饰床/桌/舷窗）；房间5尘埃 → 记事本第1页 + 迷宫闸门(MazeEntranceGate)打开 + 强推力(PushToMaze G=2.0)启用；迷宫保留幻灵/绝对方块并加第2层(MazeMid)与最高层(MazeTop)，终点 MazeExitSwitch → 记事本第2页 + 中控室舱门(ControlRoomDoor)打开；中控室(5200~5520)内 LaunchButton（进入显示"按E跃迁"）→ 黑屏淡出 → 背景切太空 + 玩家传送旋转环廊起点。新建 `Stage1Controller.gd`（叙事触发，不改动任何核心脚本）；`Corr1/Corr2` 平台与 `Zone2A/2B` 让位于中控室。自动验证 `tests/MainFlowProbe.tscn` 全 PASS。
+> - [x] **幻觉强度边框按参考系校准**：`Player.linear_g_visual_ref`（普通=1.5G 满边框）与 `rot_g_visual_ref`（旋转=20G 满边框），Player 每帧写入 `IllusionManager.vignette_g_ref`；GrimVignette 与剧情/解密 HUD 的 G 标签颜色同步按此参考（普通 1.5G 已很大 / 旋转十余 G 仅普通）
+> - [x] **幻觉强度边框更细碎**：GrimVignette 片段数 22~62、更薄（8~32px）、带随机留白的短片段
+> - [x] **剧情模式坠落死亡演出**（`scripts/DeathSequence.gd`）：坠落过多不再提示"按 R 重开"，改为渐入黑屏 → 逐段文字（检测到非正常情绪波动…/睡意…/木星…/重启流程 5,4,3…/0.）→ 回开始页 MainMenu；空格可跳过；自动验证 `tests/StoryDeathProbe.tscn`（ref 切换 1.5↔20 与 DeathSequence 挂载全 PASS）
+> - [x] **旋转参考系"脚指向核心"**（`rot_feet_to_core=true`，T4/Q4/Q5/Q6/Main/Stage3 全部旋转关卡）：玩家旋转 = 玩家→核心方向 −π/2、摄像机全局取同值（局部≈0），核心恒屏显正下方、精灵头朝上、世界旋转；跟踪速率 20（平滑滞后 ~2°）；自动验证 `tests/FeetCoreProbe.tscn`（真实 Q5：核心 X 偏移 <10px@R200、精灵屏显旋转=0、无 2× 叠加）
+> - [x] **旋转系惯性力缩放**（`Player.inertia_scale=0.5`）：离心+科里奥利写入幻觉显示系统（G/红箭/幻灵/星空）减半，玩家实际受力与轨道不变
 
 ---
 
@@ -26,8 +47,8 @@
 ### 剧情模式（阶段1+2 = `Main.tscn`，阶段3 = `scenes/Stage3.tscn`，黑屏淡入淡出过渡）
 | 系统 | 脚本 | 说明 |
 | :--- | :--- | :--- |
-| 幻觉管理器 | `IllusionManager.gd` | 双模式 G_TO_ACCEL：剧情 40 / 解密 10；`rotating_accel`；`get_current_effective_g`；**区域计数/记事本解锁持久化** |
-| 玩家 | `Player.gd` | 三分量移动；瞬时起跳（η影响）；空中微重力；洞察1秒；坠落计数；尘埃Q/Z（**旋转输入推力÷η**）；存档点；η光晕；旋转圆盘模式；**旋转同步计数**；重生/重试重置旋转状态 |
+| 幻觉管理器 | `IllusionManager.gd` | 双模式 G_TO_ACCEL：统一 10；`vignette_g_ref`（幻觉强度边框参考，Player 按参考系切换 1.5/20）；`get_current_effective_g`；**区域计数/记事本解锁持久化** |
+| 玩家 | `Player.gd` | 三分量移动；瞬时起跳（η影响）；空中微重力；洞察最长5s+尘埃加成；坠落计数（**剧情坠落过多→DeathSequence 强制休眠演出**）；尘埃Q/Z（旋转输入推力÷η）；存档点；η光晕；旋转圆盘模式（**脚指向核心 rot_feet_to_core**）；**惯性力缩放 inertia_scale**；旋转同步计数；重生/重试重置旋转状态 |
 | 幻觉区域 | `IllusionZone.gd` + `IllusionField.gd` | G/η/k/ω 导出；CONSTANT/CYCLE/RANDOM；匀速间歇；G正弦渐变；时长抖动；**进入记录（note_zone）** |
 | 幻灵/绝对方块 | `PhantomBlock.gd` | `is_phantom`；漂移范围限制；`bounce` 反弹；`counts_as_occupant` |
 | 马赫尘埃 | `Dust.gd` | E收集（累计数供记事本判定） |
@@ -39,13 +60,14 @@
 | 阶段过渡 | `StageFade.gd`（新，Autoload）+ `StageTransition.gd`（新） | 黑屏淡入淡出跨场景切换 |
 | 根节点 | `StoryRoot.gd`（新）/ `Stage3Root.gd`（新） | 阶段1+2 飞船内部背景 / 阶段3 宇宙背景 + 核心绑定 |
 | 存档点/提示区 | `Checkpoint.gd` / `HintZone.gd` | |
-| 旋转核心 | `RotatingCore.gd` | 离心ω²r（阶段2 环廊 + 阶段3 无重环带） |
+| 旋转核心 | `RotatingCore.gd` | 视觉自转 + 圆盘绘制；虚假力由 `Player._rotating_physics` 计算写入幻觉系统（阶段2 环廊 + 阶段3 无重环带） |
 | 隐藏平台/出口 | `HiddenPlatform.gd` / `VictoryTrigger.gd` | 阶段3 隐藏路径 + 黑洞视界出口 |
 | 结局演出 | `EndingSequence.gd` | 多阶段黑洞结局（阶段3 内） |
-| 开场导言 | `OpeningSequence.gd` | 8段多行（阶段1 开场） |
-| 边缘红晕 | `GrimVignette.gd` | 破碎光带，0~0.8G渐变 |
+| 开场导言 | `OpeningSequence.gd` | 9段多行（阶段1 开场） |
+| 边缘红晕 | `GrimVignette.gd` | 细碎破碎光带；0~`vignette_g_ref` 渐变（普通参考系 1.5G 满 / 旋转参考系 20G 满） |
+| 强制休眠演出 | `DeathSequence.gd` | 剧情坠落过多 → 渐入黑屏 + 逐段文字 → 回开始页（空格跳过） |
 
-### 解密模式（levels/T*.tscn / Q*.tscn，9关：教学4 + 主线5）
+### 解密模式（levels/T*.tscn / Q*.tscn，10关：教学4 + 主线6）
 | 系统 | 脚本 | 说明 |
 | :--- | :--- | :--- |
 | 关卡根 | `PuzzleLevelRoot.gd` | 强制解密模式；旋转关自动绑定核心；**自动挂载暂停菜单** |
@@ -56,7 +78,7 @@
 | 尖刺 | `Spikes.gd` | 红色倒三角；η<0.6免疫 |
 | 可撞碎墙 | `CrushableWall.gd` | η>1.5撞击粉碎（距离检测+发光屏障视觉） |
 | 旋转挡板 | `RotatingObstacle.gd` | 弧形障碍绕核心旋转 |
-| 主菜单星空 | `MenuStarField.gd` | 自转；Shift轨迹拉长 |
+| 主菜单背景 | `menu_background.tscn` | 开始页太空星云背景 |
 | 主菜单/选关 | `MainMenu.gd` / `LevelSelect.gd` / `TeachingSelect.gd` | 教学入口 + 双模式选关 |
 
 ---
@@ -142,7 +164,7 @@
 | 参考系 | 玩家受力 | 视角 |
 | :--- | :--- | :--- |
 | 横向加速度参考系（默认） | 横向虚假力 + 输入力 + 跳跃微重力 | 正常横向视角 |
-| 旋转参考系（核心为静止） | 输入力（A/D切向、W/S径向）+ 惯性力（离心 ω²r、科里奥利 -2ω×v_rel），**无重力、无跳跃** | 摄像机随盘旋转（Model B：转盘屏显静止、角色屏显固定）；滚轮缩放视野 |
+| 旋转参考系（核心为静止） | 输入力（A/D切向、W/S径向）+ 惯性力（离心 ω²r、科里奥利 -2ω×v_rel），**无重力、无跳跃** | 摄像机随盘旋转（Model B：转盘屏显静止、角色屏显固定；**可选脚指向核心 rot_feet_to_core**）；滚轮缩放视野 |
 
 ### 完整流程
 1. **横向参考系**：玩家靠近悬浮圆盘（切换区）→ 提示【系统】：检测到参考系出现较大偏差，建议切换参考系

@@ -72,6 +72,7 @@ max_speed_x = 140.0
 jump_cap = 350.0
 max_fall_speed = 350.0
 rotating_mode = true
+rot_feet_to_core = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 z_index = -1

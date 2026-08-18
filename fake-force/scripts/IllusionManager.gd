@@ -13,11 +13,14 @@ var is_insight_mode : bool = false # 当前是否处于洞察模式（背景星�
 
 var global_influence_strength : float = 1.0  # 0~1，控制环境物体受力比例
 var current_fake_vector : Vector2 = Vector2.ZERO
-var rotating_accel : Vector2 = Vector2.ZERO   # 旋转核心贡献（加速度，阶段3）
 var current_g_value : float = 0.0
 var current_omega : float = 0.0
-var current_eta : float = 1.0
 var current_damping : float = 0.5
+
+## 幻觉强度边框（GrimVignette）满强度对应的 G 值——由参考系决定：
+## 普通参考系 1.5G 已"很大"；旋转参考系十余 G 仅"普通"。
+## Player 每帧按 rot_state 在 linear/rot 两个参考值间切换。
+var vignette_g_ref : float = 1.5
 
 var zone_count : int = 0           # 已进入的不同幻觉区域数（阶段2 记事本第4页判定）
 var _zones_seen : Dictionary = {}  # zone instance_id → true
@@ -39,7 +42,7 @@ func set_mode(mode: String) -> void:
 
 
 func get_current_fake_vector() -> Vector2:
-	return current_fake_vector + rotating_accel
+	return current_fake_vector
 
 
 ## 有效幻觉强度：匀速间歇（无幻觉）时为 0
@@ -53,10 +56,10 @@ func get_current_damping() -> float:
 
 ## 由 IllusionZone 每帧调用：写入区域幻觉参数。
 ## fake_dir 为"幻觉力方向"（=-参考系加速方向）；ZERO 表示匀速间歇，无幻觉。
-func set_zone_params(g_value: float, omega: float, eta: float, damping: float, fake_dir: Vector2) -> void:
+## （_eta 为区域配置的惯性系数，当前无直接消费方，保留 API。）
+func set_zone_params(g_value: float, omega: float, _eta: float, damping: float, fake_dir: Vector2) -> void:
 	current_g_value = g_value
 	current_omega = omega
-	current_eta = eta
 	current_damping = damping
 	if fake_dir == Vector2.ZERO:
 		current_fake_vector = Vector2.ZERO
@@ -68,14 +71,12 @@ func set_zone_params(g_value: float, omega: float, eta: float, damping: float, f
 ## （旋转幻觉场与横向幻觉场互斥，随参考系切换）
 func set_rot_inertia(inertia: Vector2) -> void:
 	current_fake_vector = inertia
-	rotating_accel = Vector2.ZERO
 
 
 ## 所有区域物体离开后调用：恢复默认参数
 func reset_zone_params() -> void:
 	current_g_value = 0.0
 	current_omega = 0.0
-	current_eta = 1.0
 	current_damping = 0.5
 	current_fake_vector = Vector2.ZERO
 

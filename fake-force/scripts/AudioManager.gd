@@ -50,6 +50,7 @@ const _CFG_PATH := "user://settings.cfg"
 
 
 func _ready() -> void:
+	process_mode = Node.PROCESS_MODE_ALWAYS   # 开场动画暂停游戏树期间，Ambient Drone 继续播放
 	_load_volumes()
 	_apply_all_volumes()
 	# 常驻 Drone + 风声

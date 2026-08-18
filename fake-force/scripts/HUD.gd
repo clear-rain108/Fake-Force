@@ -36,20 +36,19 @@ func _process(delta: float) -> void:
 	# 有效幻觉强度（匀速间歇时为 0）
 	var g : float = IllusionManager.get_current_effective_g()
 	g_label.text = "当前幻觉强度：%.1f G" % g
-	g_label.modulate = Color.from_hsv(0.33 * (1.0 - clampf(g / 3.0, 0.0, 1.0)), 1.0, 1.0)
+	# 颜色按参考系校准的满强度参考（普通=1.5G 变红；旋转=rot_g_visual_ref 十余G 才变红）
+	var ref : float = maxf(IllusionManager.vignette_g_ref, 0.05)
+	g_label.modulate = Color.from_hsv(0.33 * (1.0 - clampf(g / ref, 0.0, 1.0)), 1.0, 1.0)
 
 	if is_instance_valid(_player):
 		energy_bar.value = _player.insight_energy
 		dust_label.text = "马赫尘埃：%d" % _player.dust_count
 		eta_label.text = "η：%.2f  (Q变重 / Z变轻)" % _player.player_eta
-		# 首次洞察教学提示（v3.0 台词）
 		if _player.is_insight and not _hint_shown:
 			_hint_shown = true
 			_show_message("没有人在推你。你看到的红色箭头，是你所在参考系正在加速的证明——或者说，是系统在推你。", 6.0)
-		# 失败提示
-		if _player.failed:
-			_show_message("挑战失败：坠落次数过多。按 R 恢复存档点", 3.0)
-			_player.failed = false
+		# 失败处理：剧情模式坠落过多由 Player 生成 DeathSequence 剧情演出接管，
+		# HUD 不得清除 failed（否则每帧重触发、黑屏永远淡不下去）。
 
 	if _msg_time > 0.0:
 		_msg_time -= delta

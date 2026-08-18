@@ -33,7 +33,9 @@ func _process(delta: float) -> void:
 		_player = get_tree().get_first_node_in_group("Player")
 	var g : float = IllusionManager.get_current_effective_g()
 	g_label.text = "当前幻觉强度：%.1f G" % g
-	g_label.modulate = Color.from_hsv(0.33 * (1.0 - clampf(g / 3.0, 0.0, 1.0)), 1.0, 1.0)
+	# 颜色按参考系校准的满强度参考（普通=1.5G 变红；旋转=rot_g_visual_ref 十余G 才变红）
+	var ref : float = maxf(IllusionManager.vignette_g_ref, 0.05)
+	g_label.modulate = Color.from_hsv(0.33 * (1.0 - clampf(g / ref, 0.0, 1.0)), 1.0, 1.0)
 	if is_instance_valid(_player):
 		energy_bar.value = _player.insight_energy
 		dust_label.text = "尘埃：%d" % _player.dust_count

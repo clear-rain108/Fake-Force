@@ -1,4 +1,4 @@
-[gd_scene load_steps=34 format=3]
+[gd_scene load_steps=40 format=3]
 
 [ext_resource type="Script" path="res://scripts/StoryRoot.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
@@ -19,12 +19,13 @@
 [ext_resource type="Script" path="res://scripts/OpeningSequence.gd" id="17_opening"]
 [ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="18_vignette"]
 [ext_resource type="PackedScene" path="res://scenes/background.tscn" id="19_bg"]
+[ext_resource type="Script" path="res://scripts/Stage1Controller.gd" id="20_controller"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone1"]
-size = Vector2(3800, 700)
+size = Vector2(3200, 700)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneMaze"]
 size = Vector2(1650, 500)
@@ -62,6 +63,21 @@ radius = 30.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
 size = Vector2(40, 160)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wallDiv"]
+size = Vector2(20, 250)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_push"]
+size = Vector2(260, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_ceiling"]
+size = Vector2(340, 20)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_button"]
+radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_roof"]
+size = Vector2(3200, 20)
+
 [node name="Main" type="Node2D"]
 script = ExtResource("1_root")
 
@@ -75,9 +91,10 @@ script = ExtResource("8_stage")
 
 [node name="Player" type="CharacterBody2D" parent="."]
 z_index = 1
-position = Vector2(0, 650)
+position = Vector2(120, 650)
 script = ExtResource("2_player")
 rotating_mode = true
+rot_feet_to_core = true
 speed = 60.0
 jump_velocity = 300.0
 jump_gravity = 200.0
@@ -99,9 +116,9 @@ position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
 [node name="Stage1Zone" type="Area2D" parent="."]
-position = Vector2(1350, 500)
+position = Vector2(1600, 600)
 script = ExtResource("3_zone")
-g_value = 1.5
+g_value = 0.6
 damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
@@ -110,36 +127,36 @@ field_directions = [Vector2(1, 0)]
 shape = SubResource("RectangleShape2D_zone1")
 
 [node name="Dust1" type="Area2D" parent="."]
-position = Vector2(1300, 400)
+position = Vector2(2880, 650)
 script = ExtResource("9_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Checkpoint1" type="Area2D" parent="."]
-position = Vector2(1350, 400)
+position = Vector2(2700, 600)
 script = ExtResource("11_checkpoint")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint1"]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="Switch" type="Area2D" parent="."]
-position = Vector2(3300, 190)
+[node name="MazeExitSwitch" type="Area2D" parent="."]
+position = Vector2(5050, 300)
 script = ExtResource("15_switch")
 unlock_page = 2
-gate_path = NodePath("Gate")
-hint = "【系统】：机关已启动，舱门开启。"
+gate_path = NodePath("ControlRoomDoor")
+hint = "【系统】：迷宫机关已启动，中控室舱门开启。"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Switch"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitSwitch"]
 shape = SubResource("CircleShape2D_switch")
 
-[node name="Gate" type="StaticBody2D" parent="."]
-position = Vector2(3400, 400)
+[node name="ControlRoomDoor" type="StaticBody2D" parent="MazeExitSwitch"]
+position = Vector2(100, 0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Gate"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitSwitch/ControlRoomDoor"]
 shape = SubResource("RectangleShape2D_gate")
 
-[node name="Poly" type="Polygon2D" parent="Gate"]
+[node name="Poly" type="Polygon2D" parent="MazeExitSwitch/ControlRoomDoor"]
 color = Color(0.35, 0.6, 0.9, 0.85)
 polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
 
@@ -225,35 +242,202 @@ unlock_count = 3
 [node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExit"]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="HintZoneMaze" type="Area2D" parent="."]
-position = Vector2(3900, 500)
-script = ExtResource("10_hint")
-hint_text = "【系统】：蓝色方块会被虚假力吹动——等它漂到缺口处踩上去，通过迷宫。"
+[node name="WallDiv1" type="StaticBody2D" parent="."]
+position = Vector2(640, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZoneMaze"]
-shape = SubResource("RectangleShape2D_hint")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv1"]
+shape = SubResource("RectangleShape2D_wallDiv")
 
-[node name="Zone2A" type="Area2D" parent="."]
-position = Vector2(5300, 500)
+[node name="Poly" type="Polygon2D" parent="WallDiv1"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
+
+[node name="WallDiv2" type="StaticBody2D" parent="."]
+position = Vector2(1280, 505)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv2"]
+shape = SubResource("RectangleShape2D_wallDiv")
+
+[node name="Poly" type="Polygon2D" parent="WallDiv2"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
+
+[node name="WallDiv3" type="StaticBody2D" parent="."]
+position = Vector2(1920, 505)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv3"]
+shape = SubResource("RectangleShape2D_wallDiv")
+
+[node name="Poly" type="Polygon2D" parent="WallDiv3"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
+
+[node name="WallDiv4" type="StaticBody2D" parent="."]
+position = Vector2(2560, 505)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv4"]
+shape = SubResource("RectangleShape2D_wallDiv")
+
+[node name="Poly" type="Polygon2D" parent="WallDiv4"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
+
+[node name="RoomWallLeft" type="StaticBody2D" parent="."]
+position = Vector2(0, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomWallLeft"]
+shape = SubResource("RectangleShape2D_gate")
+
+[node name="Poly" type="Polygon2D" parent="RoomWallLeft"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
+
+[node name="RoomCeiling" type="StaticBody2D" parent="."]
+position = Vector2(1600, 365)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomCeiling"]
+shape = SubResource("RectangleShape2D_roof")
+
+[node name="Poly" type="Polygon2D" parent="RoomCeiling"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-1600, -10, 1600, -10, 1600, 10, -1600, 10)
+
+[node name="DecorBed1" type="Polygon2D" parent="."]
+position = Vector2(150, 672)
+color = Color(0.5, 0.55, 0.65, 1)
+polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
+
+[node name="DecorTable1" type="Polygon2D" parent="."]
+position = Vector2(450, 676)
+color = Color(0.36, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
+
+[node name="DecorWindow1" type="Polygon2D" parent="."]
+position = Vector2(320, 470)
+color = Color(0.55, 0.75, 0.9, 0.7)
+polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
+
+[node name="DecorBed2" type="Polygon2D" parent="."]
+position = Vector2(800, 672)
+color = Color(0.5, 0.55, 0.65, 1)
+polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
+
+[node name="DecorTable2" type="Polygon2D" parent="."]
+position = Vector2(1100, 676)
+color = Color(0.36, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
+
+[node name="DecorWindow2" type="Polygon2D" parent="."]
+position = Vector2(960, 470)
+color = Color(0.55, 0.75, 0.9, 0.7)
+polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
+
+[node name="DecorBed3" type="Polygon2D" parent="."]
+position = Vector2(1450, 672)
+color = Color(0.5, 0.55, 0.65, 1)
+polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
+
+[node name="DecorTable3" type="Polygon2D" parent="."]
+position = Vector2(1700, 676)
+color = Color(0.36, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
+
+[node name="DecorWindow3" type="Polygon2D" parent="."]
+position = Vector2(1600, 470)
+color = Color(0.55, 0.75, 0.9, 0.7)
+polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
+
+[node name="DecorBed4" type="Polygon2D" parent="."]
+position = Vector2(2100, 672)
+color = Color(0.5, 0.55, 0.65, 1)
+polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
+
+[node name="DecorTable4" type="Polygon2D" parent="."]
+position = Vector2(2350, 676)
+color = Color(0.36, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
+
+[node name="DecorWindow4" type="Polygon2D" parent="."]
+position = Vector2(2240, 470)
+color = Color(0.55, 0.75, 0.9, 0.7)
+polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
+
+[node name="DecorLocker1" type="Polygon2D" parent="."]
+position = Vector2(250, 650)
+color = Color(0.25, 0.28, 0.34, 1)
+polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
+
+[node name="DecorLight1" type="Polygon2D" parent="."]
+position = Vector2(320, 380)
+color = Color(0.85, 0.92, 1.0, 0.75)
+polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
+
+[node name="DecorLocker2" type="Polygon2D" parent="."]
+position = Vector2(900, 650)
+color = Color(0.25, 0.28, 0.34, 1)
+polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
+
+[node name="DecorLight2" type="Polygon2D" parent="."]
+position = Vector2(960, 380)
+color = Color(0.85, 0.92, 1.0, 0.75)
+polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
+
+[node name="DecorLocker3" type="Polygon2D" parent="."]
+position = Vector2(1650, 650)
+color = Color(0.25, 0.28, 0.34, 1)
+polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
+
+[node name="DecorLight3" type="Polygon2D" parent="."]
+position = Vector2(1600, 380)
+color = Color(0.85, 0.92, 1.0, 0.75)
+polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
+
+[node name="DecorLocker4" type="Polygon2D" parent="."]
+position = Vector2(2300, 650)
+color = Color(0.25, 0.28, 0.34, 1)
+polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
+
+[node name="DecorLight4" type="Polygon2D" parent="."]
+position = Vector2(2240, 380)
+color = Color(0.85, 0.92, 1.0, 0.75)
+polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
+
+[node name="DecorLocker5" type="Polygon2D" parent="."]
+position = Vector2(2900, 640)
+color = Color(0.25, 0.28, 0.34, 1)
+polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
+
+[node name="DecorLight5" type="Polygon2D" parent="."]
+position = Vector2(2880, 380)
+color = Color(0.85, 0.92, 1.0, 0.75)
+polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
+
+[node name="DecorTable5" type="Polygon2D" parent="."]
+position = Vector2(2880, 676)
+color = Color(0.36, 0.4, 0.48, 1)
+polygon = PackedVector2Array(-30, -9, 30, -9, 30, 9, -30, 9)
+
+[node name="MazeEntranceGate" type="StaticBody2D" parent="."]
+position = Vector2(3200, 600)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeEntranceGate"]
+shape = SubResource("RectangleShape2D_gate")
+
+[node name="Poly" type="Polygon2D" parent="MazeEntranceGate"]
+color = Color(1.0, 0.2, 0.18, 0.7)
+polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
+
+[node name="PushToMaze" type="Area2D" parent="."]
+position = Vector2(3360, 600)
+monitoring = false
 script = ExtResource("3_zone")
-g_value = 1.2
-damping = 0.5
-field_mode = 0
-field_directions = [Vector2(-1, 0)]
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2A"]
-shape = SubResource("RectangleShape2D_zoneCorr")
-
-[node name="Zone2B" type="Area2D" parent="."]
-position = Vector2(5950, 500)
-script = ExtResource("3_zone")
-g_value = 1.2
+g_value = 2.0
 damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2B"]
-shape = SubResource("RectangleShape2D_zoneCorr")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PushToMaze"]
+shape = SubResource("RectangleShape2D_push")
 
 [node name="Zone2C" type="Area2D" parent="."]
 position = Vector2(6600, 500)
@@ -283,7 +467,7 @@ field_jitter = 0.5
 shape = SubResource("RectangleShape2D_zoneCorrD")
 
 [node name="Dust4" type="Area2D" parent="."]
-position = Vector2(5450, 420)
+position = Vector2(5450, 255)
 script = ExtResource("9_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust4"]
@@ -296,14 +480,6 @@ script = ExtResource("9_dust")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust5"]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="HintZoneStage2" type="Area2D" parent="."]
-position = Vector2(5750, 420)
-script = ExtResource("10_hint")
-hint_text = "【系统】：多段加速度场方向各异——按住Shift解析受力方向后再前进。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZoneStage2"]
-shape = SubResource("RectangleShape2D_hint")
-
 [node name="RotatingCore" type="Node2D" parent="."]
 position = Vector2(7900, 350)
 script = ExtResource("14_rotating")
@@ -312,19 +488,11 @@ influence_radius = 220.0
 core_radius = 150.0
 
 [node name="Checkpoint2" type="Area2D" parent="."]
-position = Vector2(7900, 560)
+position = Vector2(7900, 610)
 script = ExtResource("11_checkpoint")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2"]
 shape = SubResource("RectangleShape2D_checkpoint")
-
-[node name="HintZoneRing" type="Area2D" parent="."]
-position = Vector2(7900, 500)
-script = ExtResource("10_hint")
-hint_text = "【系统】：旋转参考系——跳上圆盘，靠近核心后按Shift切换参考系并同步。"
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="HintZoneRing"]
-shape = SubResource("RectangleShape2D_hint")
 
 [node name="StageTransition" type="Area2D" parent="."]
 position = Vector2(8900, 150)
@@ -334,6 +502,61 @@ hint = "【系统】：航路尽头是黑洞。在那里，过去会重新显现
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="StageTransition"]
 shape = SubResource("CircleShape2D_trans")
+
+[node name="ControlRoom" type="Node2D" parent="."]
+
+[node name="DarkBg" type="Polygon2D" parent="ControlRoom"]
+position = Vector2(5360, 245)
+z_index = -1
+color = Color(0.02, 0.03, 0.06, 0.6)
+polygon = PackedVector2Array(-200, -70, 200, -70, 200, 70, -200, 70)
+
+[node name="RightWall" type="StaticBody2D" parent="ControlRoom"]
+position = Vector2(5520, 260)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/RightWall"]
+shape = SubResource("RectangleShape2D_wallDiv")
+
+[node name="Poly" type="Polygon2D" parent="ControlRoom/RightWall"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -125, 10, -125, 10, 125, -10, 125)
+
+[node name="Ceiling" type="StaticBody2D" parent="ControlRoom"]
+position = Vector2(5360, 170)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/Ceiling"]
+shape = SubResource("RectangleShape2D_ceiling")
+
+[node name="Poly" type="Polygon2D" parent="ControlRoom/Ceiling"]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-170, -10, 170, -10, 170, 10, -170, 10)
+
+[node name="LaunchButton" type="Area2D" parent="ControlRoom"]
+position = Vector2(5360, 285)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/LaunchButton"]
+shape = SubResource("CircleShape2D_button")
+
+[node name="BtnGlow" type="Polygon2D" parent="ControlRoom/LaunchButton"]
+color = Color(1.0, 0.35, 0.25, 0.35)
+polygon = PackedVector2Array(30, 0, 21.2, 21.2, 0, 30, -21.2, 21.2, -30, 0, -21.2, -21.2, 0, -30, 21.2, -21.2)
+
+[node name="BtnVisual" type="Polygon2D" parent="ControlRoom/LaunchButton"]
+color = Color(1.0, 0.2, 0.12, 0.9)
+polygon = PackedVector2Array(20, 0, 14.1, 14.1, 0, 20, -14.1, 14.1, -20, 0, -14.1, -14.1, 0, -20, 14.1, -14.1)
+
+[node name="HintLabel" type="Label" parent="ControlRoom/LaunchButton"]
+visible = false
+offset_left = -170.0
+offset_top = -62.0
+offset_right = 170.0
+offset_bottom = -32.0
+theme_override_font_sizes/font_size = 16
+text = "按 E 执行深空号跃迁指令"
+horizontal_alignment = 1
+
+[node name="Stage1Controller" type="Node2D" parent="."]
+script = ExtResource("20_controller")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40

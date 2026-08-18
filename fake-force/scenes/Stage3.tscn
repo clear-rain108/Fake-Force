@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" path="res://scripts/Stage3Root.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
-[ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="3_core"]
+[ext_resource type="Script" path="res://scripts/BlackHole.gd" id="3_core"]
 [ext_resource type="Script" path="res://scripts/Dust.gd" id="4_dust"]
 [ext_resource type="Script" path="res://scripts/VictoryTrigger.gd" id="5_victory"]
 [ext_resource type="Script" path="res://scripts/EndingSequence.gd" id="6_ending"]
@@ -40,7 +40,7 @@ script = ExtResource("1_root")
 [node name="StarField" type="Node2D" parent="."]
 script = ExtResource("11_star")
 
-[node name="RotatingCore" type="Node2D" parent="."]
+[node name="BlackHole" type="Node2D" parent="."]
 position = Vector2(0, 0)
 script = ExtResource("3_core")
 omega = 1.0
@@ -52,6 +52,7 @@ z_index = 1
 position = Vector2(0, -220)
 script = ExtResource("2_player")
 rotating_mode = true
+rot_feet_to_core = true
 start_in_rot = true
 speed = 60.0
 jump_velocity = 300.0
