@@ -20,7 +20,7 @@ size = Vector2(400, 30)
 radius = 16.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
-size = Vector2(252, 579.5)
+size = Vector2(382, 579.5)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
 size = Vector2(60, 40)
@@ -43,7 +43,7 @@ color = Color(0.4, 0.4, 0.4, 1)
 polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
 
 [node name="PlatformRight" type="StaticBody2D" parent="." unique_id=955429919]
-position = Vector2(400, 500)
+position = Vector2(550, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformRight" unique_id=227694122]
 shape = SubResource("RectangleShape2D_platB")
@@ -66,6 +66,7 @@ kill_y = 800.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1525519751]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("7_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1340132511]
@@ -82,7 +83,7 @@ field_mode = 0
 field_directions = [Vector2(1, 0)]
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone" unique_id=1987341101]
-position = Vector2(-110, 70.25)
+position = Vector2(-45, 70.25)
 shape = SubResource("RectangleShape2D_zone")
 
 [node name="Goal" type="Area2D" parent="." unique_id=1092825793]
@@ -140,6 +141,7 @@ offset_left = -280.0
 offset_top = 10.0
 offset_right = -16.0
 offset_bottom = 42.0
+grow_horizontal = 0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=1653570252]
 layout_mode = 0
@@ -157,6 +159,7 @@ offset_left = 16.0
 offset_top = -40.0
 offset_right = 200.0
 offset_bottom = -10.0
+grow_vertical = 0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=680151713]
 layout_mode = 0
@@ -176,6 +179,8 @@ offset_left = -200.0
 offset_top = -40.0
 offset_right = -16.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=783168655]
 layout_mode = 0

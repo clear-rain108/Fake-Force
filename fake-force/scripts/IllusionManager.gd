@@ -6,6 +6,9 @@ extends Node
 ## 双模式统一 G→加速度 换算（剧情与解密手感完全一致）
 const G_TO_ACCEL_STORY : float = 10.0
 const G_TO_ACCEL_PUZZLE : float = 10.0
+## 系统阻力（阻尼）系数缩放：降为 0.6× —— 物理阻尼与绿箭显示共用
+## （空中重力不动物理，显示层缩放见 Player.gd SYSTEM_ARROW_SCALE）
+const SYSTEM_RESIST_SCALE : float = 0.6
 
 var g_to_accel : float = G_TO_ACCEL_STORY
 var game_mode : String = "story"   # "story" 剧情 / "puzzle" 解密
@@ -51,7 +54,8 @@ func get_current_effective_g() -> float:
 
 
 func get_current_damping() -> float:
-	return current_damping
+	# 物理阻尼 ×0.6（系统阻力手感降低）；空中重力的显示缩放见 Player.gd SYSTEM_ARROW_SCALE
+	return current_damping * SYSTEM_RESIST_SCALE
 
 
 ## 由 IllusionZone 每帧调用：写入区域幻觉参数。

@@ -1,7 +1,6 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene format=3 uid="uid://vu6mupna4n6g"]
 
-[ext_resource type="Script" path="res://tests/EndingProbe.gd" id="1_probe"]
+[ext_resource type="Script" uid="uid://tsfgah8q4sn6" path="res://tests/EndingProbe.gd" id="1_probe"]
 
-[node name="EndingProbe" type="Node2D"]
+[node name="EndingProbe" type="Node2D" unique_id=1762920647]
 script = ExtResource("1_probe")
-

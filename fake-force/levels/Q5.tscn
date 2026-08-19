@@ -34,6 +34,7 @@ position = Vector2(-200, 0)
 script = ExtResource("3_goal")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="RotatingCore/Goal" unique_id=830123004]
+scale = Vector2(0.5, 0.5)
 shape = SubResource("RectangleShape2D_goal")
 
 [node name="Player" type="CharacterBody2D" parent="." unique_id=860199436]
@@ -41,12 +42,13 @@ z_index = 1
 position = Vector2(200, 300)
 script = ExtResource("2_player")
 rotating_mode = true
-rot_feet_to_core = true
 start_in_rot = true
 safe_ring_radius = 200.0
+rot_feet_to_core = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=922194899]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("9_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1421228885]
@@ -89,6 +91,7 @@ offset_left = -280.0
 offset_top = 10.0
 offset_right = -16.0
 offset_bottom = 42.0
+grow_horizontal = 0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=805415804]
 layout_mode = 0
@@ -106,6 +109,7 @@ offset_left = 16.0
 offset_top = -40.0
 offset_right = 200.0
 offset_bottom = -10.0
+grow_vertical = 0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=18556921]
 layout_mode = 0
@@ -125,6 +129,8 @@ offset_left = -200.0
 offset_top = -40.0
 offset_right = -16.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=1765982137]
 layout_mode = 0

@@ -2,13 +2,13 @@
 
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
-uid="uid://m0osbv07nwd1"
-path="res://.godot/imported/The thinking of star.ogg-1bad62a7d6410f374fe6222f6e63a54c.oggvorbisstr"
+uid="uid://4yrq55fg1y1e"
+path="res://.godot/imported/the thinking of star.ogg-e9b1af4f2f8adc8be0673dcecf0f52ef.oggvorbisstr"
 
 [deps]
 
-source_file="res://The thinking of star.ogg"
-dest_files=["res://.godot/imported/The thinking of star.ogg-1bad62a7d6410f374fe6222f6e63a54c.oggvorbisstr"]
+source_file="res://the thinking of star.ogg"
+dest_files=["res://.godot/imported/the thinking of star.ogg-e9b1af4f2f8adc8be0673dcecf0f52ef.oggvorbisstr"]
 
 [params]
 

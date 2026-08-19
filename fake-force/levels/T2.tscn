@@ -74,6 +74,7 @@ kill_y = 800.0
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1689855940]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("10_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=746315890]
@@ -117,7 +118,8 @@ shape = SubResource("RectangleShape2D_block")
 [node name="HintZone" type="Area2D" parent="." unique_id=177940901]
 position = Vector2(150, 350)
 script = ExtResource("11_hint")
-hint_text = "橙色方块＝绝对路标（纹丝不动）\n 蓝色方块会被吹动——等它漂到中间，踩着它过深渊"
+hint_text = "橙色方块＝绝对路标（纹丝不动）
+ 蓝色方块会被吹动——等它漂到中间，踩着它过深渊"
 persistent = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone" unique_id=748787132]
@@ -163,6 +165,7 @@ offset_left = -280.0
 offset_top = 10.0
 offset_right = -16.0
 offset_bottom = 42.0
+grow_horizontal = 0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=705692207]
 layout_mode = 0
@@ -180,6 +183,7 @@ offset_left = 16.0
 offset_top = -40.0
 offset_right = 200.0
 offset_bottom = -10.0
+grow_vertical = 0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=417065579]
 layout_mode = 0
@@ -199,6 +203,8 @@ offset_left = -200.0
 offset_top = -40.0
 offset_right = -16.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=2124058511]
 layout_mode = 0

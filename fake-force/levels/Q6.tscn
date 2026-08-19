@@ -47,12 +47,13 @@ z_index = 1
 position = Vector2(200, 300)
 script = ExtResource("2_player")
 rotating_mode = true
-rot_feet_to_core = true
 start_in_rot = true
 safe_ring_radius = 200.0
+rot_feet_to_core = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1891258747]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("10_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1436884386]
@@ -122,6 +123,7 @@ offset_left = -280.0
 offset_top = 10.0
 offset_right = -16.0
 offset_bottom = 42.0
+grow_horizontal = 0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=1406318093]
 layout_mode = 0
@@ -139,6 +141,7 @@ offset_left = 16.0
 offset_top = -40.0
 offset_right = 200.0
 offset_bottom = -10.0
+grow_vertical = 0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=1550999321]
 layout_mode = 0
@@ -158,6 +161,8 @@ offset_left = -200.0
 offset_top = -40.0
 offset_right = -16.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=1847906166]
 layout_mode = 0

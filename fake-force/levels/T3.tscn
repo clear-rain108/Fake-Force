@@ -64,6 +64,7 @@ dust_eta_step = 0.7
 
 [node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=714269485]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("12_texture")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1671465490]
@@ -153,7 +154,8 @@ shape = SubResource("RectangleShape2D_goal")
 [node name="HintZone" type="Area2D" parent="." unique_id=598431473]
 position = Vector2(-150, 450)
 script = ExtResource("13_hint")
-hint_text = "按住 E 吸附马赫尘埃 ｜ Q 变重 / Z 变轻 \n 尖刺需变轻(η<0.6)飘过，蓝色墙需变重(η>1.5)撞碎"
+hint_text = "按住 E 吸附马赫尘埃 ｜ Q 变重 / Z 变轻 
+ 尖刺需变轻(η<0.6)飘过，蓝色墙需变重(η>1.5)撞碎"
 persistent = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="HintZone" unique_id=76182082]
@@ -192,6 +194,7 @@ offset_left = -280.0
 offset_top = 10.0
 offset_right = -16.0
 offset_bottom = 42.0
+grow_horizontal = 0
 
 [node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=947268793]
 layout_mode = 0
@@ -209,6 +212,7 @@ offset_left = 16.0
 offset_top = -40.0
 offset_right = 200.0
 offset_bottom = -10.0
+grow_vertical = 0
 
 [node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=366288304]
 layout_mode = 0
@@ -228,6 +232,8 @@ offset_left = -200.0
 offset_top = -40.0
 offset_right = -16.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 
 [node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=1609416171]
 layout_mode = 0

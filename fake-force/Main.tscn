@@ -1,25 +1,24 @@
-[gd_scene load_steps=40 format=3]
+[gd_scene format=3 uid="uid://bul3700pxo7t5"]
 
-[ext_resource type="Script" path="res://scripts/StoryRoot.gd" id="1_root"]
-[ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
-[ext_resource type="Script" path="res://scripts/IllusionZone.gd" id="3_zone"]
-[ext_resource type="Script" path="res://scripts/PhantomBlock.gd" id="4_block"]
-[ext_resource type="Script" path="res://scripts/HUD.gd" id="5_hud"]
-[ext_resource type="Texture2D" path="res://Art_Chsr_Main.png" id="6_texture"]
-[ext_resource type="Script" path="res://scripts/StarField.gd" id="7_star"]
-[ext_resource type="Script" path="res://scripts/StageBuilder.gd" id="8_stage"]
-[ext_resource type="Script" path="res://scripts/Dust.gd" id="9_dust"]
-[ext_resource type="Script" path="res://scripts/HintZone.gd" id="10_hint"]
-[ext_resource type="Script" path="res://scripts/Checkpoint.gd" id="11_checkpoint"]
-[ext_resource type="Script" path="res://scripts/Notebook.gd" id="12_notebook"]
-[ext_resource type="Script" path="res://scripts/NotebookTrigger.gd" id="13_trigger"]
-[ext_resource type="Script" path="res://scripts/RotatingCore.gd" id="14_rotating"]
-[ext_resource type="Script" path="res://scripts/Switch.gd" id="15_switch"]
-[ext_resource type="Script" path="res://scripts/StageTransition.gd" id="16_trans"]
-[ext_resource type="Script" path="res://scripts/OpeningSequence.gd" id="17_opening"]
-[ext_resource type="Script" path="res://scripts/GrimVignette.gd" id="18_vignette"]
+[ext_resource type="Script" uid="uid://bys26xxdm1ktx" path="res://scripts/StoryRoot.gd" id="1_root"]
+[ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
+[ext_resource type="Script" uid="uid://cwdwx54qndmnj" path="res://scripts/IllusionZone.gd" id="3_zone"]
+[ext_resource type="Script" uid="uid://c2a5py7w4p28b" path="res://scripts/PhantomBlock.gd" id="4_block"]
+[ext_resource type="Script" uid="uid://ktvrk72i67co" path="res://scripts/HUD.gd" id="5_hud"]
+[ext_resource type="Texture2D" uid="uid://b1nu7s3jgs2pr" path="res://Art_Chsr_Main.png" id="6_texture"]
+[ext_resource type="Script" uid="uid://dec4h3nj1qlqi" path="res://scripts/StarField.gd" id="7_star"]
+[ext_resource type="Script" uid="uid://bx3xsickn4dia" path="res://scripts/StageBuilder.gd" id="8_stage"]
+[ext_resource type="Script" uid="uid://c2r5ktdwdbnh1" path="res://scripts/Dust.gd" id="9_dust"]
+[ext_resource type="Script" uid="uid://qeflfrpjpb8y" path="res://scripts/Checkpoint.gd" id="11_checkpoint"]
+[ext_resource type="Script" uid="uid://ccywmpee4h0qw" path="res://scripts/Notebook.gd" id="12_notebook"]
+[ext_resource type="Script" uid="uid://d00i24ln7k3ut" path="res://scripts/NotebookTrigger.gd" id="13_trigger"]
+[ext_resource type="Script" uid="uid://clvlxe7bej24l" path="res://scripts/RotatingCore.gd" id="14_rotating"]
+[ext_resource type="Script" uid="uid://f1dixhr664l6" path="res://scripts/Switch.gd" id="15_switch"]
+[ext_resource type="Script" uid="uid://g7xkr7mtdnq" path="res://scripts/StageTransition.gd" id="16_trans"]
+[ext_resource type="Script" uid="uid://d0oinyw3wf1v1" path="res://scripts/OpeningSequence.gd" id="17_opening"]
+[ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="18_vignette"]
 [ext_resource type="PackedScene" path="res://scenes/background.tscn" id="19_bg"]
-[ext_resource type="Script" path="res://scripts/Stage1Controller.gd" id="20_controller"]
+[ext_resource type="Script" uid="uid://bgltmpe63r7el" path="res://scripts/Stage1Controller.gd" id="20_controller"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -27,14 +26,23 @@ radius = 16.0
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone1"]
 size = Vector2(3200, 700)
 
+[sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
+radius = 8.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpoint"]
+size = Vector2(200, 300)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_switch"]
+radius = 26.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate"]
+size = Vector2(40, 335)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneMaze"]
 size = Vector2(1650, 500)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneCorr"]
-size = Vector2(600, 500)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneCorrD"]
-size = Vector2(500, 500)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
+size = Vector2(40, 160)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_block"]
 size = Vector2(100, 40)
@@ -42,32 +50,23 @@ size = Vector2(100, 40)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_blockBig"]
 size = Vector2(200, 40)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
-radius = 8.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hint"]
-size = Vector2(1000, 600)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpoint"]
-size = Vector2(200, 300)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_gate"]
-size = Vector2(40, 400)
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_switch"]
-radius = 26.0
-
-[sub_resource type="CircleShape2D" id="CircleShape2D_trans"]
-radius = 30.0
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_wall"]
-size = Vector2(40, 160)
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_wallDiv"]
 size = Vector2(20, 250)
 
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_roof"]
+size = Vector2(3200, 20)
+
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_push"]
 size = Vector2(260, 300)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneCorr"]
+size = Vector2(600, 500)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneCorrD"]
+size = Vector2(500, 500)
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_trans"]
+radius = 30.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ceiling"]
 size = Vector2(340, 20)
@@ -75,47 +74,45 @@ size = Vector2(340, 20)
 [sub_resource type="CircleShape2D" id="CircleShape2D_button"]
 radius = 24.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_roof"]
-size = Vector2(3200, 20)
-
-[node name="Main" type="Node2D"]
+[node name="Main" type="Node2D" unique_id=1506711572]
 script = ExtResource("1_root")
 
-[node name="Background" parent="." instance=ExtResource("19_bg")]
+[node name="Background" parent="." unique_id=1481419208 instance=ExtResource("19_bg")]
 
-[node name="StarField" type="Node2D" parent="."]
+[node name="StarField" type="Node2D" parent="." unique_id=543112907]
 script = ExtResource("7_star")
 
-[node name="StageBuilder" type="Node2D" parent="."]
+[node name="StageBuilder" type="Node2D" parent="." unique_id=1376846557]
 script = ExtResource("8_stage")
 
-[node name="Player" type="CharacterBody2D" parent="."]
+[node name="Player" type="CharacterBody2D" parent="." unique_id=1735793533]
 z_index = 1
 position = Vector2(120, 650)
 script = ExtResource("2_player")
-rotating_mode = true
-rot_feet_to_core = true
 speed = 60.0
 jump_velocity = 300.0
 jump_gravity = 200.0
 max_speed_x = 140.0
 jump_cap = 350.0
 max_fall_speed = 350.0
+rotating_mode = true
+rot_feet_to_core = true
 kill_y = 800.0
 dust_eta_step = 0.7
 
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1658161207]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("6_texture")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=380012055]
 shape = SubResource("CircleShape2D_player")
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=1610538449]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="Stage1Zone" type="Area2D" parent="."]
+[node name="Stage1Zone" type="Area2D" parent="." unique_id=1037003981]
 position = Vector2(1600, 600)
 script = ExtResource("3_zone")
 g_value = 0.6
@@ -123,44 +120,49 @@ damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Stage1Zone"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Stage1Zone" unique_id=2142325210]
+position = Vector2(19, -32)
 shape = SubResource("RectangleShape2D_zone1")
 
-[node name="Dust1" type="Area2D" parent="."]
+[node name="Dust1" type="Area2D" parent="." unique_id=1751180849]
 position = Vector2(2880, 650)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1" unique_id=1104253029]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Checkpoint1" type="Area2D" parent="."]
-position = Vector2(2700, 600)
+[node name="Checkpoint1" type="Area2D" parent="." unique_id=481703620]
+position = Vector2(2700, 660)
 script = ExtResource("11_checkpoint")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint1" unique_id=1560616570]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="MazeExitSwitch" type="Area2D" parent="."]
+[node name="MazeExitSwitch" type="Area2D" parent="." unique_id=1348781151]
 position = Vector2(5050, 300)
 script = ExtResource("15_switch")
-unlock_page = 2
 gate_path = NodePath("ControlRoomDoor")
 hint = "【系统】：迷宫机关已启动，中控室舱门开启。"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitSwitch"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitSwitch" unique_id=1642707083]
 shape = SubResource("CircleShape2D_switch")
 
-[node name="ControlRoomDoor" type="StaticBody2D" parent="MazeExitSwitch"]
-position = Vector2(100, 0)
+[node name="ControlRoomDoor" type="StaticBody2D" parent="MazeExitSwitch" unique_id=65489256]
+position = Vector2(122, -61.000008)
+rotation = -0.122555606
+scale = Vector2(1, 0.558413)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitSwitch/ControlRoomDoor"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitSwitch/ControlRoomDoor" unique_id=2061284702]
+position = Vector2(0, 32.5)
 shape = SubResource("RectangleShape2D_gate")
 
-[node name="Poly" type="Polygon2D" parent="MazeExitSwitch/ControlRoomDoor"]
+[node name="Poly" type="Polygon2D" parent="MazeExitSwitch/ControlRoomDoor" unique_id=2138442235]
+position = Vector2(0, 26.999989)
+scale = Vector2(1, 0.83)
 color = Color(0.35, 0.6, 0.9, 0.85)
 polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
 
-[node name="MazeZone" type="Area2D" parent="."]
+[node name="MazeZone" type="Area2D" parent="." unique_id=1761955367]
 position = Vector2(4125, 560)
 script = ExtResource("3_zone")
 g_value = 1.2
@@ -168,34 +170,33 @@ damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeZone"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeZone" unique_id=1877553761]
 shape = SubResource("RectangleShape2D_zoneMaze")
 
-[node name="WallA" type="StaticBody2D" parent="."]
+[node name="WallA" type="StaticBody2D" parent="." unique_id=671390554]
 position = Vector2(3480, 470)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallA"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallA" unique_id=327100474]
 shape = SubResource("RectangleShape2D_wall")
 
-[node name="Poly" type="Polygon2D" parent="WallA"]
+[node name="Poly" type="Polygon2D" parent="WallA" unique_id=92466919]
 color = Color(0.5, 0.5, 0.55, 1)
 polygon = PackedVector2Array(-20, -80, 20, -80, 20, 80, -20, 80)
 
-[node name="PB1" type="RigidBody2D" parent="."]
+[node name="PB1" type="RigidBody2D" parent="." unique_id=123304009]
 position = Vector2(3725, 470)
 gravity_scale = 0.0
 linear_damp = 0.2
 script = ExtResource("4_block")
-size_x = 100.0
 x_min = 3650.0
 x_max = 3800.0
 counts_as_occupant = false
 activation_distance = 450.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PB1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PB1" unique_id=778650783]
 shape = SubResource("RectangleShape2D_block")
 
-[node name="PB2" type="RigidBody2D" parent="."]
+[node name="PB2" type="RigidBody2D" parent="." unique_id=1242425067]
 position = Vector2(4620, 470)
 gravity_scale = 0.0
 linear_damp = 0.2
@@ -206,228 +207,231 @@ x_max = 4700.0
 counts_as_occupant = false
 activation_distance = 450.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PB2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PB2" unique_id=394786992]
 shape = SubResource("RectangleShape2D_blockBig")
 
-[node name="AbsRef" type="RigidBody2D" parent="."]
+[node name="AbsRef" type="RigidBody2D" parent="." unique_id=900162730]
 position = Vector2(4050, 400)
 gravity_scale = 0.0
 script = ExtResource("4_block")
 is_phantom = false
-size_x = 100.0
 counts_as_occupant = false
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsRef"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AbsRef" unique_id=674016504]
 shape = SubResource("RectangleShape2D_block")
 
-[node name="Dust2" type="Area2D" parent="."]
+[node name="Dust2" type="Area2D" parent="." unique_id=739529313]
 position = Vector2(3850, 480)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2" unique_id=164809127]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Dust3" type="Area2D" parent="."]
+[node name="Dust3" type="Area2D" parent="." unique_id=1284640658]
 position = Vector2(4550, 470)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3" unique_id=72773452]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="MazeExit" type="Area2D" parent="."]
+[node name="MazeExit" type="Area2D" parent="." unique_id=1349693587]
 position = Vector2(4900, 500)
 script = ExtResource("13_trigger")
-unlock_count = 3
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExit"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExit" unique_id=1408376946]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="WallDiv1" type="StaticBody2D" parent="."]
+[node name="WallDiv1" type="StaticBody2D" parent="." unique_id=167370169]
 position = Vector2(640, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv1" unique_id=1571358553]
 shape = SubResource("RectangleShape2D_wallDiv")
 
-[node name="Poly" type="Polygon2D" parent="WallDiv1"]
+[node name="Poly" type="Polygon2D" parent="WallDiv1" unique_id=115549347]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
 
-[node name="WallDiv2" type="StaticBody2D" parent="."]
+[node name="WallDiv2" type="StaticBody2D" parent="." unique_id=152041745]
 position = Vector2(1280, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv2" unique_id=303476335]
 shape = SubResource("RectangleShape2D_wallDiv")
 
-[node name="Poly" type="Polygon2D" parent="WallDiv2"]
+[node name="Poly" type="Polygon2D" parent="WallDiv2" unique_id=3404886]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
 
-[node name="WallDiv3" type="StaticBody2D" parent="."]
+[node name="WallDiv3" type="StaticBody2D" parent="." unique_id=33599417]
 position = Vector2(1920, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv3"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv3" unique_id=1249727570]
 shape = SubResource("RectangleShape2D_wallDiv")
 
-[node name="Poly" type="Polygon2D" parent="WallDiv3"]
+[node name="Poly" type="Polygon2D" parent="WallDiv3" unique_id=951691149]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
 
-[node name="WallDiv4" type="StaticBody2D" parent="."]
+[node name="WallDiv4" type="StaticBody2D" parent="." unique_id=2014312676]
 position = Vector2(2560, 505)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv4"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="WallDiv4" unique_id=604855448]
 shape = SubResource("RectangleShape2D_wallDiv")
 
-[node name="Poly" type="Polygon2D" parent="WallDiv4"]
+[node name="Poly" type="Polygon2D" parent="WallDiv4" unique_id=1372178565]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-10, -140, 10, -140, 10, 125, -10, 125)
 
-[node name="RoomWallLeft" type="StaticBody2D" parent="."]
+[node name="RoomWallLeft" type="StaticBody2D" parent="." unique_id=156356702]
 position = Vector2(0, 500)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomWallLeft"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomWallLeft" unique_id=784403666]
+position = Vector2(0, 54)
 shape = SubResource("RectangleShape2D_gate")
 
-[node name="Poly" type="Polygon2D" parent="RoomWallLeft"]
+[node name="Poly" type="Polygon2D" parent="RoomWallLeft" unique_id=1974015281]
+position = Vector2(0, 35.000027)
+scale = Vector2(1, 0.9050001)
 color = Color(0.32, 0.34, 0.4, 1)
-polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
+polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, 0.11657715, 200, -20, 200)
 
-[node name="RoomCeiling" type="StaticBody2D" parent="."]
+[node name="RoomCeiling" type="StaticBody2D" parent="." unique_id=1068619921]
 position = Vector2(1600, 365)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomCeiling"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="RoomCeiling" unique_id=935684255]
 shape = SubResource("RectangleShape2D_roof")
 
-[node name="Poly" type="Polygon2D" parent="RoomCeiling"]
+[node name="Poly" type="Polygon2D" parent="RoomCeiling" unique_id=1615665153]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-1600, -10, 1600, -10, 1600, 10, -1600, 10)
 
-[node name="DecorBed1" type="Polygon2D" parent="."]
+[node name="DecorBed1" type="Polygon2D" parent="." unique_id=1782362128]
 position = Vector2(150, 672)
 color = Color(0.5, 0.55, 0.65, 1)
 polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
 
-[node name="DecorTable1" type="Polygon2D" parent="."]
+[node name="DecorTable1" type="Polygon2D" parent="." unique_id=910509101]
 position = Vector2(450, 676)
 color = Color(0.36, 0.4, 0.48, 1)
 polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
 
-[node name="DecorWindow1" type="Polygon2D" parent="."]
-position = Vector2(320, 470)
+[node name="DecorWindow1" type="Polygon2D" parent="." unique_id=1425711653]
+position = Vector2(325, 530)
+scale = Vector2(15.25, 8.61111)
 color = Color(0.55, 0.75, 0.9, 0.7)
 polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
 
-[node name="DecorBed2" type="Polygon2D" parent="."]
+[node name="DecorBed2" type="Polygon2D" parent="." unique_id=195044483]
 position = Vector2(800, 672)
 color = Color(0.5, 0.55, 0.65, 1)
 polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
 
-[node name="DecorTable2" type="Polygon2D" parent="."]
+[node name="DecorTable2" type="Polygon2D" parent="." unique_id=1344589599]
 position = Vector2(1100, 676)
 color = Color(0.36, 0.4, 0.48, 1)
 polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
 
-[node name="DecorWindow2" type="Polygon2D" parent="."]
-position = Vector2(960, 470)
+[node name="DecorWindow2" type="Polygon2D" parent="." unique_id=977479293]
+position = Vector2(960, 530)
+scale = Vector2(15.500002, 8.611112)
 color = Color(0.55, 0.75, 0.9, 0.7)
 polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
 
-[node name="DecorBed3" type="Polygon2D" parent="."]
+[node name="DecorBed3" type="Polygon2D" parent="." unique_id=1480016633]
 position = Vector2(1450, 672)
 color = Color(0.5, 0.55, 0.65, 1)
 polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
 
-[node name="DecorTable3" type="Polygon2D" parent="."]
+[node name="DecorTable3" type="Polygon2D" parent="." unique_id=488085607]
 position = Vector2(1700, 676)
 color = Color(0.36, 0.4, 0.48, 1)
 polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
 
-[node name="DecorWindow3" type="Polygon2D" parent="."]
-position = Vector2(1600, 470)
+[node name="DecorWindow3" type="Polygon2D" parent="." unique_id=1750553318]
+position = Vector2(1463, 465)
+rotation = 0.20921454
+scale = Vector2(8.225, 3.1111112)
 color = Color(0.55, 0.75, 0.9, 0.7)
-polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
+polygon = PackedVector2Array(-22.847397, -16.748627, 9.739258, -35.04032, 10.951324, -19.948174, 15.589569, -22.551735, 41.48845, -21.974121, 46.192505, 38.146797, 13.421768, 52.598694, 5.8314667, 50.944626, -16.408325, 63.428375)
 
-[node name="DecorBed4" type="Polygon2D" parent="."]
+[node name="DecorBed4" type="Polygon2D" parent="." unique_id=758591433]
 position = Vector2(2100, 672)
 color = Color(0.5, 0.55, 0.65, 1)
 polygon = PackedVector2Array(-35, -13, 35, -13, 35, 13, -35, 13)
 
-[node name="DecorTable4" type="Polygon2D" parent="."]
+[node name="DecorTable4" type="Polygon2D" parent="." unique_id=1632265359]
 position = Vector2(2350, 676)
 color = Color(0.36, 0.4, 0.48, 1)
 polygon = PackedVector2Array(-22, -9, 22, -9, 22, 9, -22, 9)
 
-[node name="DecorWindow4" type="Polygon2D" parent="."]
-position = Vector2(2240, 470)
-color = Color(0.55, 0.75, 0.9, 0.7)
-polygon = PackedVector2Array(-20, -18, 20, -18, 20, 18, -20, 18)
-
-[node name="DecorLocker1" type="Polygon2D" parent="."]
+[node name="DecorLocker1" type="Polygon2D" parent="." unique_id=462318005]
 position = Vector2(250, 650)
 color = Color(0.25, 0.28, 0.34, 1)
 polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
 
-[node name="DecorLight1" type="Polygon2D" parent="."]
+[node name="DecorLight1" type="Polygon2D" parent="." unique_id=1783242337]
 position = Vector2(320, 380)
-color = Color(0.85, 0.92, 1.0, 0.75)
+color = Color(0.85, 0.92, 1, 0.75)
 polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
 
-[node name="DecorLocker2" type="Polygon2D" parent="."]
+[node name="DecorLocker2" type="Polygon2D" parent="." unique_id=1890149337]
 position = Vector2(900, 650)
 color = Color(0.25, 0.28, 0.34, 1)
 polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
 
-[node name="DecorLight2" type="Polygon2D" parent="."]
+[node name="DecorLight2" type="Polygon2D" parent="." unique_id=1384818407]
 position = Vector2(960, 380)
-color = Color(0.85, 0.92, 1.0, 0.75)
+color = Color(0.85, 0.92, 1, 0.75)
 polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
 
-[node name="DecorLocker3" type="Polygon2D" parent="."]
+[node name="DecorLocker3" type="Polygon2D" parent="." unique_id=1160515963]
 position = Vector2(1650, 650)
 color = Color(0.25, 0.28, 0.34, 1)
 polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
 
-[node name="DecorLight3" type="Polygon2D" parent="."]
+[node name="DecorLight3" type="Polygon2D" parent="." unique_id=884899506]
 position = Vector2(1600, 380)
-color = Color(0.85, 0.92, 1.0, 0.75)
+color = Color(0.85, 0.92, 1, 0.75)
 polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
 
-[node name="DecorLocker4" type="Polygon2D" parent="."]
+[node name="DecorLocker4" type="Polygon2D" parent="." unique_id=41697059]
 position = Vector2(2300, 650)
 color = Color(0.25, 0.28, 0.34, 1)
 polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
 
-[node name="DecorLight4" type="Polygon2D" parent="."]
+[node name="DecorLight4" type="Polygon2D" parent="." unique_id=168545637]
 position = Vector2(2240, 380)
-color = Color(0.85, 0.92, 1.0, 0.75)
+color = Color(0.85, 0.92, 1, 0.75)
 polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
 
-[node name="DecorLocker5" type="Polygon2D" parent="."]
-position = Vector2(2900, 640)
+[node name="DecorLocker5" type="Polygon2D" parent="." unique_id=1402628393]
+position = Vector2(2772.0002, 474.99994)
+rotation = -1.0960621
 color = Color(0.25, 0.28, 0.34, 1)
 polygon = PackedVector2Array(-13, -35, 13, -35, 13, 35, -13, 35)
 
-[node name="DecorLight5" type="Polygon2D" parent="."]
+[node name="DecorLight5" type="Polygon2D" parent="." unique_id=465694445]
 position = Vector2(2880, 380)
-color = Color(0.85, 0.92, 1.0, 0.75)
+color = Color(0.85, 0.92, 1, 0.75)
 polygon = PackedVector2Array(-35, -4, 35, -4, 35, 4, -35, 4)
 
-[node name="DecorTable5" type="Polygon2D" parent="."]
+[node name="DecorTable5" type="Polygon2D" parent="." unique_id=1558831052]
 position = Vector2(2880, 676)
 color = Color(0.36, 0.4, 0.48, 1)
 polygon = PackedVector2Array(-30, -9, 30, -9, 30, 9, -30, 9)
 
-[node name="MazeEntranceGate" type="StaticBody2D" parent="."]
+[node name="MazeEntranceGate" type="StaticBody2D" parent="." unique_id=1059901691]
 position = Vector2(3200, 600)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeEntranceGate"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeEntranceGate" unique_id=463319656]
 shape = SubResource("RectangleShape2D_gate")
 
-[node name="Poly" type="Polygon2D" parent="MazeEntranceGate"]
-color = Color(1.0, 0.2, 0.18, 0.7)
+[node name="Poly" type="Polygon2D" parent="MazeEntranceGate" unique_id=1746279262]
+position = Vector2(-15, -47.499973)
+scale = Vector2(1, 0.8825001)
+color = Color(0.5093629, 0.5478468, 0.72833025, 0.7019608)
 polygon = PackedVector2Array(-20, -200, 20, -200, 20, 200, -20, 200)
 
-[node name="PushToMaze" type="Area2D" parent="."]
+[node name="PushToMaze" type="Area2D" parent="." unique_id=1405259481]
 position = Vector2(3360, 600)
 monitoring = false
 script = ExtResource("3_zone")
@@ -436,116 +440,113 @@ damping = 0.5
 field_mode = 0
 field_directions = [Vector2(1, 0)]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PushToMaze"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PushToMaze" unique_id=1035497935]
 shape = SubResource("RectangleShape2D_push")
 
-[node name="Zone2C" type="Area2D" parent="."]
+[node name="Zone2C" type="Area2D" parent="." unique_id=1037771173]
 position = Vector2(6600, 500)
 script = ExtResource("3_zone")
 g_value = 1.2
 damping = 0.5
-field_mode = 1
 field_directions = [Vector2(1, 0), Vector2(-1, 0)]
-field_interval = 3.0
 field_coast = 1.0
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2C"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2C" unique_id=280441557]
 shape = SubResource("RectangleShape2D_zoneCorr")
 
-[node name="Zone2D" type="Area2D" parent="."]
+[node name="Zone2D" type="Area2D" parent="." unique_id=2137963809]
 position = Vector2(7200, 450)
 script = ExtResource("3_zone")
 g_value = 1.5
 damping = 0.5
 field_mode = 2
-field_directions = [Vector2(-1, 0), Vector2(1, 0)]
 field_interval = 2.2
 field_coast = 0.8
 field_jitter = 0.5
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2D"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Zone2D" unique_id=60780272]
 shape = SubResource("RectangleShape2D_zoneCorrD")
 
-[node name="Dust4" type="Area2D" parent="."]
+[node name="Dust4" type="Area2D" parent="." unique_id=1996141877]
 position = Vector2(5450, 255)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust4"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust4" unique_id=1061566969]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Dust5" type="Area2D" parent="."]
+[node name="Dust5" type="Area2D" parent="." unique_id=595016174]
 position = Vector2(6400, 420)
 script = ExtResource("9_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust5"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust5" unique_id=1738492735]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="RotatingCore" type="Node2D" parent="."]
+[node name="RotatingCore" type="Node2D" parent="." unique_id=1231373320]
 position = Vector2(7900, 350)
 script = ExtResource("14_rotating")
 omega = 0.8
 influence_radius = 220.0
 core_radius = 150.0
 
-[node name="Checkpoint2" type="Area2D" parent="."]
+[node name="Checkpoint2" type="Area2D" parent="." unique_id=1705977345]
 position = Vector2(7900, 610)
 script = ExtResource("11_checkpoint")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Checkpoint2" unique_id=1977676972]
 shape = SubResource("RectangleShape2D_checkpoint")
 
-[node name="StageTransition" type="Area2D" parent="."]
+[node name="StageTransition" type="Area2D" parent="." unique_id=479316058]
 position = Vector2(8900, 150)
 script = ExtResource("16_trans")
-unlock_page = 5
 hint = "【系统】：航路尽头是黑洞。在那里，过去会重新显现。"
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StageTransition"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StageTransition" unique_id=287906462]
 shape = SubResource("CircleShape2D_trans")
 
-[node name="ControlRoom" type="Node2D" parent="."]
+[node name="ControlRoom" type="Node2D" parent="." unique_id=640722421]
 
-[node name="DarkBg" type="Polygon2D" parent="ControlRoom"]
-position = Vector2(5360, 245)
+[node name="DarkBg" type="Polygon2D" parent="ControlRoom" unique_id=510684445]
 z_index = -1
+position = Vector2(5355, 245)
+scale = Vector2(0.84000033, 1)
 color = Color(0.02, 0.03, 0.06, 0.6)
 polygon = PackedVector2Array(-200, -70, 200, -70, 200, 70, -200, 70)
 
-[node name="RightWall" type="StaticBody2D" parent="ControlRoom"]
+[node name="RightWall" type="StaticBody2D" parent="ControlRoom" unique_id=1922931162]
 position = Vector2(5520, 260)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/RightWall"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/RightWall" unique_id=1641249933]
 shape = SubResource("RectangleShape2D_wallDiv")
 
-[node name="Poly" type="Polygon2D" parent="ControlRoom/RightWall"]
+[node name="Poly" type="Polygon2D" parent="ControlRoom/RightWall" unique_id=1743120336]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-10, -125, 10, -125, 10, 125, -10, 125)
 
-[node name="Ceiling" type="StaticBody2D" parent="ControlRoom"]
+[node name="Ceiling" type="StaticBody2D" parent="ControlRoom" unique_id=68013485]
 position = Vector2(5360, 170)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/Ceiling"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/Ceiling" unique_id=1455428439]
 shape = SubResource("RectangleShape2D_ceiling")
 
-[node name="Poly" type="Polygon2D" parent="ControlRoom/Ceiling"]
+[node name="Poly" type="Polygon2D" parent="ControlRoom/Ceiling" unique_id=468816]
 color = Color(0.32, 0.34, 0.4, 1)
 polygon = PackedVector2Array(-170, -10, 170, -10, 170, 10, -170, 10)
 
-[node name="LaunchButton" type="Area2D" parent="ControlRoom"]
+[node name="LaunchButton" type="Area2D" parent="ControlRoom" unique_id=190612906]
 position = Vector2(5360, 285)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/LaunchButton"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ControlRoom/LaunchButton" unique_id=1813269613]
 shape = SubResource("CircleShape2D_button")
 
-[node name="BtnGlow" type="Polygon2D" parent="ControlRoom/LaunchButton"]
-color = Color(1.0, 0.35, 0.25, 0.35)
+[node name="BtnGlow" type="Polygon2D" parent="ControlRoom/LaunchButton" unique_id=1222353203]
+color = Color(1, 0.35, 0.25, 0.35)
 polygon = PackedVector2Array(30, 0, 21.2, 21.2, 0, 30, -21.2, 21.2, -30, 0, -21.2, -21.2, 0, -30, 21.2, -21.2)
 
-[node name="BtnVisual" type="Polygon2D" parent="ControlRoom/LaunchButton"]
-color = Color(1.0, 0.2, 0.12, 0.9)
+[node name="BtnVisual" type="Polygon2D" parent="ControlRoom/LaunchButton" unique_id=763837635]
+color = Color(1, 0.2, 0.12, 0.9)
 polygon = PackedVector2Array(20, 0, 14.1, 14.1, 0, 20, -14.1, 14.1, -20, 0, -14.1, -14.1, 0, -20, 14.1, -14.1)
 
-[node name="HintLabel" type="Label" parent="ControlRoom/LaunchButton"]
+[node name="HintLabel" type="Label" parent="ControlRoom/LaunchButton" unique_id=2117028182]
 visible = false
 offset_left = -170.0
 offset_top = -62.0
@@ -555,25 +556,25 @@ theme_override_font_sizes/font_size = 16
 text = "按 E 执行深空号跃迁指令"
 horizontal_alignment = 1
 
-[node name="Stage1Controller" type="Node2D" parent="."]
+[node name="Stage1Controller" type="Node2D" parent="." unique_id=1965713646]
 script = ExtResource("20_controller")
 
-[node name="GrimVignette" type="CanvasLayer" parent="."]
+[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=2033804896]
 layer = 40
 
-[node name="VignetteDraw" type="Node2D" parent="GrimVignette"]
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=1603087083]
 script = ExtResource("18_vignette")
 
-[node name="Opening" type="CanvasLayer" parent="."]
+[node name="Opening" type="CanvasLayer" parent="." unique_id=1474585534]
 layer = 50
 
-[node name="OpeningDraw" type="Node2D" parent="Opening"]
+[node name="OpeningDraw" type="Node2D" parent="Opening" unique_id=505318353]
 script = ExtResource("17_opening")
 
-[node name="HUD" type="CanvasLayer" parent="."]
+[node name="HUD" type="CanvasLayer" parent="." unique_id=1593470355]
 script = ExtResource("5_hud")
 
-[node name="GValue" type="Label" parent="HUD"]
+[node name="GValue" type="Label" parent="HUD" unique_id=1472674708]
 offset_left = 16.0
 offset_top = 10.0
 offset_right = 420.0
@@ -581,7 +582,7 @@ offset_bottom = 42.0
 theme_override_font_sizes/font_size = 24
 text = "当前幻觉强度：0.0 G"
 
-[node name="EnergyBar" type="ProgressBar" parent="HUD"]
+[node name="EnergyBar" type="ProgressBar" parent="HUD" unique_id=630470709]
 offset_left = 16.0
 offset_top = 50.0
 offset_right = 260.0
@@ -589,14 +590,14 @@ offset_bottom = 70.0
 value = 100.0
 show_percentage = false
 
-[node name="Message" type="Label" parent="HUD"]
+[node name="Message" type="Label" parent="HUD" unique_id=1388685129]
 offset_left = 16.0
 offset_top = 120.0
 offset_right = 900.0
 offset_bottom = 160.0
 theme_override_font_sizes/font_size = 20
 
-[node name="DustInfo" type="Label" parent="HUD"]
+[node name="DustInfo" type="Label" parent="HUD" unique_id=37120865]
 offset_left = 16.0
 offset_top = 175.0
 offset_right = 400.0
@@ -604,7 +605,7 @@ offset_bottom = 205.0
 theme_override_font_sizes/font_size = 16
 text = "马赫尘埃：0"
 
-[node name="EtaInfo" type="Label" parent="HUD"]
+[node name="EtaInfo" type="Label" parent="HUD" unique_id=112445496]
 offset_left = 16.0
 offset_top = 205.0
 offset_right = 500.0
@@ -612,8 +613,5 @@ offset_bottom = 235.0
 theme_override_font_sizes/font_size = 16
 text = "η：1.00"
 
-[node name="Notebook" type="Node2D" parent="HUD"]
+[node name="Notebook" type="Node2D" parent="HUD" unique_id=1113391610]
 script = ExtResource("12_notebook")
-
-
-

@@ -97,12 +97,12 @@ void fragment() {
 	}
 
 	// —— 中心十字准星（细线） ——
-	vec2 ap = abs(p);
-	float cross = smoothstep(0.0035, 0.0, ap.x) * smoothstep(0.085, 0.075, ap.y)
-		+ smoothstep(0.0035, 0.0, ap.y) * smoothstep(0.085, 0.075, ap.x);
-	col += cyan * cross * 0.16;
+	//vec2 ap = abs(p);
+	//float cross = smoothstep(0.0035, 0.0, ap.x) * smoothstep(0.085, 0.075, ap.y)
+		//+ smoothstep(0.0035, 0.0, ap.y) * smoothstep(0.085, 0.075, ap.x);
+	//col += cyan * cross * 0.16;
 	// 中心小点
-	col += cyan * smoothstep(0.006, 0.0, r) * 0.20;
+	//col += cyan * smoothstep(0.006, 0.0, r) * 0.20;
 
 	// —— 虚假力方向指示针 ——
 	float has_f = step(0.001, length(fake_dir));
@@ -146,16 +146,16 @@ void fragment() {
 	col += cyan_d * etick * 0.14;
 
 	// —— 取景框角标（4 个 L 形，低透明） ——
-	float bracket = 0.0;
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.455, -0.345), vec2(-0.455, -0.455))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.455, -0.455), vec2(-0.345, -0.455))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.345, -0.455), vec2(0.455, -0.455))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.455, -0.455), vec2(0.455, -0.345))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.455, 0.345), vec2(0.455, 0.455))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.455, 0.455), vec2(0.345, 0.455))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.345, 0.455), vec2(-0.455, 0.455))));
-	bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.455, 0.455), vec2(-0.455, 0.345))));
-	col += cyan_d * bracket * 0.26;
+	//float bracket = 0.0;
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.455, -0.345), vec2(-0.455, -0.455))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.455, -0.455), vec2(-0.345, -0.455))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.345, -0.455), vec2(0.455, -0.455))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.455, -0.455), vec2(0.455, -0.345))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.455, 0.345), vec2(0.455, 0.455))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(0.455, 0.455), vec2(0.345, 0.455))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.345, 0.455), vec2(-0.455, 0.455))));
+	//bracket = max(bracket, smoothstep(0.005, 0.0, seg_dist(p, vec2(-0.455, 0.455), vec2(-0.455, 0.345))));
+	//col += cyan_d * bracket * 0.26;
 
 	// —— G 值增大 → 整体变暗（系统压制，与太空一致） ——
 	float darken = 1.0 - clamp(g_strength, 0.0, 3.0) * 0.16;

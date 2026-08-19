@@ -10,8 +10,8 @@ const LEVELS : Array = [
 	["res://levels/Q2.tscn", "Q2  双向往返", THEME_SHIP],
 	["res://levels/Q3.tscn", "Q3  幻灵航路", THEME_SHIP],
 	["res://levels/Q4.tscn", "Q4  参考系登高", THEME_SPACE],
-	["res://levels/Q5.tscn", "Q5  离心抛射", THEME_SPACE],
-	["res://levels/Q6.tscn", "Q6  科里奥利", THEME_SPACE],
+	["res://levels/Q5.tscn", "Q5  太空环岛", THEME_SPACE],
+	["res://levels/Q6.tscn", "Q6  离心抛射", THEME_SPACE],
 ]
 
 var _bg : CanvasLayer = null

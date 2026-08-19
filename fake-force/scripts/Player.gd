@@ -57,11 +57,18 @@ var _dbg_system : Vector2 = Vector2.ZERO   # 洞察：系统阻力（同步态=�
 var _dbg_net : Vector2 = Vector2.ZERO      # 洞察：合力（切换态=蓝+红）
 var _dbg_target : Vector2 = Vector2.ZERO   # 切换洞察：目标向心力（=ω²r 向心）
 
-# 同比例箭头（需求1：合力=运动可验证）：长度 = |力| × ARROW_SCALE，截断到 [MIN, MAX]
-const ARROW_SCALE := 1.0      # px / (px·s⁻²)，输入 60 → 60px
+# —— 洞察箭头：按参考系单位化长度 ——
+# 玩家身位 = 32px（精灵尺寸/碰撞直径）。单位化：普通参考系 1G、旋转参考系 10G，
+# 各自对应箭头长度 = 3 个玩家身位（96px）。旋转系 G 值动辄十余，用 10G 归一避免箭头过长。
+const BODY_SIZE : float = 32.0
+const ARROW_UNIT_BODY : float = 3.0
+const ARROW_UNIT_G_LINEAR : float = 1.0   # 普通参考系：1G → 3 身位
+const ARROW_UNIT_G_ROT : float = 10.0     # 旋转参考系：10G → 3 身位
 const ARROW_MIN_LEN := 8.0    # 最短箭长（过小不可见）
 const ARROW_MAX_LEN := 150.0  # 最长箭长（极端值防占屏）
 const ARROW_GOLD_MIN := 20.0  # 金色目标箭头最小长度（始终可见作引导）
+const ARROW_WIDTH : float = 2.0   # 箭头线宽（更细；箭头头部约半个玩家身位）
+const SYSTEM_ARROW_SCALE : float = 0.6  # 系统阻力绿箭：空中重力部分的显示缩放（阻尼物理已由 get_current_damping×0.6）
 
 # 旋转参考系：常规灰色平台隐身（旋转系内平台渐变隐身，脱出后现身）
 var _platform_polys : Array = []           # 场景中常规平台（StaticBody2D/Poly）的 Polygon2D
@@ -536,38 +543,46 @@ func _draw() -> void:
 	# 切换洞察（参考系切换）：目标向心力(金) + 玩家输入(蓝) + 惯性力(红) + 合力(紫)
 	# 蓝=你按的方向（A顺时针/D逆时针/W向心/S离心）；红=惯性力；金=同步后需维持的向心力；紫=合力（蓝+红）
 	if _switching or rot_state == ROT_SWITCHING:
-		_draw_arrow(center, _scaled_arrow(_dbg_target, ARROW_GOLD_MIN).rotated(inv_rot), Color(1.0, 0.84, 0.0), false, 4.0)
-		_draw_arrow(center, _scaled_arrow(_dbg_input).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, 4.0)
-		_draw_arrow(center, _scaled_arrow(_dbg_inertia).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, 4.0)
-		_draw_arrow(center, _scaled_arrow(_dbg_net).rotated(inv_rot), Color(0.7, 0.35, 0.95), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_target, ARROW_GOLD_MIN).rotated(inv_rot), Color(1.0, 0.84, 0.0), false, ARROW_WIDTH)
+		_draw_arrow(center, _scaled_arrow(_dbg_input).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, ARROW_WIDTH)
+		_draw_arrow(center, _scaled_arrow(_dbg_inertia).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, ARROW_WIDTH)
+		_draw_arrow(center, _scaled_arrow(_dbg_net).rotated(inv_rot), Color(0.7, 0.35, 0.95), false, ARROW_WIDTH)
 		return
 	# 旋转参考系洞察：蓝=输入、红=惯性力（离心+科里奥利）、绿=系统阻力（圆盘向心力 -ω²R）
 	if rot_state != ROT_NONE:
-		_draw_arrow(center, _scaled_arrow(_dbg_input).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, 4.0)
-		_draw_arrow(center, _scaled_arrow(_dbg_inertia).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, 4.0)
-		_draw_arrow(center, _scaled_arrow(_dbg_system).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(_dbg_input).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, ARROW_WIDTH)
+		_draw_arrow(center, _scaled_arrow(_dbg_inertia).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, ARROW_WIDTH)
+		_draw_arrow(center, _scaled_arrow(_dbg_system).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, ARROW_WIDTH)
 		return
-	# 横向参考系洞察：蓝=输入、红=虚假力（幻觉场）、绿=系统阻力（阻尼+空中重力）
+	# 横向参考系洞察：蓝=输入、红=虚假力、绿=系统阻力（阻尼+空中重力）
+	# 系统阻力绿箭：阻尼物理已 ×0.6（get_current_damping）；空中重力不动物理、显示层 ×SYSTEM_ARROW_SCALE
 	var input_dir : Vector2 = Input.get_vector("left", "right", "up", "down")
 	var input_force : Vector2 = input_dir * speed / maxf(player_eta, 0.001)
 	if input_force.length_squared() > 0.001:
-		_draw_arrow(center, _scaled_arrow(input_force).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(input_force).rotated(inv_rot), Color(0.25, 0.6, 1.0), false, ARROW_WIDTH)
 	var fake_vec : Vector2 = IllusionManager.get_current_fake_vector()
 	if fake_vec.length_squared() > 0.001:
-		_draw_arrow(center, _scaled_arrow(fake_vec).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, 4.0)
+		_draw_arrow(center, _scaled_arrow(fake_vec).rotated(inv_rot), Color(1.0, 0.3, 0.25), true, ARROW_WIDTH)
 	var system_vec : Vector2 = -IllusionManager.get_current_damping() * velocity
 	if not is_on_floor():
-		system_vec += Vector2(0.0, jump_gravity)
+		system_vec += Vector2(0.0, jump_gravity * SYSTEM_ARROW_SCALE)
 	if system_vec.length_squared() > 0.001:
-		_draw_arrow(center, _scaled_arrow(system_vec).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, 4.0)
+		_draw_arrow(center, _scaled_arrow(system_vec).rotated(inv_rot), Color(0.3, 1.0, 0.4), false, ARROW_WIDTH)
 
 
-## 同比例箭头：长度 = |v| × ARROW_SCALE，截断到 [min_len, ARROW_MAX_LEN]（需求1：合力=运动可验证）
+## 当前参考系的箭头单位化比例（px / (px·s⁻²)）：
+## 普通参考系 1G、旋转参考系 10G → 箭头长 = 3 玩家身位（各自参考系内仍同比例，合力=运动可验证）
+func _arrow_scale() -> float:
+	var unit_g : float = ARROW_UNIT_G_ROT if rot_state != ROT_NONE else ARROW_UNIT_G_LINEAR
+	return ARROW_UNIT_BODY * BODY_SIZE / (unit_g * IllusionManager.g_to_accel)
+
+
+## 单位化箭头：长度 = |v| × _arrow_scale()，截断到 [min_len, ARROW_MAX_LEN]
 func _scaled_arrow(v: Vector2, min_len: float = ARROW_MIN_LEN) -> Vector2:
 	var L : float = v.length()
 	if L < 0.001:
 		return Vector2.ZERO
-	var scaled : float = clampf(L * ARROW_SCALE, min_len, ARROW_MAX_LEN)
+	var scaled : float = clampf(L * _arrow_scale(), min_len, ARROW_MAX_LEN)
 	return v * (scaled / L)
 
 
@@ -585,13 +600,11 @@ func _draw_arrow(from: Vector2, vec: Vector2, color: Color, dashed: bool, width:
 			dist = seg_end + gap_len
 	else:
 		draw_line(from, to, color, width)
-	# 箭头头部
+	# 箭头头部（≈半个玩家身位大小）
 	if vec.length() > 6.0:
 		var dir_n : Vector2 = vec.normalized()
-		var head_len : float = 12.0
+		var head_len : float = 8.0
 		var head_base : Vector2 = to - dir_n * head_len
 		var perp : Vector2 = dir_n.orthogonal() * head_len * 0.5
 		draw_line(to, head_base + perp, color, width)
 		draw_line(to, head_base - perp, color, width)
-
-

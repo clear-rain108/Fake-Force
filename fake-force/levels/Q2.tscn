@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3]
+[gd_scene format=3 uid="uid://bdtv2h3fmu63w"]
 
 [ext_resource type="Script" uid="uid://djcl6n16gpcy" path="res://scripts/PuzzleLevelRoot.gd" id="1_root"]
 [ext_resource type="Script" uid="uid://cauce821bao0y" path="res://scripts/Player.gd" id="2_player"]
@@ -21,86 +21,86 @@ size = Vector2(440, 30)
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_platTop"]
 size = Vector2(220, 30)
 
-[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
-radius = 16.0
-
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_zone"]
 size = Vector2(1300, 400)
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
-size = Vector2(60, 40)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
 radius = 8.0
 
-[node name="Main" type="Node2D"]
+[sub_resource type="CircleShape2D" id="CircleShape2D_player"]
+radius = 16.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
+size = Vector2(60, 40)
+
+[node name="Main" type="Node2D" unique_id=1789817584]
 script = ExtResource("1_root")
 bg_theme = 1
 
-[node name="StarField" type="Node2D" parent="."]
+[node name="StarField" type="Node2D" parent="." unique_id=2081799066]
 script = ExtResource("8_star")
 
-[node name="BottomL" type="StaticBody2D" parent="."]
+[node name="BottomL" type="StaticBody2D" parent="." unique_id=1879995519]
 position = Vector2(-310, 520)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomL"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomL" unique_id=1076982867]
 shape = SubResource("RectangleShape2D_platL")
 
-[node name="Poly" type="Polygon2D" parent="BottomL"]
+[node name="Poly" type="Polygon2D" parent="BottomL" unique_id=1895101352]
 color = Color(0.4, 0.4, 0.4, 1)
 polygon = PackedVector2Array(-160, -15, 160, -15, 160, 15, -160, 15)
 
-[node name="BottomR" type="StaticBody2D" parent="."]
+[node name="BottomR" type="StaticBody2D" parent="." unique_id=2011864658]
 position = Vector2(300, 520)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomR"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="BottomR" unique_id=1511280659]
 shape = SubResource("RectangleShape2D_platR")
 
-[node name="Poly" type="Polygon2D" parent="BottomR"]
+[node name="Poly" type="Polygon2D" parent="BottomR" unique_id=332879441]
 color = Color(0.4, 0.4, 0.4, 1)
 polygon = PackedVector2Array(-220, -15, 220, -15, 220, 15, -220, 15)
 
-[node name="MidL" type="StaticBody2D" parent="."]
+[node name="MidL" type="StaticBody2D" parent="." unique_id=1252654653]
 position = Vector2(-310, 380)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MidL"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidL" unique_id=122193694]
 shape = SubResource("RectangleShape2D_platL")
 
-[node name="Poly" type="Polygon2D" parent="MidL"]
+[node name="Poly" type="Polygon2D" parent="MidL" unique_id=145348054]
 color = Color(0.45, 0.45, 0.48, 1)
 polygon = PackedVector2Array(-160, -15, 160, -15, 160, 15, -160, 15)
 
-[node name="MidR" type="StaticBody2D" parent="."]
+[node name="MidR" type="StaticBody2D" parent="." unique_id=1382387031]
 position = Vector2(300, 380)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MidR"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MidR" unique_id=1111510826]
 shape = SubResource("RectangleShape2D_platR")
 
-[node name="Poly" type="Polygon2D" parent="MidR"]
+[node name="Poly" type="Polygon2D" parent="MidR" unique_id=696789321]
 color = Color(0.45, 0.45, 0.48, 1)
 polygon = PackedVector2Array(-220, -15, 220, -15, 220, 15, -220, 15)
 
-[node name="TopRow" type="StaticBody2D" parent="."]
-position = Vector2(-470, 240)
+[node name="TopRow" type="StaticBody2D" parent="." unique_id=1510371511]
+position = Vector2(-470, 120)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TopRow"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TopRow" unique_id=1444975834]
 shape = SubResource("RectangleShape2D_platTop")
 
-[node name="Poly" type="Polygon2D" parent="TopRow"]
+[node name="Poly" type="Polygon2D" parent="TopRow" unique_id=1231090826]
 color = Color(0.5, 0.5, 0.55, 1)
 polygon = PackedVector2Array(-110, -15, 110, -15, 110, 15, -110, 15)
 
-[node name="ArrowBottom" type="Polygon2D" parent="."]
+[node name="ArrowBottom" type="Polygon2D" parent="." unique_id=86623783]
 position = Vector2(-300, 475)
 color = Color(0.95, 0.35, 0.35, 0.85)
 polygon = PackedVector2Array(-18, -13, -18, 13, 24, 0)
 
-[node name="ArrowMid" type="Polygon2D" parent="."]
+[node name="ArrowMid" type="Polygon2D" parent="." unique_id=1166601913]
 position = Vector2(300, 335)
 color = Color(0.95, 0.35, 0.35, 0.85)
 polygon = PackedVector2Array(-18, -13, -18, 13, 24, 0)
 
-[node name="IllusionZone" type="Area2D" parent="."]
+[node name="IllusionZone" type="Area2D" parent="." unique_id=1914078423]
 position = Vector2(0, 380)
 script = ExtResource("3_zone")
 g_value = 1.5
@@ -108,36 +108,48 @@ damping = 0.35
 field_mode = 0
 field_directions = [Vector2(-1, 0)]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="IllusionZone" unique_id=1218809321]
 shape = SubResource("RectangleShape2D_zone")
 
-[node name="Spike1" type="Area2D" parent="."]
+[node name="Spike1" type="Area2D" parent="." unique_id=1665489243]
 position = Vector2(-100, 560)
 script = ExtResource("11_spikes")
 
-[node name="Spike2" type="Area2D" parent="."]
+[node name="Spike2" type="Area2D" parent="." unique_id=1352928560]
 position = Vector2(-50, 560)
 script = ExtResource("11_spikes")
 
-[node name="Spike3" type="Area2D" parent="."]
+[node name="Spike3" type="Area2D" parent="." unique_id=455597893]
 position = Vector2(0, 560)
 script = ExtResource("11_spikes")
 
-[node name="Dust1" type="Area2D" parent="."]
+[node name="Spike4" type="Area2D" parent="." unique_id=1468174091]
+position = Vector2(112, 360)
+script = ExtResource("11_spikes")
+
+[node name="Spike5" type="Area2D" parent="." unique_id=1352165672]
+position = Vector2(154, 360)
+script = ExtResource("11_spikes")
+
+[node name="Spike6" type="Area2D" parent="." unique_id=556024742]
+position = Vector2(202, 360)
+script = ExtResource("11_spikes")
+
+[node name="Dust1" type="Area2D" parent="." unique_id=1746818000]
 position = Vector2(-350, 350)
 script = ExtResource("12_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1" unique_id=872236210]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Dust2" type="Area2D" parent="."]
+[node name="Dust2" type="Area2D" parent="." unique_id=1435818817]
 position = Vector2(200, 350)
 script = ExtResource("12_dust")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2" unique_id=659702177]
 shape = SubResource("CircleShape2D_dust")
 
-[node name="Player" type="CharacterBody2D" parent="."]
+[node name="Player" type="CharacterBody2D" parent="." unique_id=402524397]
 z_index = 1
 position = Vector2(-380, 470)
 script = ExtResource("2_player")
@@ -149,34 +161,35 @@ jump_cap = 350.0
 max_fall_speed = 350.0
 kill_y = 800.0
 
-[node name="Sprite2D" type="Sprite2D" parent="Player"]
+[node name="Sprite2D" type="Sprite2D" parent="Player" unique_id=1755358848]
 z_index = -1
+texture_filter = 1
 texture = ExtResource("7_texture")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player" unique_id=1328209712]
 shape = SubResource("CircleShape2D_player")
 
-[node name="Camera2D" type="Camera2D" parent="Player"]
+[node name="Camera2D" type="Camera2D" parent="Player" unique_id=338810882]
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="Goal" type="Area2D" parent="."]
-position = Vector2(-500, 220)
+[node name="Goal" type="Area2D" parent="." unique_id=1348101644]
+position = Vector2(-500, 80)
 script = ExtResource("4_goal")
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal"]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Goal" unique_id=1846900784]
 shape = SubResource("RectangleShape2D_goal")
 
-[node name="GrimVignette" type="CanvasLayer" parent="."]
+[node name="GrimVignette" type="CanvasLayer" parent="." unique_id=1593151339]
 layer = 40
 
-[node name="VignetteDraw" type="Node2D" parent="GrimVignette"]
+[node name="VignetteDraw" type="Node2D" parent="GrimVignette" unique_id=367799837]
 script = ExtResource("9_vignette")
 
-[node name="PuzzleHUD" type="CanvasLayer" parent="."]
+[node name="PuzzleHUD" type="CanvasLayer" parent="." unique_id=1045550814]
 script = ExtResource("5_hud")
 
-[node name="TopLeft" type="Control" parent="PuzzleHUD"]
+[node name="TopLeft" type="Control" parent="PuzzleHUD" unique_id=1194133228]
 layout_mode = 3
 anchors_preset = 0
 offset_left = 16.0
@@ -184,14 +197,14 @@ offset_top = 10.0
 offset_right = 420.0
 offset_bottom = 42.0
 
-[node name="GValue" type="Label" parent="PuzzleHUD/TopLeft"]
+[node name="GValue" type="Label" parent="PuzzleHUD/TopLeft" unique_id=1282190026]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 20
 text = "当前幻觉强度：0.0 G"
 
-[node name="TopRight" type="Control" parent="PuzzleHUD"]
+[node name="TopRight" type="Control" parent="PuzzleHUD" unique_id=184182120]
 layout_mode = 3
 anchors_preset = 1
 anchor_left = 1.0
@@ -200,15 +213,16 @@ offset_left = -280.0
 offset_top = 10.0
 offset_right = -16.0
 offset_bottom = 42.0
+grow_horizontal = 0
 
-[node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight"]
+[node name="EnergyBar" type="ProgressBar" parent="PuzzleHUD/TopRight" unique_id=1178122456]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 value = 100.0
 show_percentage = false
 
-[node name="BottomLeft" type="Control" parent="PuzzleHUD"]
+[node name="BottomLeft" type="Control" parent="PuzzleHUD" unique_id=1658462839]
 layout_mode = 3
 anchors_preset = 2
 anchor_top = 1.0
@@ -217,15 +231,16 @@ offset_left = 16.0
 offset_top = -40.0
 offset_right = 200.0
 offset_bottom = -10.0
+grow_vertical = 0
 
-[node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft"]
+[node name="DustInfo" type="Label" parent="PuzzleHUD/BottomLeft" unique_id=1620661452]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
 theme_override_font_sizes/font_size = 16
 text = "尘埃：0"
 
-[node name="BottomRight" type="Control" parent="PuzzleHUD"]
+[node name="BottomRight" type="Control" parent="PuzzleHUD" unique_id=256377699]
 layout_mode = 3
 anchors_preset = 3
 anchor_left = 1.0
@@ -236,8 +251,10 @@ offset_left = -200.0
 offset_top = -40.0
 offset_right = -16.0
 offset_bottom = -10.0
+grow_horizontal = 0
+grow_vertical = 0
 
-[node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight"]
+[node name="EtaInfo" type="Label" parent="PuzzleHUD/BottomRight" unique_id=820236974]
 layout_mode = 0
 anchor_right = 1.0
 anchor_bottom = 1.0
@@ -245,7 +262,7 @@ theme_override_font_sizes/font_size = 16
 text = "η = 1.00"
 horizontal_alignment = 2
 
-[node name="SysMsg" type="Label" parent="PuzzleHUD"]
+[node name="SysMsg" type="Label" parent="PuzzleHUD" unique_id=831232741]
 anchors_preset = 3
 anchor_left = 1.0
 anchor_top = 1.0
@@ -258,8 +275,8 @@ offset_bottom = -52.0
 theme_override_font_sizes/font_size = 16
 horizontal_alignment = 2
 
-[node name="PuzzleVictory" type="CanvasLayer" parent="."]
+[node name="PuzzleVictory" type="CanvasLayer" parent="." unique_id=1718034914]
 layer = 100
 
-[node name="VictoryDraw" type="Node2D" parent="PuzzleVictory"]
+[node name="VictoryDraw" type="Node2D" parent="PuzzleVictory" unique_id=969548754]
 script = ExtResource("6_victory")
