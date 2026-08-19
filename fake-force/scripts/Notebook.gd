@@ -17,6 +17,7 @@ const PANEL_OFFSET := Vector2(-PANEL_SIZE.x * 0.5, -PANEL_SIZE.y - 40)
 ## 剧情碎片表（顺序解锁）。require_g / require_g_time：
 ## 需要有效幻觉强度持续高于 require_g 达 require_g_time 秒才解锁。
 ## 也可由 NotebookTrigger 区域进入事件直接解锁（v3.0 约束4 允许）。
+## 阶段2 迷宫剧情为第 4~7 页（由 L2~L5 剧情触发区按 F 解锁）。
 var pages : Array = [
 	{
 		"title": "（第一页）",
@@ -37,14 +38,32 @@ var pages : Array = [
 		"require_g_time": 1.5,
 	},
 	{
-		"title": "（第四页·黑洞前）",
-		"text": "引力是时空在告诉物质如何弯曲。虚假力是系统在告诉船员如何移动。黑洞是引力把光压回原点。你是系统把记忆压回原点的那个点。",
+		"title": "（第四页·异常状况其一）",
+		"text": "【异常状况收录】其一：部分操作员出现特殊记忆，如梦见自己成为资本巨鳄等。\n为保证稳定，已自动启动强制休眠",
 		"require_g": 0.0,
 		"require_g_time": 0.0,
 	},
 	{
-		"title": "（最后一页）",
-		"text": "不是逃出去。是跳进去。",
+		"title": "（第五页·异常状况其二）",
+		"text": "【异常状况收录】其二：有多名船员反馈“出现噩梦，看见自己同飞船冲向陨石群。”申请全员记忆重启。\n状态：被否决。",
+		"require_g": 0.0,
+		"require_g_time": 0.0,
+	},
+	{
+		"title": "（第六页·航路图）",
+		"text": "一本记事本，其中有一些潦草的笔记，且在航路图上画有两个方向。\n第一条：从地外轨道指向近地轨道，标注“梦”。\n第二条：从地外轨道指向太阳系外，经由木星加速。",
+		"require_g": 0.0,
+		"require_g_time": 0.0,
+	},
+	{
+		"title": "（第七页·凡·赫特克·上）",
+		"text": "一段来自凡·赫特克的语音：\n“很抱歉把你们带上这条不归路。可是，谁能面对人类的存亡，苦痛，大我的消失而置之不理呢？",
+		"require_g": 0.0,
+		"require_g_time": 0.0,
+	},
+	{
+		"title": "（第八页·凡·赫特克·下）",
+		"text": "可能未来，人们会把我们从穹顶上取回来。但在那之前，请现在的我们不要停止设想未来，请未来的我们不要停止回望过去。”",
 		"require_g": 0.0,
 		"require_g_time": 0.0,
 	},
@@ -58,6 +77,8 @@ var glowing : bool = false
 var _g_high_time : float = 0.0
 var _font_size : int = 16
 var _font : Font = null
+var _floating_text : String = ""
+var _float_time : float = 0.0
 
 
 func _ready() -> void:
@@ -76,6 +97,28 @@ func unlock_pages(n: int) -> void:
 	_g_high_time = 0.0
 
 
+## 由剧情触发区调用：解锁到指定页（按顺序解锁前 n 页；与 unlock_pages 一致，语义为"解锁第 n 页"）
+func unlock_page(n: int) -> void:
+	unlock_pages(n)
+
+
+## 剧情触发区：解锁第 n 页并直接翻开该页（一次 F 即可阅读到新碎片）
+func reveal_page(n: int) -> void:
+	unlock_pages(n)
+	if page_index < unlocked:
+		page_index = mini(unlocked - 1, pages.size() - 1)   # 直接定位到最新解锁页
+		reading = true
+		get_tree().paused = true
+		AudioManager.play_notebook_reveal()
+
+
+## 显示悬浮提示（剧情触发区调用，如"📖 按 F 阅读档案碎片"）；duration<=0 时清除
+func show_floating_text(text: String, duration: float = 5.0) -> void:
+	_floating_text = text
+	_float_time = duration if duration > 0.0 else 0.0
+	queue_redraw()
+
+
 func _next_page() -> void:
 	if page_index + 1 < unlocked:
 		page_index += 1
@@ -88,6 +131,10 @@ func _prev_page() -> void:
 
 func _process(delta: float) -> void:
 	_update_unlock(delta)
+	if _float_time > 0.0:
+		_float_time -= delta
+		if _float_time <= 0.0:
+			_floating_text = ""
 	queue_redraw()
 
 
@@ -122,10 +169,10 @@ func _update_unlock(_delta: float) -> void:
 	# 第1页：阶段1 收集第一枚马赫尘埃（老人数据碎片）
 	if unlocked < 1 and is_instance_valid(player) and player.dust_collected >= 1:
 		unlock_pages(1)
-	# 第4页：阶段2 穿越多个加速度场 + 完成旋转参考系同步
-	if unlocked < 4 and is_instance_valid(player) \
+	# 第3页：阶段2 穿越多个加速度场 + 完成旋转参考系同步
+	if unlocked < 3 and is_instance_valid(player) \
 			and IllusionManager.zone_count >= 3 and player.rot_switch_count >= 1:
-		unlock_pages(4)
+		unlock_pages(3)
 
 
 func _close_page() -> void:
@@ -154,6 +201,10 @@ func _draw() -> void:
 	if glowing and not reading:
 		draw_string(font, Vector2(-24, 44), "按 F 阅读", \
 			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.8, 0.95, 1.0))
+	# 剧情触发区悬浮提示（如"📖 按 F 阅读档案碎片"）
+	if not _floating_text.is_empty():
+		draw_string(font, Vector2(-24, -34), _floating_text, \
+			HORIZONTAL_ALIGNMENT_LEFT, -1, 14, Color(0.95, 0.85, 0.6))
 	# 阅读面板：视口居中（保证完整落在屏幕范围内）
 	if reading and page_index < pages.size():
 		var p : Dictionary = pages[page_index]

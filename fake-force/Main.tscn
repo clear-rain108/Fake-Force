@@ -19,6 +19,12 @@
 [ext_resource type="Script" uid="uid://bpr3cvhm8alc1" path="res://scripts/GrimVignette.gd" id="18_vignette"]
 [ext_resource type="PackedScene" path="res://scenes/background.tscn" id="19_bg"]
 [ext_resource type="Script" uid="uid://bgltmpe63r7el" path="res://scripts/Stage1Controller.gd" id="20_controller"]
+[ext_resource type="Script" uid="uid://c4lw05wrcprjw" path="res://scripts/MazeZone.gd" id="21_mazezone"]
+[ext_resource type="Script" uid="uid://bi03swx2ugtic" path="res://scripts/MazeExitGate.gd" id="22_gate"]
+[ext_resource type="Script" uid="uid://cqqkuhfg1bcva" path="res://scripts/Spikes.gd" id="23_spikes"]
+[ext_resource type="Script" uid="uid://cuqv77blme2jl" path="res://scripts/DebugTeleport.gd" id="24_debug"]
+[ext_resource type="Script" uid="uid://ctj0iwc426hb0" path="res://scripts/MazeStoryTrigger.gd" id="25_story"]
+[ext_resource type="Script" uid="uid://b7w1qq7niuoa2" path="res://scripts/MazeTopExit.gd" id="26_topexit"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -73,6 +79,48 @@ size = Vector2(340, 20)
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_button"]
 radius = 24.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mazeWall"]
+size = Vector2(20, 560)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mazeRoofTop"]
+size = Vector2(1290, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mazeRoof"]
+size = Vector2(1580, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platMaze"]
+size = Vector2(700, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_mazeSide"]
+size = Vector2(20, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneMazeL"]
+size = Vector2(700, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_zoneMazeN"]
+size = Vector2(630, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_blockMaze"]
+size = Vector2(100, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_gateExit"]
+size = Vector2(40, 120)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platCond"]
+size = Vector2(300, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platCond3"]
+size = Vector2(260, 30)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_checkpointMaze"]
+size = Vector2(160, 60)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_storyZone"]
+size = Vector2(180, 100)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_topCheck"]
+size = Vector2(450, 500)
 
 [node name="Main" type="Node2D" unique_id=1506711572]
 script = ExtResource("1_root")
@@ -496,7 +544,8 @@ script = ExtResource("11_checkpoint")
 shape = SubResource("RectangleShape2D_checkpoint")
 
 [node name="StageTransition" type="Area2D" parent="." unique_id=479316058]
-position = Vector2(8900, 150)
+position = Vector2(9714, 672)
+monitoring = false
 script = ExtResource("16_trans")
 hint = "【系统】：航路尽头是黑洞。在那里，过去会重新显现。"
 
@@ -555,6 +604,487 @@ offset_bottom = -32.0
 theme_override_font_sizes/font_size = 16
 text = "按 E 执行深空号跃迁指令"
 horizontal_alignment = 1
+
+[node name="MazeWallLeft" type="StaticBody2D" parent="." unique_id=-1694967195]
+position = Vector2(8200, 440)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeWallLeft" unique_id=-1694967194]
+shape = SubResource("RectangleShape2D_mazeWall")
+
+[node name="Poly" type="Polygon2D" parent="MazeWallLeft" unique_id=-1694967193]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -280, 10, -280, 10, 280, -10, 280)
+
+[node name="MazeWallRight" type="StaticBody2D" parent="." unique_id=-1694967192]
+position = Vector2(9800, 440)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeWallRight" unique_id=-1694967191]
+shape = SubResource("RectangleShape2D_mazeWall")
+
+[node name="Poly" type="Polygon2D" parent="MazeWallRight" unique_id=-1694967190]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -280, 10, -280, 10, 280, -10, 280)
+
+[node name="MazeWallTop" type="StaticBody2D" parent="." unique_id=-1694967189]
+position = Vector2(9145, 160)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeWallTop" unique_id=-1694967188]
+shape = SubResource("RectangleShape2D_mazeRoofTop")
+
+[node name="Poly" type="Polygon2D" parent="MazeWallTop" unique_id=-1694967187]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-645, -10, 645, -10, 645, 10, -645, 10)
+
+[node name="MazeWallBottom" type="StaticBody2D" parent="." unique_id=-1694967186]
+position = Vector2(9000, 720)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeWallBottom" unique_id=-1694967185]
+shape = SubResource("RectangleShape2D_mazeRoof")
+
+[node name="Poly" type="Polygon2D" parent="MazeWallBottom" unique_id=-1694967184]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-790, -10, 790, -10, 790, 10, -790, 10)
+
+[node name="L1_Platform" type="StaticBody2D" parent="." unique_id=-1694967095]
+position = Vector2(9000, 700)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L1_Platform" unique_id=-1694967094]
+shape = SubResource("RectangleShape2D_platMaze")
+
+[node name="Poly" type="Polygon2D" parent="L1_Platform" unique_id=-1694967093]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-350, -15, 350, -15, 350, 15, -350, 15)
+
+[node name="L2_Platform" type="StaticBody2D" parent="." unique_id=-1694967092]
+position = Vector2(8975, 580)
+scale = Vector2(0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L2_Platform" unique_id=-1694967091]
+shape = SubResource("RectangleShape2D_platMaze")
+
+[node name="Poly" type="Polygon2D" parent="L2_Platform" unique_id=-1694967090]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-350, -15, 350, -15, 350, 15, -350, 15)
+
+[node name="L3_Platform" type="StaticBody2D" parent="." unique_id=-1694967089]
+position = Vector2(9025, 460)
+scale = Vector2(0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L3_Platform" unique_id=-1694967088]
+shape = SubResource("RectangleShape2D_platMaze")
+
+[node name="Poly" type="Polygon2D" parent="L3_Platform" unique_id=-1694967087]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-350, -15, 350, -15, 350, 15, -350, 15)
+
+[node name="L4_Platform" type="StaticBody2D" parent="." unique_id=-1694967086]
+position = Vector2(8975, 340)
+scale = Vector2(0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L4_Platform" unique_id=-1694967085]
+shape = SubResource("RectangleShape2D_platMaze")
+
+[node name="Poly" type="Polygon2D" parent="L4_Platform" unique_id=-1694967084]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-350, -15, 350, -15, 350, 15, -350, 15)
+
+[node name="L5_Platform" type="StaticBody2D" parent="." unique_id=-1694967083]
+position = Vector2(9025, 220)
+scale = Vector2(0.9, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L5_Platform" unique_id=-1694967082]
+shape = SubResource("RectangleShape2D_platMaze")
+
+[node name="Poly" type="Polygon2D" parent="L5_Platform" unique_id=-1694967081]
+color = Color(0.4, 0.4, 0.4, 1)
+polygon = PackedVector2Array(-350, -15, 350, -15, 350, 15, -350, 15)
+
+[node name="L2_SideWallL" type="StaticBody2D" parent="." unique_id=-1694966995]
+position = Vector2(8650, 560)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L2_SideWallL" unique_id=-1694966994]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L2_SideWallL" unique_id=-1694966993]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L2_SideWallR" type="StaticBody2D" parent="." unique_id=-1694966992]
+position = Vector2(9350, 580)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L2_SideWallR" unique_id=-1694966991]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L2_SideWallR" unique_id=-1694966990]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L3_SideWallL" type="StaticBody2D" parent="." unique_id=-1694966989]
+position = Vector2(8650, 460)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L3_SideWallL" unique_id=-1694966988]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L3_SideWallL" unique_id=-1694966987]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L3_SideWallR" type="StaticBody2D" parent="." unique_id=-1694966986]
+position = Vector2(9350, 460)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L3_SideWallR" unique_id=-1694966985]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L3_SideWallR" unique_id=-1694966984]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L4_SideWallL" type="StaticBody2D" parent="." unique_id=-1694966983]
+position = Vector2(8650, 340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L4_SideWallL" unique_id=-1694966982]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L4_SideWallL" unique_id=-1694966981]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L4_SideWallR" type="StaticBody2D" parent="." unique_id=-1694966980]
+position = Vector2(9350, 340)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L4_SideWallR" unique_id=-1694966979]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L4_SideWallR" unique_id=-1694966978]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L5_SideWallL" type="StaticBody2D" parent="." unique_id=-1694966977]
+position = Vector2(8650, 220)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L5_SideWallL" unique_id=-1694966976]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L5_SideWallL" unique_id=-1694966975]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L5_SideWallR" type="StaticBody2D" parent="." unique_id=-1694966974]
+position = Vector2(9350, 265)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L5_SideWallR" unique_id=-1694966973]
+shape = SubResource("RectangleShape2D_mazeSide")
+
+[node name="Poly" type="Polygon2D" parent="L5_SideWallR" unique_id=-1694966972]
+color = Color(0.32, 0.34, 0.4, 1)
+polygon = PackedVector2Array(-10, -60, 10, -60, 10, 60, -10, 60)
+
+[node name="L1_IllusionZone" type="Area2D" parent="." unique_id=-1694966895]
+position = Vector2(9000, 655)
+script = ExtResource("21_mazezone")
+g_value = 1.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L1_IllusionZone" unique_id=-1694966894]
+shape = SubResource("RectangleShape2D_zoneMazeL")
+
+[node name="Timer" type="Timer" parent="L1_IllusionZone" unique_id=-1694966893]
+wait_time = 2.5
+one_shot = true
+
+[node name="L2_IllusionZone" type="Area2D" parent="." unique_id=-1694966892]
+position = Vector2(8975, 535)
+script = ExtResource("21_mazezone")
+g_value = 2.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L2_IllusionZone" unique_id=-1694966891]
+shape = SubResource("RectangleShape2D_zoneMazeN")
+
+[node name="Timer" type="Timer" parent="L2_IllusionZone" unique_id=-1694966890]
+wait_time = 2.5
+one_shot = true
+
+[node name="L3_IllusionZone" type="Area2D" parent="." unique_id=-1694966889]
+position = Vector2(9025, 415)
+script = ExtResource("21_mazezone")
+g_value = 4.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(-1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L3_IllusionZone" unique_id=-1694966888]
+shape = SubResource("RectangleShape2D_zoneMazeN")
+
+[node name="Timer" type="Timer" parent="L3_IllusionZone" unique_id=-1694966887]
+wait_time = 2.5
+one_shot = true
+
+[node name="L4_IllusionZone" type="Area2D" parent="." unique_id=-1694966886]
+position = Vector2(8975, 295)
+script = ExtResource("21_mazezone")
+g_value = 5.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(-1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L4_IllusionZone" unique_id=-1694966885]
+shape = SubResource("RectangleShape2D_zoneMazeN")
+
+[node name="Timer" type="Timer" parent="L4_IllusionZone" unique_id=-1694966884]
+wait_time = 2.5
+one_shot = true
+
+[node name="L5_IllusionZone" type="Area2D" parent="." unique_id=-1694966883]
+position = Vector2(9025, 175)
+script = ExtResource("21_mazezone")
+g_value = 6.0
+damping = 0.5
+field_mode = 0
+field_directions = [Vector2(1, 0)]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L5_IllusionZone" unique_id=-1694966882]
+shape = SubResource("RectangleShape2D_zoneMazeN")
+
+[node name="Timer" type="Timer" parent="L5_IllusionZone" unique_id=-1694966881]
+wait_time = 2.5
+one_shot = true
+
+[node name="MazePB_L1a" type="RigidBody2D" parent="." unique_id=-1694966795]
+position = Vector2(8500, 665)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+x_min = 8400.0
+x_max = 8600.0
+counts_as_occupant = false
+activation_distance = 450.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazePB_L1a" unique_id=-1694966794]
+shape = SubResource("RectangleShape2D_blockMaze")
+
+[node name="MazePB_L1b" type="RigidBody2D" parent="." unique_id=-1694966793]
+position = Vector2(8800, 665)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+x_min = 8740.0
+x_max = 8860.0
+counts_as_occupant = false
+activation_distance = 450.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazePB_L1b" unique_id=-1694966792]
+shape = SubResource("RectangleShape2D_blockMaze")
+
+[node name="MazePB_L2" type="RigidBody2D" parent="." unique_id=-1694966791]
+position = Vector2(8900, 545)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+x_min = 8840.0
+x_max = 8960.0
+counts_as_occupant = false
+activation_distance = 450.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazePB_L2" unique_id=-1694966790]
+shape = SubResource("RectangleShape2D_blockMaze")
+
+[node name="MazePB_L4" type="RigidBody2D" parent="." unique_id=-1694966789]
+position = Vector2(8700, 305)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+x_min = 8640.0
+x_max = 8760.0
+counts_as_occupant = false
+activation_distance = 450.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazePB_L4" unique_id=-1694966788]
+shape = SubResource("RectangleShape2D_blockMaze")
+
+[node name="MazeAB_L3b" type="RigidBody2D" parent="." unique_id=-1694966785]
+position = Vector2(9200, 425)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+is_phantom = false
+counts_as_occupant = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeAB_L3b" unique_id=-1694966784]
+shape = SubResource("RectangleShape2D_blockMaze")
+
+[node name="MazeAB_L4" type="RigidBody2D" parent="." unique_id=-1694966783]
+position = Vector2(9200, 305)
+gravity_scale = 0.0
+linear_damp = 0.2
+script = ExtResource("4_block")
+is_phantom = false
+counts_as_occupant = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeAB_L4" unique_id=-1694966782]
+shape = SubResource("RectangleShape2D_blockMaze")
+
+[node name="SpikeL2_1" type="Area2D" parent="." unique_id=-1694966695]
+position = Vector2(8600, 565)
+script = ExtResource("23_spikes")
+
+[node name="SpikeL2_2" type="Area2D" parent="." unique_id=-1694966694]
+position = Vector2(9000, 565)
+script = ExtResource("23_spikes")
+
+[node name="SpikeL2_3" type="Area2D" parent="." unique_id=-1694966693]
+position = Vector2(9400, 565)
+script = ExtResource("23_spikes")
+
+[node name="SpikeL3_1" type="Area2D" parent="." unique_id=-1694966692]
+position = Vector2(8800, 445)
+script = ExtResource("23_spikes")
+
+[node name="SpikeL3_2" type="Area2D" parent="." unique_id=-1694966691]
+position = Vector2(9290, 445)
+script = ExtResource("23_spikes")
+
+[node name="SpikeL4_2" type="Area2D" parent="." unique_id=-1694966689]
+position = Vector2(9033, 325)
+script = ExtResource("23_spikes")
+
+[node name="MazeExitGate" type="Area2D" parent="." unique_id=-1694966595]
+position = Vector2(9553, 465)
+scale = Vector2(1, 4)
+monitoring = false
+script = ExtResource("22_gate")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeExitGate" unique_id=-1694966594]
+position = Vector2(-197, -70)
+scale = Vector2(0.2, 0.1)
+shape = SubResource("RectangleShape2D_gateExit")
+disabled = true
+
+[node name="Step2_Conditional" type="StaticBody2D" parent="." unique_id=-1694966593]
+visible = false
+position = Vector2(8250, 360)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Step2_Conditional" unique_id=-1694966592]
+shape = SubResource("RectangleShape2D_platCond")
+disabled = true
+
+[node name="Poly" type="Polygon2D" parent="Step2_Conditional" unique_id=-1694966591]
+color = Color(0.5, 0.55, 0.68, 1)
+polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+
+[node name="Step3_Conditional" type="StaticBody2D" parent="." unique_id=-1694966590]
+visible = false
+position = Vector2(8600, 260)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Step3_Conditional" unique_id=-1694966589]
+shape = SubResource("RectangleShape2D_platCond3")
+disabled = true
+
+[node name="Poly" type="Polygon2D" parent="Step3_Conditional" unique_id=-1694966588]
+color = Color(0.5, 0.55, 0.68, 1)
+polygon = PackedVector2Array(-130, -15, 130, -15, 130, 15, -130, 15)
+
+[node name="Transition_Conditional" type="StaticBody2D" parent="." unique_id=-1694966587]
+visible = false
+position = Vector2(8900, 180)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Transition_Conditional" unique_id=-1694966586]
+shape = SubResource("RectangleShape2D_platCond")
+disabled = true
+
+[node name="Poly" type="Polygon2D" parent="Transition_Conditional" unique_id=-1694966585]
+color = Color(0.5, 0.55, 0.68, 1)
+polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+
+[node name="MazeL1_Checkpoint" type="Area2D" parent="." unique_id=-1694966495]
+position = Vector2(8700, 669)
+script = ExtResource("11_checkpoint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeL1_Checkpoint" unique_id=-1694966494]
+shape = SubResource("RectangleShape2D_checkpointMaze")
+
+[node name="MazeL2_Checkpoint" type="Area2D" parent="." unique_id=-1694966493]
+position = Vector2(8800, 549)
+script = ExtResource("11_checkpoint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeL2_Checkpoint" unique_id=-1694966492]
+shape = SubResource("RectangleShape2D_checkpointMaze")
+
+[node name="MazeL3_Checkpoint" type="Area2D" parent="." unique_id=-1694966491]
+position = Vector2(9000, 429)
+script = ExtResource("11_checkpoint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeL3_Checkpoint" unique_id=-1694966490]
+shape = SubResource("RectangleShape2D_checkpointMaze")
+
+[node name="MazeL4_Checkpoint" type="Area2D" parent="." unique_id=-1694966489]
+position = Vector2(8800, 309)
+script = ExtResource("11_checkpoint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeL4_Checkpoint" unique_id=-1694966488]
+shape = SubResource("RectangleShape2D_checkpointMaze")
+
+[node name="MazeL5_Checkpoint" type="Area2D" parent="." unique_id=-1694966487]
+position = Vector2(9000, 189)
+script = ExtResource("11_checkpoint")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeL5_Checkpoint" unique_id=-1694966486]
+shape = SubResource("RectangleShape2D_checkpointMaze")
+
+[node name="DebugTeleport" type="Node2D" parent="." unique_id=-1694966485]
+script = ExtResource("24_debug")
+
+[node name="L2_StoryTrigger" type="Area2D" parent="." unique_id=-1694966395]
+position = Vector2(8700, 549)
+script = ExtResource("25_story")
+zone_path = NodePath("../L2_IllusionZone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L2_StoryTrigger" unique_id=-1694966394]
+shape = SubResource("RectangleShape2D_storyZone")
+
+[node name="L3_StoryTrigger" type="Area2D" parent="." unique_id=-1694966393]
+position = Vector2(8900, 429)
+script = ExtResource("25_story")
+page_number = 5
+zone_path = NodePath("../L3_IllusionZone")
+new_direction = Vector2(0, -1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L3_StoryTrigger" unique_id=-1694966392]
+shape = SubResource("RectangleShape2D_storyZone")
+
+[node name="L4_StoryTrigger" type="Area2D" parent="." unique_id=-1694966391]
+position = Vector2(8700, 309)
+script = ExtResource("25_story")
+page_number = 6
+zone_path = NodePath("../L4_IllusionZone")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L4_StoryTrigger" unique_id=-1694966390]
+shape = SubResource("RectangleShape2D_storyZone")
+
+[node name="L5_StoryTrigger" type="Area2D" parent="." unique_id=-1694966389]
+position = Vector2(8800, 189)
+script = ExtResource("25_story")
+page_number = 8
+zone_path = NodePath("../L5_IllusionZone")
+new_direction = Vector2(0, -1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="L5_StoryTrigger" unique_id=-1694966388]
+shape = SubResource("RectangleShape2D_storyZone")
+
+[node name="MazeTopCheck" type="Area2D" parent="." unique_id=-1694966387]
+position = Vector2(9550, 480)
+script = ExtResource("26_topexit")
+transition_path = NodePath("../StageTransition")
+conditional_paths = [NodePath("../Step2_Conditional"), NodePath("../Step3_Conditional"), NodePath("../Transition_Conditional")]
+gate_path = NodePath("../MazeExitGate")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="MazeTopCheck" unique_id=-1694966386]
+position = Vector2(25, 0)
+shape = SubResource("RectangleShape2D_topCheck")
 
 [node name="Stage1Controller" type="Node2D" parent="." unique_id=1965713646]
 script = ExtResource("20_controller")

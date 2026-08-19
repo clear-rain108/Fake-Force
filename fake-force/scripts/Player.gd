@@ -261,9 +261,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			_consume_dust(-dust_eta_step)  # 消耗1份尘埃：变轻（η-）
 
 
-## 存档点（后续阶段可调用）
+## 存档点（后续阶段可调用）；到达存档点重置死亡计数（尖刺/坠落统一计数后避免整关累计过快）
 func set_checkpoint(pos: Vector2) -> void:
 	_spawn_point = pos
+	fall_count = 0
 
 
 func reset_level() -> void:
@@ -293,9 +294,17 @@ func _consume_dust(delta_eta: float) -> void:
 	player_eta = clampf(player_eta + delta_eta, 0.3, 2.5)
 
 
-## 危险入口（尖刺/旋转障碍等调用）：统一即时重生（与解密模式手感一致）
+## 危险入口（尖刺/旋转障碍等调用）：
+## 解密模式保持即时重生；剧情模式计入死亡计数（>max_falls 触发强制休眠死亡演出，与坠落一致）
 func on_hazard() -> void:
-	_instant_respawn()
+	if IllusionManager.game_mode == "puzzle":
+		_instant_respawn()
+		return
+	fall_count += 1
+	if fall_count > max_falls:
+		_fail_death()
+	else:
+		_instant_respawn()
 
 
 func _instant_respawn() -> void:
@@ -316,18 +325,23 @@ func _on_fallen() -> void:
 	# 剧情模式：坠落计数（>max_falls 失败 → 强制休眠剧情演出，不再提示按 R 重开）
 	fall_count += 1
 	if fall_count > max_falls:
-		failed = true
-		velocity = Vector2.ZERO
-		Engine.time_scale = 1.0
-		var layer := CanvasLayer.new()
-		layer.layer = 60
-		var seq : Node2D = load("res://scripts/DeathSequence.gd").new()
-		layer.add_child(seq)
-		get_tree().current_scene.add_child(layer)
+		_fail_death()
 	else:
 		global_position = _spawn_point
 		velocity = Vector2.ZERO
 		_reset_rot_state()
+
+
+## 触发强制休眠死亡演出（剧情模式死亡超限；一次性保护由 failed 保证）
+func _fail_death() -> void:
+	failed = true
+	velocity = Vector2.ZERO
+	Engine.time_scale = 1.0
+	var layer := CanvasLayer.new()
+	layer.layer = 60
+	var seq : Node2D = load("res://scripts/DeathSequence.gd").new()
+	layer.add_child(seq)
+	get_tree().current_scene.add_child(layer)
 
 
 func _update_insight(delta: float) -> void:

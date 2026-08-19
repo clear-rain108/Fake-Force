@@ -26,6 +26,12 @@ var _done : bool = false
 
 func _ready() -> void:
 	process_mode = Node.PROCESS_MODE_ALWAYS
+	# 非法访问重启等场景：跳过开场动画（一次性消费标志）
+	if IllusionManager.skip_opening:
+		IllusionManager.skip_opening = false
+		get_tree().paused = false
+		queue_free()
+		return
 	# 开场即暂停游戏树：玩家静止，不会在开场期间被幻觉推力推落而误触发死亡演出。
 	# （本节点 PROCESS_MODE_ALWAYS，暂停期间仍可显示文字并响应空格跳过。）
 	get_tree().paused = true

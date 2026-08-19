@@ -25,9 +25,10 @@ var current_damping : float = 0.5
 ## Player 每帧按 rot_state 在 linear/rot 两个参考值间切换。
 var vignette_g_ref : float = 1.5
 
-var zone_count : int = 0           # 已进入的不同幻觉区域数（阶段2 记事本第4页判定）
+var zone_count : int = 0           # 已进入的不同幻觉区域数（阶段2 记事本第3页判定）
 var _zones_seen : Dictionary = {}  # zone instance_id → true
 var notebook_unlocked : int = 0    # 记事本已解锁页数（跨场景持久）
+var skip_opening : bool = false    # 重开游戏时跳过开场动画（非法访问重启等一次性标志）
 
 
 ## 记录玩家进入过的幻觉区域（按实例去重）
