@@ -27,6 +27,11 @@ var _core : Node = null
 func _ready() -> void:
 	# 尘埃发射器置于视口中心（CanvasLayer 屏幕坐标系，左上角为原点）
 	_dust.position = get_viewport().get_visible_rect().size * 0.5
+	# 关卡背景音乐循环兜底：LOOP1sp.test.ogg 的导入参数 loop 可能为 false，
+	# 运行时强制开启循环，保证任意关卡背景音乐播完自动从头循环。
+	var music := get_node_or_null("Music") as AudioStreamPlayer
+	if music and music.stream is AudioStreamOggVorbis:
+		(music.stream as AudioStreamOggVorbis).loop = true
 
 
 func _process(delta: float) -> void:

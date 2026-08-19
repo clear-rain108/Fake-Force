@@ -5,7 +5,8 @@
 > - `Fake_Forces_Design_Puzzle.md`（解密模式设计）
 > - `Fake_Forces_Lore.md`（剧情集）
 > 记录当前工程实现进度、参数配置与待办事项
-> 最后更新：2026-08-18（v2.5.4：结局动画重写 / 剧情集同步 / 探针清理）
+> 最后更新：2026-08-19（v0.2 音频修复：关卡音乐循环 / 结局背景音乐文件名大小写）
+> - [x] **音频修复（v0.2）**：①**剧情（及全部）关卡音乐不循环**——根因 `LOOP1sp.test.ogg.import` 导入参数 `loop` 被回退为 `false`；已恢复为 `true`，并在 `BackgroundController._ready` 运行时兜底强制 `Music.stream.loop=true`（覆盖所有剧情/解密关卡，导出包同样生效）。②**结局背景音乐未播放**——根因 `EndingSequence.gd` 按 `res://The thinking of star.ogg`（大写）加载，而磁盘文件为 `the thinking of star.ogg`（小写，Windows 大小写不敏感导致静默漂移），源码运行仅告警、导出 PCK 大小写敏感直接加载失败；已把磁盘文件与 `.import` 源路径统一为大写 `The thinking of star.ogg` 并重新导入。`tests/EndingProbe.tscn` 验证无 Case mismatch 警告、结局曲播放/时间轴对齐全 PASS；`tests/AudioDurProbe.tscn` 验证三曲时长与循环状态（结局/菜单曲保持不循环、关卡曲运行时 `loop=true`）
 > - [x] **结局动画重写**（`EndingSequence.gd`）：删除老人面孔与"Demo 结束"；结局文本改为**逐段淡入淡出**（如开场动画）——引号段=老人遗言（暖色）、纯文本段=旁白（苍蓝），共 12 段；黑洞本体重绘；Esc 退出保留。`tests/EndingProbe.tscn` 验证进入文字阶段无错误
 > - [x] **结局演出细化（v3.5）**：黑洞仅在**老人遗言期间**显示，遗言结束（第4段播完）后**黑洞消失**、**黑屏 1s** 再开始播放旁白；结局**不播放音乐**（`start_ending` 静音 Music 总线）（v3.7 起改为播放结局背景音乐 "The thinking of star"，此条被取代）；`tests/EndingProbe.tscn` 验证文字阶段 + 音乐静音全 PASS
 > - [x] **通关致谢 + 自动退出（v3.6）**：旁白结束后显示致谢字幕"**感谢游玩《Fake Forces 善假于物》**"（停留约 4.5s），随后**自动结束游戏**（`EndingSequence` 在 `_process` 中 `get_tree().quit()`，无需按键）；`tests/EndingProbe.tscn` 全流程验证（文字阶段 / 音乐静音 / 感谢字幕进入 / 自动退出）全 PASS
