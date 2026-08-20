@@ -55,8 +55,8 @@ func _on_room5_dust_collected() -> void:
 	if not is_inside_tree():
 		return
 	var nb := get_tree().get_first_node_in_group("Notebook")
-	if nb and nb.has_method("unlock_pages"):
-		nb.unlock_pages(1)   # 记事本第1页
+	if nb and nb.has_method("unlock_page_only"):
+		nb.unlock_page_only(1)   # 只解锁第1页（马赫尘埃）
 	if _maze_gate and is_instance_valid(_maze_gate):
 		_maze_gate.queue_free()   # 迷宫闸门打开
 	if _push_zone:

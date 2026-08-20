@@ -1,4 +1,4 @@
-[gd_scene load_steps=20 format=3]
+[gd_scene load_steps=21 format=3]
 
 [ext_resource type="Script" path="res://scripts/Stage3Root.gd" id="1_root"]
 [ext_resource type="Script" path="res://scripts/Player.gd" id="2_player"]
@@ -13,6 +13,8 @@
 [ext_resource type="Script" path="res://scripts/StarField.gd" id="11_star"]
 [ext_resource type="PackedScene" path="res://scenes/background.tscn" id="12_bg"]
 [ext_resource type="Texture2D" path="res://Art_Chsr_Main.png" id="13_texture"]
+[ext_resource type="Script" path="res://scripts/OrbitStoryTrigger.gd" id="14_story"]
+[ext_resource type="Script" path="res://scripts/GravityWell.gd" id="15_well"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_player"]
 radius = 16.0
@@ -20,17 +22,17 @@ radius = 16.0
 [sub_resource type="CircleShape2D" id="CircleShape2D_dust"]
 radius = 8.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platStart"]
-size = Vector2(300, 30)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_seg"]
+size = Vector2(130, 30)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platMid"]
-size = Vector2(360, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_storyTrig"]
+radius = 60.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platOuter"]
-size = Vector2(400, 30)
+[sub_resource type="CircleShape2D" id="CircleShape2D_well"]
+radius = 120.0
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_goal"]
-size = Vector2(80, 40)
+size = Vector2(60, 60)
 
 [node name="Stage3" type="Node2D"]
 script = ExtResource("1_root")
@@ -43,17 +45,29 @@ script = ExtResource("11_star")
 [node name="BlackHole" type="Node2D" parent="."]
 position = Vector2(0, 0)
 script = ExtResource("3_core")
-omega = 1.0
+omega = 0.3
 influence_radius = 10000.0
 core_radius = 180.0
 
+[node name="GravityWell" type="Area2D" parent="."]
+position = Vector2(0, 0)
+script = ExtResource("15_well")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GravityWell"]
+shape = SubResource("CircleShape2D_well")
+
 [node name="Player" type="CharacterBody2D" parent="."]
 z_index = 1
-position = Vector2(0, -220)
+position = Vector2(600, 0)
 script = ExtResource("2_player")
 rotating_mode = true
 rot_feet_to_core = true
 start_in_rot = true
+safe_ring_radius = 0.0
+radial_accel = 110.0
+tang_accel = 60.0
+gravity_accel = 200.0
+core_gravity_enabled = true
 speed = 60.0
 jump_velocity = 300.0
 jump_gravity = 200.0
@@ -74,66 +88,209 @@ shape = SubResource("CircleShape2D_player")
 position_smoothing_enabled = true
 position_smoothing_speed = 8.0
 
-[node name="StartRing" type="StaticBody2D" parent="."]
-position = Vector2(0, -220)
+[node name="OrbitTrack" type="Node2D" parent="."]
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="StartRing"]
-shape = SubResource("RectangleShape2D_platStart")
+[node name="Seg0" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(600, 0)
+rotation = 1.5707963
 
-[node name="Poly" type="Polygon2D" parent="StartRing"]
-color = Color(0.45, 0.45, 0.5, 1)
-polygon = PackedVector2Array(-150, -15, 150, -15, 150, 15, -150, 15)
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg0"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
 
-[node name="MidRing" type="StaticBody2D" parent="."]
-position = Vector2(0, -340)
+[node name="Seg1" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(520, 300)
+rotation = 2.0943951
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="MidRing"]
-shape = SubResource("RectangleShape2D_platMid")
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg1"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
 
-[node name="Poly" type="Polygon2D" parent="MidRing"]
-color = Color(0.48, 0.48, 0.53, 1)
-polygon = PackedVector2Array(-180, -15, 180, -15, 180, 15, -180, 15)
+[node name="Seg2" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(300, 520)
+rotation = 2.6179939
 
-[node name="OuterRing" type="StaticBody2D" parent="."]
-position = Vector2(0, -470)
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg2"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="OuterRing"]
-shape = SubResource("RectangleShape2D_platOuter")
+[node name="Seg3" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(0, 600)
+rotation = 3.1415927
 
-[node name="Poly" type="Polygon2D" parent="OuterRing"]
-color = Color(0.5, 0.5, 0.55, 1)
-polygon = PackedVector2Array(-200, -15, 200, -15, 200, 15, -200, 15)
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg3"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg4" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(-300, 520)
+rotation = 3.6651914
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg4"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg5" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(-520, 300)
+rotation = 4.1887902
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg5"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg6" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(-600, 0)
+rotation = 4.7123890
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg6"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg7" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(-520, -300)
+rotation = 5.2359878
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg7"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg8" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(-300, -520)
+rotation = 5.7595865
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg8"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg9" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(0, -600)
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg9"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg10" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(300, -520)
+rotation = 0.5235988
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg10"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="Seg11" type="StaticBody2D" parent="OrbitTrack"]
+position = Vector2(520, -300)
+rotation = 1.0471976
+
+[node name="Poly" type="Polygon2D" parent="OrbitTrack/Seg11"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.9)
+polygon = PackedVector2Array(-65, -15, 65, -15, 65, 15, -65, 15)
+
+[node name="StoryTrigger_0" type="Area2D" parent="."]
+position = Vector2(600, 0)
+script = ExtResource("14_story")
+page_number = 9
+require_eta = 0.3
+hint_fail = "【系统】：需要 η=0.3（Z 消耗尘埃变轻）才能读取该残影。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StoryTrigger_0"]
+shape = SubResource("CircleShape2D_storyTrig")
+
+[node name="Marker_10" type="Node2D" parent="."]
+position = Vector2(0, 450)
+
+[node name="Poly" type="Polygon2D" parent="Marker_10"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.6)
+polygon = PackedVector2Array(-65, -8, 65, -8, 65, 8, -65, 8)
+
+[node name="StoryTrigger_1" type="Area2D" parent="."]
+position = Vector2(0, 450)
+script = ExtResource("14_story")
+page_number = 10
+require_eta = 1.0
+hint_fail = "【系统】：需要 η=1.0（初始）才能读取该残影。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StoryTrigger_1"]
+shape = SubResource("CircleShape2D_storyTrig")
+
+[node name="Marker_11" type="Node2D" parent="."]
+position = Vector2(-300, 0)
+
+[node name="Poly" type="Polygon2D" parent="Marker_11"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.6)
+polygon = PackedVector2Array(-65, -8, 65, -8, 65, 8, -65, 8)
+
+[node name="StoryTrigger_2" type="Area2D" parent="."]
+position = Vector2(-300, 0)
+script = ExtResource("14_story")
+page_number = 11
+require_eta = 1.7
+hint_fail = "【系统】：需要 η=1.7（Q 消耗尘埃变重）才能读取该残影。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StoryTrigger_2"]
+shape = SubResource("CircleShape2D_storyTrig")
+
+[node name="Marker_12" type="Node2D" parent="."]
+position = Vector2(0, -180)
+
+[node name="Poly" type="Polygon2D" parent="Marker_12"]
+metadata/no_rot_fade = true
+color = Color(0.4, 0.55, 0.7, 0.6)
+polygon = PackedVector2Array(-65, -8, 65, -8, 65, 8, -65, 8)
+
+[node name="StoryTrigger_3" type="Area2D" parent="."]
+position = Vector2(0, -180)
+script = ExtResource("14_story")
+page_number = 12
+require_eta = 2.5
+hint_fail = "【系统】：需要 η=2.5（Q 消耗尘埃变重）才能读取该残影。"
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="StoryTrigger_3"]
+shape = SubResource("CircleShape2D_storyTrig")
 
 [node name="Dust1" type="Area2D" parent="."]
-position = Vector2(120, -260)
+position = Vector2(600, 100)
 script = ExtResource("4_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust1"]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Dust2" type="Area2D" parent="."]
-position = Vector2(-140, -300)
+position = Vector2(0, 400)
 script = ExtResource("4_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust2"]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Dust3" type="Area2D" parent="."]
-position = Vector2(260, -380)
+position = Vector2(-300, 60)
 script = ExtResource("4_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust3"]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Dust4" type="Area2D" parent="."]
-position = Vector2(-260, -420)
+position = Vector2(0, -100)
 script = ExtResource("4_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust4"]
 shape = SubResource("CircleShape2D_dust")
 
 [node name="Dust5" type="Area2D" parent="."]
-position = Vector2(0, -455)
+position = Vector2(-150, 350)
 script = ExtResource("4_dust")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Dust5"]
@@ -150,13 +307,6 @@ script = ExtResource("10_hidden")
 [node name="Hidden3" type="StaticBody2D" parent="."]
 position = Vector2(0, -500)
 script = ExtResource("10_hidden")
-
-[node name="VictoryTrigger" type="Area2D" parent="."]
-position = Vector2(0, -455)
-script = ExtResource("5_victory")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="VictoryTrigger"]
-shape = SubResource("RectangleShape2D_goal")
 
 [node name="GrimVignette" type="CanvasLayer" parent="."]
 layer = 40

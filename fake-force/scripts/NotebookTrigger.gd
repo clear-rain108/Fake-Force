@@ -1,6 +1,6 @@
 extends Area2D
-## 记事本解锁触发区：玩家进入时解锁前 N 页剧情碎片
-## 触发方式为"区域进入事件"（v3.0 §5.1 约束4 允许），保证叙事推进稳定。
+## 记事本解锁触发区：玩家进入时**只**解锁本处对应的第 unlock_count 页（1-based），
+## 不连带解锁前面的页。触发方式为"区域进入事件"（v3.0 §5.1 约束4 允许）。
 
 @export var unlock_count : int = 3
 
@@ -17,5 +17,5 @@ func _on_body_entered(body: Node2D) -> void:
 	if body.is_in_group("Player"):
 		_triggered = true
 		var nb := get_tree().get_first_node_in_group("Notebook")
-		if nb:
-			nb.unlock_pages(unlock_count)
+		if nb and nb.has_method("unlock_page_only"):
+			nb.unlock_page_only(unlock_count)   # 只解锁本处对应页（不连带前面的页）

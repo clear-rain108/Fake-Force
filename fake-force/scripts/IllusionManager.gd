@@ -27,7 +27,9 @@ var vignette_g_ref : float = 1.5
 
 var zone_count : int = 0           # 已进入的不同幻觉区域数（阶段2 记事本第3页判定）
 var _zones_seen : Dictionary = {}  # zone instance_id → true
-var notebook_unlocked : int = 0    # 记事本已解锁页数（跨场景持久）
+var notebook_unlocked : int = 0    # 记事本已解锁页数（跨场景持久；各页独立解锁）
+var notebook_unlocked_mask : int = 0  # 记事本逐页解锁位掩码（bit i = 第 i+1 页已解锁）
+var notebook_read_mask : int = 0      # 记事本逐页已读位掩码（bit i = 第 i+1 页已读；跨场景/重载持久）
 var skip_opening : bool = false    # 重开游戏时跳过开场动画（非法访问重启等一次性标志）
 
 

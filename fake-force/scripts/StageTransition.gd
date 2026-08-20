@@ -17,8 +17,8 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	_triggered = true
 	var nb := get_tree().get_first_node_in_group("Notebook")
-	if nb and nb.has_method("unlock_pages"):
-		nb.unlock_pages(unlock_page)
+	if nb and nb.has_method("unlock_page_only"):
+		nb.unlock_page_only(unlock_page)   # 只解锁本处对应页（不连带前面的页）
 	if not hint.is_empty():
 		var hud := get_tree().get_first_node_in_group("HUD")
 		if hud and hud.has_method("show_message"):

@@ -39,9 +39,14 @@ func _process(delta: float) -> void:
 		_timer += delta
 		if _timer >= CHECK_TIME:
 			var nb := get_tree().get_first_node_in_group("Notebook")
-			var unlocked : int = int(nb.get("unlocked")) if nb else IllusionManager.notebook_unlocked
-			var need : int = int(nb.get("pages").size()) if nb else 8   # 8 页（第7段剧情拆2页）
-			if unlocked >= need:
+			# 迷宫出口检查：仅需迷宫剧情（第4~8页）全部解锁。
+			# 第1~3页在走廊/旋转环廊已收集；第9~12页属阶段3 环形轨道剧情，与迷宫出口无关。
+			var complete : bool = false
+			if nb and nb.has_method("are_pages_unlocked"):
+				complete = nb.are_pages_unlocked([4, 5, 6, 7, 8])
+			else:
+				complete = IllusionManager.notebook_unlocked >= 8
+			if complete:
 				_open_exit()
 			else:
 				_start_illegal()

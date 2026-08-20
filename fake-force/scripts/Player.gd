@@ -24,6 +24,8 @@ extends CharacterBody2D
 @export var start_in_rot : bool = false    # 开局即已在旋转参考系（已同步）
 @export var radial_accel : float = 60.0    # W/S 径向推力（向心/离心）
 @export var tang_accel : float = 60.0      # A/D 切向推力
+@export var gravity_accel : float = 280.0  # 核心引力强度：指向核心，大小 gravity_accel×(600/r) 衰减（r=600 轨道处=280）
+@export var core_gravity_enabled : bool = false  # 核心引力仅阶段3（BlackHole）启用；其他关卡保持原样
 @export var sync_radius : float = 30.0     # 同步判定阈值（相对速度）
 @export var safe_ring_radius : float = 0.0 # 安全环半径（0=不启用）
 @export var inertia_scale : float = 0.5    # 旋转系惯性力缩放（离心+科里奥利；调小=更轻手感：G/红箭/幻灵/星空同步变弱，不影响玩家实际受力与轨道）
@@ -41,6 +43,7 @@ var rot_sync_lock : float = 0.0            # 同步后拒绝输入计时
 var _switching : bool = false              # 切换洞察中（无时间限制）
 var _last_insight_in_rot : bool = false
 var _last_in_rot_range : bool = false      # 上一帧是否处于旋转核心影响范围（进入提示前沿检测）
+var _ending_triggered : bool = false       # 结局演出是否已触发（防重复，r<30 靠近核心时）
 var rot_switch_count : int = 0              # 累计完成旋转参考系同步次数（记事本第4页判定）
 var _prev_insight : bool = false           # 上一帧洞察状态（切换扫频音前沿检测）
 
@@ -114,6 +117,20 @@ func setup_rotating(core: Node2D) -> void:
 		_set_platform_visibility(true)  # 开局即在旋转系：平台隐身
 
 
+## 切换"脚指向核心"视角模式（Stage3 轨道入口/出口触发器调用）：
+## 跳上轨道（OrbitEntryTrigger）→ true（脚指向核心）；跳下轨道（OrbitExitTrigger）→ false（立即切回横板视角）。
+## 仅切换视角姿态，不改变物理参考系。
+func set_feet_to_core(enable: bool) -> void:
+	rot_feet_to_core = enable
+	if not enable:
+		# 立即复位摄像机旋转（切回横板视角）
+		_rot_vis_rot = 0.0
+		_rot_vis_cam = 0.0
+		if is_instance_valid(_rot_camera):
+			_rot_camera.rotation = 0.0
+			_rot_camera.zoom = Vector2(1.0, 1.0)
+
+
 func _ready() -> void:
 	add_to_group("IllusionGroup")
 	add_to_group("Player")
@@ -184,14 +201,20 @@ func _rotating_physics(delta: float) -> void:
 	var a_cor : Vector2 = Vector2(2.0 * omega * v_rel.y, -2.0 * omega * v_rel.x)
 	var a_inertia : Vector2 = (a_cent + a_cor) * inertia_scale
 	IllusionManager.set_rot_inertia(a_inertia)
+	# 核心引力：指向核心（-r_hat），大小 gravity_accel×(600/r) 随距离衰减。
+	# 仅阶段3（core_gravity_enabled）且旋转参考系内生效；r≥influence_radius 或 r≤120（核心边缘/GravityWell 区）时无引力，
+	# 保证玩家靠近黑洞后仍可自由操作/逃离，不会被巨大引力压住。
+	var gravity_force : Vector2 = Vector2.ZERO
+	if core_gravity_enabled and r > 120.0 and r < float(core_ref.influence_radius):
+		gravity_force = -r_hat * gravity_accel * (600.0 / r)
 	# 绝对加速度：
-	# - 切换中：无向心力 → 输入直接作用（直线/惯性，旋转参考系中表现为"被甩"）
-	# - 已同步：向心加速度 -ω²R（圆盘提供）维持圆周运动 → 无输入也随盘转；输入叠加
+	# - 切换中：无向心力 → 输入+引力直接作用（直线/惯性，旋转参考系中表现为"被甩"）
+	# - 已同步：向心加速度 -ω²R（圆盘提供）维持圆周运动 → 无输入也随盘转；输入+引力叠加
 	var a_abs : Vector2
 	if rot_state == ROT_SWITCHING:
-		a_abs = a_input
+		a_abs = a_input + gravity_force
 	else:  # ROT_SYNCED
-		a_abs = a_input - omega * omega * R
+		a_abs = a_input - omega * omega * R + gravity_force
 		# 安全环：额外恢复力（稳定在安全环半径）
 		if safe_ring_radius > 0.0:
 			a_abs += -r_hat * (r - safe_ring_radius) * 3.0
@@ -222,6 +245,18 @@ func _rotating_physics(delta: float) -> void:
 	# 脱离圆盘
 	if r > core_ref.influence_radius:
 		_exit_rotating()
+	# 结局触发：靠近核心（r<30，旋转参考系内）且剧情（第9~12页）全部已读 → 启动结局演出并禁用玩家输入。
+	# 未读全时即使靠近核心也不触发，避免玩家被永久禁用物理。
+	if rot_state != ROT_NONE and r < 30.0 and not _ending_triggered:
+		var nb := get_tree().get_first_node_in_group("Notebook")
+		var story_done : bool = nb != null and nb.has_method("are_pages_read") \
+				and nb.are_pages_read([9, 10, 11, 12])
+		if story_done:
+			_ending_triggered = true
+			set_physics_process(false)   # 禁用玩家输入/物理（结局演出接管）
+			var ending := get_tree().get_first_node_in_group("Ending")
+			if ending and ending.has_method("start_ending"):
+				ending.start_ending()
 
 
 func _process(delta: float) -> void:
@@ -470,7 +505,8 @@ func _collect_polys(n: Node) -> void:
 	for c in n.get_children():
 		if c is StaticBody2D:
 			for child in c.get_children():
-				if child is Polygon2D:
+				# 标记 no_rot_fade 的平台（如 Stage3 环形轨道）不随旋转参考系隐身
+				if child is Polygon2D and not child.get_meta("no_rot_fade", false):
 					_platform_polys.append(child)
 		_collect_polys(c)
 

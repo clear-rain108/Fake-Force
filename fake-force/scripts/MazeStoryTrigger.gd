@@ -1,19 +1,25 @@
 extends Area2D
 ## 迷宫剧情触发区（阶段2 五层塔 L2~L5）：
-## 玩家进入触发区 → 自动解锁该层记事本碎片（无需按键）；
-## 按 F 阅读（交由记事本自身处理）；按 X 改变该层幻觉方向。
-## 操作提示已写入剧情第 4 页。
+## 剧情碎片解锁已改为"严格判定、只在存档点触发"（见 Checkpoint.unlock_pages_only）；
+## 本触发区仅保留交互：按 X 改变该层幻觉方向（按 F 阅读由记事本自身处理）。
 
-@export var page_number : int = 4              # 解锁的记事本页号（4~8）
+@export var page_number : int = 4              # 保留兼容（不再自动解锁；对应层剧情由存档点解锁）
 @export var zone_path : NodePath = NodePath()  # 对应 IllusionZone（X 改变该层方向）
 @export var new_direction : Vector2 = Vector2.DOWN
 
 var _in_zone : bool = false
+var _flipped : bool = false                # X 是否已把该层方向切到 new_direction
+var _original_directions : Array = []      # 该层原始参考系加速方向（按 X 可切回）
 
 
 func _ready() -> void:
 	body_entered.connect(_on_body_entered)
 	body_exited.connect(_on_body_exited)
+	var zone := get_node_or_null(zone_path)
+	if zone:
+		var dirs = zone.get("field_directions")
+		if dirs is Array:
+			_original_directions = dirs.duplicate()
 
 
 func _on_body_entered(body: Node2D) -> void:
@@ -21,11 +27,8 @@ func _on_body_entered(body: Node2D) -> void:
 		return
 	_in_zone = true
 	var nb := get_tree().get_first_node_in_group("Notebook")
-	if nb:
-		if nb.has_method("unlock_page"):
-			nb.unlock_page(page_number)   # 到达自动解锁（幂等）
-		if nb.has_method("show_floating_text"):
-			nb.show_floating_text("📖 按 F 阅读档案碎片 ｜ 按 X 改变幻觉方向", 6.0)
+	if nb and nb.has_method("show_floating_text"):
+		nb.show_floating_text("按 X 改变幻觉方向", 6.0)
 
 
 func _on_body_exited(body: Node2D) -> void:
@@ -49,16 +52,21 @@ func _input(event: InputEvent) -> void:
 
 
 func _change_direction() -> void:
+	# 双向切换：每按一次 X，在"原方向"与"竖向方向(new_direction)"之间交替
+	_flipped = not _flipped
+	var dirs : Array = [new_direction] if _flipped else _original_directions
 	var zone := get_node_or_null(zone_path)
 	if zone:
-		zone.set("field_directions", [new_direction])
+		zone.set("field_directions", dirs)
 		var field = zone.get("_field")
 		if field:
-			field.directions = [new_direction]
+			field.directions = dirs
 			field.reset()
 	var hud := get_tree().get_first_node_in_group("HUD")
 	if hud and hud.has_method("show_system_message"):
-		hud.show_system_message("【系统】：已改变该层幻觉方向 → " + _dir_text(new_direction))
+		var d : Vector2 = new_direction if _flipped else \
+				(_original_directions[0] as Vector2 if not _original_directions.is_empty() else Vector2.ZERO)
+		hud.show_system_message("【系统】：已改变该层幻觉方向 → " + _dir_text(d))
 
 
 ## 方向文字：幻觉力 = -参考系加速方向
